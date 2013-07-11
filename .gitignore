@@ -1,6 +1,7 @@
 *.py[cod]
 
 env
+.DS_Store
 
 # C extensions
 *.so
