@@ -3,8 +3,8 @@ Frozen Pie
 
 Can you publish a blog with markdown and YAML, as a single index.html ?
 
-python pie.py debug
-python pie.py for static site generation
-See config.py
+Prepare the crust, choose a pan, add ingredients, and *bake*.
+
+Coming soon: Recipes.
 
 License: GPLv3
