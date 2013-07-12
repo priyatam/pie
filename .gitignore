@@ -1,6 +1,10 @@
 *.py[cod]
 
 env
+build
+*.swp
+*.swo
+
 
 # C extensions
 *.so
