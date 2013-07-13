@@ -1,28 +1,88 @@
 #!/usr/bin/env python
-
 """
-# bake.py
-python bake.py layout.mustache page.md
+Usage:
+python bake.py > index.html
 
-## Process
-1. Prepare the Crust by reading Markdown document and YAML data
-2. Choose a Pan by adding the Crust to a Mustache Template.
-3. Add ingredients by choosing a stylesheet (TODO)
-4. Pick a Recipe. A recipe is nothing but a Mustache lambda (TODO)
-5. Bake. This generates the final index file with wrapped html, js, css includes etc.
+Algo:
+Read config.yaml
+For each post, generate complete html by applying templates
+Generate index.html with included CSS
 
 """
 
 from __future__ import with_statement
-import sys, contextlib
+import os, time
 import yaml, markdown as md, pystache
-import xml.etree.ElementTree as ET
+import json
 
-def prepare_crust(filename):
+posts = []
+config = None
+
+class Config(object):
+    def __init__(self, yaml_data):
+        self.yaml_data = yaml_data
+
+    def post_template(self):
+        template_file = self.yaml_data.get("post_template")
+        filename = "templates/" + template_file
+        with open(filename, "r") as filename_fin:
+            return filename_fin.read()
+
+    def index_template(self):
+        template_file = self.yaml_data.get("index_template")
+        filename = "templates/" + template_file
+        with open(filename, "r") as filename_fin:
+            return filename_fin.read()
+
+
+    def style_sheet(self):
+        css_file = self.yaml_data.get("theme")
+        filename = "static/" + css_file
+        with open(filename, "r") as filename_fin:
+            return filename_fin.read()
+
+
+    def script(self):
+        script_file = self.yaml_data.get("script")
+        filename = "static/" + script_file
+        with open(filename, "r") as filename_fin:
+            return filename_fin.read()
+
+
+def Post(front_matter, raw_content, name, ctime, mtime):
+        data = {
+            "body" : raw_content,
+            "name" : name,
+            "ctime" : ctime,
+            "mtime" : mtime
+            }
+        data.update(front_matter)
+        return data
+
+
+def read_config():
+    with open("config.yaml", "r") as content_file:
+        text = content_file.read()
+        return yaml.load(text)
+
+
+def prepare_crust():
     ''' '''
-    with contextlib.closing(open(filename)) as filename_fin:
-        text, data = __read(filename_fin)
-        return choose_pan(markstache(text, data), data)
+    global config
+    global posts
+    config_data = read_config()
+    config = Config(config_data)
+
+    for filename in os.listdir("posts"):
+        filename = "posts/" + filename
+        with open(filename, "r") as filename_fin:
+            text, data = __read(filename_fin)
+            ctime = time.ctime(os.path.getmtime(filename))
+            mtime = time.ctime(os.path.getctime(filename))
+            post = Post(data, text, filename, ctime, mtime)
+            shake_pan(post)
+            posts.append(post)
+
 
 def __read(port):
     ''' Splits file into a tuple of YAML and Markdown '''
@@ -33,58 +93,29 @@ def __read(port):
         return (parts[1], yaml.load(parts[0]))
 
 
-def markstache(template, data):
+def markstache(post):
     ''' Expands Mustache templates from local YAML data and renders Markdown as HTML  '''
-    return md.Markdown().convert(pystache.render(template, data))
+    post["html"] = md.Markdown().convert(pystache.render(config.post_template(), post))
+    return post
 
 
-def choose_pan(body, context):
+def shake_pan(post):
     ''' Export Crust to a Pan as {{ body }}.
         A Pan is a template in Markdown'''
-
-    doc = ET.fromstring('<html>%s</html>' % body)
-
-    top = list(doc)
-    take(top, context, 'h1', 'title')
-
-    context['body'] = ''.join(ET.tostring(e, 'utf-8') for e in top)
-
-    return context
+    return markstache(post)
 
 
-def take(elems, context, tag, name):
-    if not elems or elems[0].tag != tag:
-        raise RuntimeError('Expected %s' % tag)
-    context[name] = elems.pop(0).text
-    return context
-
-def page(layout, article):
-    ''' Combines the page with template '''
-
-    with contextlib.closing(open(layout)) as layout_fin:
-        text, data = __read(layout_fin)
-        html = md.Markdown().convert(text)
-        # FIXME: header and footer mustache are not being applied
-        return pystache.render(html, prepare_crust(article))
-
-
-def add_ingredients(style):
-    ''' Adds stylesheet
-        Final output should be
-        bake.py layout.mustache page.md style.css
-        '''
-
-    print 'TODO' + page
-
-def bake(page):
-    ''' Wrap the final page in Html5, CSS, JSS '''
-    print 'TODO' + page
-
-
+def bake(style_sheet, script):
+    ''' Wrap the final page in Html5, CSS, JS, POSTS '''
+    print pystache.render(config.index_template(), { "style_sheet" : style_sheet, "script" : script, "json_data" : json.dumps(posts) })
 ## Main ##
 
-def main(layout, article):
-    print page(layout, article)
+def main():
+    prepare_crust()
+    # get ingredients
+    style_sheet = config.style_sheet()
+    script = config.script()
+    bake(style_sheet, script)
 
 if __name__ == '__main__':
-    main(*sys.argv[1:])
+    main()

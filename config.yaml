@@ -1,0 +1,4 @@
+theme: style.css
+script: metadata_render.js
+post_template: post.mustache
+index_template: index.mustache

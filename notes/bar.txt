@@ -1,8 +1,0 @@
----
-title: "TODO"
-author: harsha
-tags: dev
-copyright: CC BY-NC
----
-
-* Bookmarks
