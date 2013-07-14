@@ -22,6 +22,9 @@ class Config(object):
     def __init__(self, yaml_data):
         self.yaml_data = yaml_data
 
+    def relative_path(self):
+        return self.yaml_data.get("relative_path")
+
     def post_template(self):
         template_file = self.yaml_data.get("post_template")
         filename = "templates/" + template_file
@@ -40,7 +43,6 @@ class Config(object):
         filename = "static/" + css_file
         with open(filename, "r") as filename_fin:
             return filename_fin.read()
-
 
     def script(self):
         script_file = self.yaml_data.get("script")
@@ -75,6 +77,7 @@ def prepare_crust():
 
     for filename in os.listdir("posts"):
         filename = "posts/" + filename
+        # uppercase and lowercase letters, decimal digits, hyphen, period, underscore, and tilde
         with open(filename, "r") as filename_fin:
             text, data = __read(filename_fin)
             ctime = time.ctime(os.path.getmtime(filename))
@@ -95,7 +98,9 @@ def __read(port):
 
 def markstache(post):
     ''' Expands Mustache templates from local YAML data and renders Markdown as HTML  '''
-    post["html"] = md.Markdown().convert(pystache.render(config.post_template(), post))
+    md_html = md.markdown(post['body'])
+    pystache_render = pystache.render(config.post_template(), { "body": md_html })
+    post["html"] = pystache_render
     return post
 
 
@@ -107,7 +112,7 @@ def shake_pan(post):
 
 def bake(style_sheet, script):
     ''' Wrap the final page in Html5, CSS, JS, POSTS '''
-    print pystache.render(config.index_template(), { "style_sheet" : style_sheet, "script" : script, "json_data" : json.dumps(posts) })
+    print pystache.render(config.index_template(), { "style_sheet" : style_sheet, "script" : script, "json_data" : json.dumps(posts), "relative_path": config.relative_path() })
 ## Main ##
 
 def main():
