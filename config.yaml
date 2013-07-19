@@ -1,5 +1,12 @@
-theme: screen.css
-script: index.js
-post_template: post.mustache
-index_template: index.mustache
-relative_path: /index.html
+templates: 
+  - post.mustache
+  - index.mustache
+
+styles:
+  - index.css
+
+scripts:
+  - index.js
+
+system:
+  - /index.html
