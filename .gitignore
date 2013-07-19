@@ -5,7 +5,8 @@ env
 build
 *.swp
 *.swo
-
+.idea
+*.iml
 
 # C extensions
 *.so
