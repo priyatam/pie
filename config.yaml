@@ -8,5 +8,5 @@ styles:
 scripts:
   - index.js
 
-system:
-  - /index.html
+# System Config
+relative_path: /index.html
