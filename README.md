@@ -1,7 +1,7 @@
 Frozen Pie
 ==========
 
-Can you publish a blog with markdown and YAML, as a single index.html ?
+Can you publish a site with Markdown, YAML, Mustache?
 
 make_crust
 > mix flour, egg, water together
