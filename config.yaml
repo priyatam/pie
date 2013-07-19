@@ -1,5 +1,5 @@
 theme: screen.css
-script: metadata_render.js
+script: index.js
 post_template: post.mustache
 index_template: index.mustache
 relative_path: /index.html
