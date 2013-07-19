@@ -1,5 +1,7 @@
 ---
 title: Introduction
+type: page
+category: tech
 author: Sreeharsha Mudivarti
 ---
 
@@ -8,7 +10,7 @@ author: Sreeharsha Mudivarti
 It's a *single file* static generator with all the bells and whistles.  
 Write all your md posts in posts/. Your file name becomes the url.  
 
-./bake.py > index.html  
+./bake.py
 
 Copy the single file, you are done.  
 
