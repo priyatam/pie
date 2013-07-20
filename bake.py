@@ -28,15 +28,14 @@ def load_config():
         return yaml.load(fin.read())
 
 
-def load_content(config):
-    """Reads templates, scripts, styles, posts and stores them as dictionaries"""
+def load_layout(config):
+    """Reads templates, scripts, styles and stores them as dictionaries"""
+    
     content = {}
-
     # Group these by type in config
     templates = dict(config, 'templates')
     styles = dict(config, 'styles')
     scripts = dict(config, 'scripts')
-
     # Merge them
     content.update(templates)
     content.update(styles)
@@ -48,8 +47,7 @@ def load_content(config):
 def load_posts(config):
     """Creates a dictionary of Post meta data, including body as 'raw content'"""
     
-    posts = []
-    
+    posts = []    
     for filename in os.listdir("posts"):
         yaml_data, md_data = read_markdown('posts', filename)
         filename = 'posts' + os.sep + filename
@@ -67,7 +65,7 @@ def load_posts(config):
     
 def dict(config, key):
     """Creates a dictionary of key->file (raw content)"""
-    return {x: read(key, x) for x in config[key]}
+    return {filename: read(key, filename) for filename in config[key]}
 
 
 def read(subdir, filename):
@@ -90,7 +88,7 @@ def main():
     """Let's cook an Apple Pie"""
 
     config = load_config()
-    content = load_content(config)
+    content = load_layout(config)
     posts = load_post(config)
     print posts
 
