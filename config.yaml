@@ -1,4 +1,5 @@
-templates: 
+title: Some thoughts
+templates:
   - post.mustache
   - index.mustache
 

@@ -15,11 +15,15 @@ Write all your md posts in posts/. Your file name becomes the url.
 
 Copy the single file, you are done.  
 
-## How can a single file show multiple posts in an interactive manner ?  
+## How can a single file show multiple posts in an interactive manner ?--
 Sammy.js  
 
+## Bookmarkable, Back button ?
+Yes  
+
 ## What about styles ?  
-https://github.com/jasonm23/markdown-css-themes/  
+Pick from <https://github.com/jasonm23/markdown-css-themes/>--
+and see the config--
 
 ## What about templates ?  
 See the mustache templates in templates/  

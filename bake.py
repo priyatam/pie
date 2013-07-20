@@ -10,9 +10,15 @@ Generate index.html with included CSS, JS
 
 """
 
-import os, time
-import yaml, markdown as md, pystache
+import os
+import re
+import time
+import yaml
+import markdown as md
+import pystache
 import json
+from datetime import datetime
+
 
 def load_config():
     """Loads configuration from config.yaml"""
@@ -24,33 +30,42 @@ def load_posts(config):
     """Creates a dictionary of Post meta data, including body as 'raw content'"""
     posts = []
     for fname in os.listdir("posts"):
-        yaml_data, md_data = read_markdown('posts', fname)
-        fname = 'posts' + os.sep + fname
-        post = {
-            "name": fname,
-            "body": md_data, # raw, unprocessed md
-            "created_date": time.ctime(os.path.getmtime(fname)),
-            "modified_date": time.ctime(os.path.getctime(fname))
-        }
-        post.update(yaml_data)  # Merge Yaml data
-        posts.append(post)
+        if re.match(r'[A-Za-z\.0-9-_~]+', fname):
+            yaml_data, md_data = read_markdown('posts', fname)
+            fname = 'posts' + os.sep + fname
+            post = {
+                "name": fname,
+                "body": md_data,  # raw, unprocessed md
+                "created_date": datetime.strptime(time.ctime(os.path.getmtime(fname)), "%a %b %d %H:%M:%S %Y").strftime("%m-%d-%y"),
+                "modified_date": datetime.strptime(time.ctime(os.path.getctime(fname)), "%a %b %d %H:%M:%S %Y").strftime("%m-%d-%y")
+            }
+            post.update(yaml_data)  # Merge Yaml data
+            posts.append(post)
+        else:
+            print """File name is allowed to have uppercase and lowercase letters,
+                                                  decimal digits,
+                                                  hyphen,
+                                                  period,
+                                                  underscore,
+                                                  and tilde only."""
+            exit(1)
 
     return posts
 
 
 def load_layout(config):
     """Reads templates, scripts, styles and stores them as dictionaries"""
-    content = {}
+    metacontent = {}
     # Group these by type in config
     templates = rawcontent_by_fname(config, 'templates')
     styles = rawcontent_by_fname(config, 'styles')
     scripts = rawcontent_by_fname(config, 'scripts')
     # Merge them
-    content.update(templates)
-    content.update(styles)
-    content.update(scripts)
+    metacontent.update(templates)
+    metacontent.update(styles)
+    metacontent.update(scripts)
 
-    return content
+    return metacontent
 
 
 def rawcontent_by_fname(config, key):
@@ -76,29 +91,30 @@ def read_markdown(subdir, fname):
 
 def markstache(post, template):
     """Expands Mustache templates from local YAML data and renders Markdown as HTML"""
-    raw_md = md.markdown(post['body'])
+    raw_md = md.markdown(post['body'].decode("utf-8"))
     return pystache.render(template, {"body": raw_md})
 
 
-def bake(config, content, posts):
+def bake(config, metacontent, posts):
     """ Parse everything. Wrap results in a final page in Html5, CSS, JS, POSTS """
     # Stache
     for post in posts:
-        post['html'] = markstache(post, content[post['template']])
-    
+        post['html'] = markstache(post, metacontent[post['template']])  # every post can have its template
+
     # Merge into one
-    output = pystache.render(content['index.mustache'],
-                             {"style_sheet": content['index.css'], "script": content['index.js'],
-                              "json_data": json.dumps(posts), "relative_path": config['relative_path']})
-    print output
+    content = pystache.render(metacontent['index.mustache'],
+                              {"style_sheet": metacontent['index.css'], "script": metacontent['index.js'],
+                               "json_data": json.dumps(posts), "relative_path": config['relative_path'],
+                               "title": config['title']})
+    print content
 
 
 def main():
     """Let's cook an Apple Pie"""
     config = load_config()
-    content = load_layout(config)
+    metacontent = load_layout(config)
     posts = load_posts(config)
-    bake(config, content, posts)
+    bake(config, metacontent, posts)
 
 
 if __name__ == '__main__':
