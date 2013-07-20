@@ -14,45 +14,71 @@ import os, time
 import yaml, markdown as md, pystache
 import json
 
+
+def markstache(template, post):
+    """Expands Mustache templates from local YAML data and renders Markdown as HTML"""
+    raw_md = md.markdown(post['body'])
+    post["html"] = pystache.render(template, {"body": raw_md})
+    return post
+
+
 def load_config():
-    """Loads configuration from config.yaml""" 
+    """Loads configuration from config.yaml"""
     with open("config.yaml", "r") as fin:
-        params = fin.read()
-        #templates = [ p for p in params .find('template') for  for p in params if p.find('template') is not -1 ]
-        
-        return yaml.load(params)
+        return yaml.load(fin.read())
+
 
 def load_content(config):
-    """Reads templates, scripts, styles and stores their raw content in dictionaries"""  
-    content = {}         
+    """Reads templates, scripts, styles, posts and stores them as dictionaries"""
+    content = {}
 
-    # Group by type in config
+    # Group these by type in config
     templates = dict(config, 'templates')
     styles = dict(config, 'styles')
     scripts = dict(config, 'scripts')
-    
-    # Merge dictionaries
+
+    # Merge them
     content.update(templates)
     content.update(styles)
     content.update(scripts)
-
+     
     return content
 
 
-def dict(config, key):
-    """Creates a dictionary of key->config[key] raw content"""
-    return {x: read(key, x) for x in config[key]}
+def load_posts(config):
+    """Creates a dictionary of Post meta data, including body as 'raw content'"""
     
+    posts = []
+    
+    for filename in os.listdir("posts"):
+        yaml_data, md_data = read_markdown('posts', filename)
+        filename = 'posts' + os.sep + filename
+        post = {
+            "name": filename,
+            "body": md_data, # raw, unprocessed md
+            "created_date": time.ctime(os.path.getmtime(filename)),
+            "modified_date": time.ctime(os.path.getctime(filename))
+        }     
+        post.update(yaml_data)  # Merge Yaml data
+        posts.append(post)        
+        
+    return posts
+    
+    
+def dict(config, key):
+    """Creates a dictionary of key->file (raw content)"""
+    return {x: read(key, x) for x in config[key]}
+
 
 def read(subdir, filename):
-        """Reads subdir/<filename> as raw content"""                              
-        with open(subdir + os.sep + filename, "r") as fin: 
-            return fin.read()    
+    """Reads subdir/<filename> as raw content"""
+    with open(subdir + os.sep + filename, "r") as fin:
+        return fin.read()
 
 
 def read_markdown(subdir, filename):
     """Splits Markdown file into a tuple of YAML and content"""
-    with open(subdir + os.sep + filename, "r") as fin:                
+    with open(subdir + os.sep + filename, "r") as fin:
         yaml_and_md = fin.read().split('\n---\n')
         if len(yaml_and_md) == 1:
             return {}, yaml_and_md[0]
@@ -61,19 +87,14 @@ def read_markdown(subdir, filename):
 
 
 def main():
-    """
-    Let's cook an Apple Pie.
-    """
+    """Let's cook an Apple Pie"""
 
     config = load_config()
-    print type(config)
-    print config    
-    
     content = load_content(config)
-    print type(content)
-    for i in content.keys():
-        print i
+    posts = load_post(config)
+    print posts
 
+    
 
 if __name__ == '__main__':
     main()

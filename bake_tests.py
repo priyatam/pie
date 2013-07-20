@@ -12,8 +12,8 @@ import bake
 class BakeTests(unittest.TestCase):
 
     def setUp(self):
-        """ """
-
+        self.config = {'templates': ['post.mustache', 'index.mustache'], 'scripts': ['index.js'], 'styles':['index.css'], 'relative_path': ['/index.html']}
+        
     def test_load_config(self):
         config = bake.load_config()
         self.assertEqual(types.DictType, type(config))
@@ -24,18 +24,22 @@ class BakeTests(unittest.TestCase):
         self.assertEqual('/index.html', config['relative_path'])
 
     def test_load_content(self):
-        config = {'templates': ['post.mustache', 'index.mustache'], 'scripts': ['index.js'], 'styles':['index.css'], 'relative_path': ['/index.html']}
-        content = bake.load_content(config)
+       
+        content = bake.load_content(self.config)
         self.assertEqual(types.DictType, type(content))
         for k, v in content.items(): 
-            self.assertIsNotNone(k in config.values())            
+            self.assertIsNotNone(k in self.config.values())            
             self.assertIsNotNone(v)            
        
     def test_read_markdown(self):
         yaml, post = bake.read_markdown('posts', 'page.md')             
         self.assertEqual(4, len(yaml))
         self.assertIsNotNone(post)
-        
+      
+    def test_load_posts(self):
+        posts = bake.load_posts(self.config)          
+        self.assertEqual(2, len(posts))
+        self.assertIsNotNone(posts[0]['body'])  
         
 if __name__ == '__main__':
     unittest.main()
