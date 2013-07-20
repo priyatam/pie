@@ -18,8 +18,7 @@ import json
 def markstache(template, post):
     """Expands Mustache templates from local YAML data and renders Markdown as HTML"""
     raw_md = md.markdown(post['body'])
-    post["html"] = pystache.render(template, {"body": raw_md})
-    return post
+    return pystache.render(template, {"body": raw_md})
 
 
 def load_config():
@@ -89,8 +88,9 @@ def main():
 
     config = load_config()
     content = load_layout(config)
-    posts = load_post(config)
-    print posts
+    posts = load_posts(config)
+    stache = markstache(content['post.mustache'], posts[0])
+    print stache
 
     
 
