@@ -30,7 +30,12 @@ class BakeTests(unittest.TestCase):
         for k, v in content.items(): 
             self.assertIsNotNone(k in config.values())            
             self.assertIsNotNone(v)            
-           
-    
+       
+    def test_read_markdown(self):
+        yaml, post = bake.read_markdown('posts', 'page.md')             
+        self.assertEqual(4, len(yaml))
+        self.assertIsNotNone(post)
+        
+        
 if __name__ == '__main__':
     unittest.main()

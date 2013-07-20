@@ -26,10 +26,12 @@ def load_content(config):
     """Reads templates, scripts, styles and stores their raw content in dictionaries"""  
     content = {}         
 
+    # Group by type in config
     templates = dict(config, 'templates')
     styles = dict(config, 'styles')
     scripts = dict(config, 'scripts')
     
+    # Merge dictionaries
     content.update(templates)
     content.update(styles)
     content.update(scripts)
@@ -46,6 +48,16 @@ def read(subdir, filename):
         """Reads subdir/<filename> as raw content"""                              
         with open(subdir + os.sep + filename, "r") as fin: 
             return fin.read()    
+
+
+def read_markdown(subdir, filename):
+    """Splits Markdown file into a tuple of YAML and content"""
+    with open(subdir + os.sep + filename, "r") as fin:                
+        yaml_and_md = fin.read().split('\n---\n')
+        if len(yaml_and_md) == 1:
+            return {}, yaml_and_md[0]
+        else:
+            return yaml.load(yaml_and_md[0]), yaml_and_md[1]
 
 
 def main():
