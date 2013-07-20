@@ -1,6 +1,7 @@
 ---
 title: Introduction
 type: page
+template: post.mustache
 category: tech
 author: Sreeharsha Mudivarti
 ---

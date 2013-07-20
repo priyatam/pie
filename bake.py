@@ -82,15 +82,20 @@ def read_markdown(subdir, filename):
         else:
             return yaml.load(yaml_and_md[0]), yaml_and_md[1]
 
-
+def make_crust(content, posts):
+    """Parse Markdown, YAML, Mustache"""
+    for post in posts:
+        post['html'] = markstache(post, content[post['template']]) 
+       
+    
 def main():
     """Let's cook an Apple Pie"""
 
     config = load_config()
     content = load_layout(config)
     posts = load_posts(config)
-    stache = markstache(content['post.mustache'], posts[0])
-    print stache
+    
+    make_crust(content, posts)
 
     
 

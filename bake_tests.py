@@ -32,7 +32,7 @@ class BakeTests(unittest.TestCase):
 
     def test_read_markdown(self):
         yaml, post = bake.read_markdown('posts', 'page.md')
-        self.assertEqual(4, len(yaml))
+        self.assertEqual(5, len(yaml))
         self.assertIsNotNone(post)
 
     def test_load_posts(self):

@@ -2,6 +2,7 @@
 title: Be the Change you wish to see
 type: blog
 category: tech
+template: post.mustache
 author: Priyatam Mudivarti
 ---
 
