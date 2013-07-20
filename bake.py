@@ -22,14 +22,45 @@ def load_config():
         
         return yaml.load(params)
 
+def load_content(config):
+    """Reads templates, scripts, styles and stores their raw content in dictionaries"""  
+    content = {}         
+
+    templates = dict(config, 'templates')
+    styles = dict(config, 'styles')
+    scripts = dict(config, 'scripts')
     
+    content.update(templates)
+    content.update(styles)
+    content.update(scripts)
+
+    return content
+
+
+def dict(config, key):
+    """Creates a dictionary of key->config[key] raw content"""
+    return {x: read(key, x) for x in config[key]}
+    
+
+def read(subdir, filename):
+        """Reads subdir/<filename> as raw content"""                              
+        with open(subdir + os.sep + filename, "r") as fin: 
+            return fin.read()    
+
+
 def main():
     """
     Let's cook an Apple Pie.
     """
 
     config = load_config()
+    print type(config)
     print config    
+    
+    content = load_content(config)
+    print type(content)
+    for i in content.keys():
+        print i
 
 
 if __name__ == '__main__':
