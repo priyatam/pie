@@ -14,7 +14,7 @@ class BakeTests(unittest.TestCase):
         self.config = {'templates': ['post.mustache', 'index.mustache'], 'scripts': ['index.js'],
                        'styles': ['index.css'], 'relative_path': ['/index.html']}
 
-    
+ 
     def test_load_config(self):
         config = bake.load_config()
         self.assertEqual(types.DictType, type(config))
@@ -34,7 +34,7 @@ class BakeTests(unittest.TestCase):
 
 
     def test_read_markdown(self):
-        yaml, post = bake.read_markdown('posts', 'page.md')
+        yaml, post = bake.read_markdown('posts', 'introduction.md')
         self.assertEqual(5, len(yaml))
         self.assertIsNotNone(post)
 

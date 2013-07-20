@@ -7,6 +7,7 @@ build
 *.swo
 .idea
 *.iml
+*.log
 
 # C extensions
 *.so

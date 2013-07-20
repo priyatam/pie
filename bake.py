@@ -36,8 +36,10 @@ def load_posts(config):
             post = {
                 "name": fname,
                 "body": md_data,  # raw, unprocessed md
-                "created_date": datetime.strptime(time.ctime(os.path.getmtime(fname)), "%a %b %d %H:%M:%S %Y").strftime("%m-%d-%y"),
-                "modified_date": datetime.strptime(time.ctime(os.path.getctime(fname)), "%a %b %d %H:%M:%S %Y").strftime("%m-%d-%y")
+                "created_date": datetime.strptime(time.ctime(os.path.getmtime(fname)),
+                                                  "%a %b %d %H:%M:%S %Y").strftime("%m-%d-%y"),
+                "modified_date": datetime.strptime(time.ctime(os.path.getctime(fname)),
+                                                   "%a %b %d %H:%M:%S %Y").strftime("%m-%d-%y")
             }
             post.update(yaml_data)  # Merge Yaml data
             posts.append(post)
@@ -101,9 +103,14 @@ def bake(config, metacontent, posts):
     for post in posts:
         post['html'] = markstache(post, metacontent[post['template']])  # every post can have its template
 
-    # Merge into one
+    style_sheets = [metacontent[key] for key in config['styles']]
+    style_sheet = "".join(style_sheets)
+
+    scripts = [metacontent[key] for key in config['scripts']]
+    script = "".join(scripts)
+
     content = pystache.render(metacontent['index.mustache'],
-                              {"style_sheet": metacontent['index.css'], "script": metacontent['index.js'],
+                              {"style_sheet": style_sheet, "script": script,
                                "json_data": json.dumps(posts), "relative_path": config['relative_path'],
                                "title": config['title']})
     print content
