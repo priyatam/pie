@@ -26,7 +26,7 @@ class BakeTests(unittest.TestCase):
 
 
     def test_load_layout(self):
-        content = bake.load_layout(self.config)
+        content = bake.load_metacontent(self.config)
         self.assertEqual(types.DictType, type(content))
         for k, v in content.items():
             self.assertIsNotNone(k in self.config.values())

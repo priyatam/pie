@@ -13,6 +13,8 @@ import os
 import sys
 import re
 import time
+from datetime import datetime
+import json
 import yaml
 import markdown as md
 import pystache
@@ -47,26 +49,19 @@ def load_posts(config):
             post = {
                 "name": fname,
                 "body": md_data,  # raw, unprocessed md
-                "created_date": datetime.strptime(time.ctime(os.path.getmtime(fname)),
-                                                  "%a %b %d %H:%M:%S %Y").strftime("%m-%d-%y"),
-                "modified_date": datetime.strptime(time.ctime(os.path.getctime(fname)),
-                                                   "%a %b %d %H:%M:%S %Y").strftime("%m-%d-%y")
+                "created_date": _format_date(fname, 'c'),
+                "modified_date": _format_date(fname, 'm')
             }
             post.update(yaml_data)  # Merge Yaml data
             posts.append(post)
         else:
-            print """File name is allowed to have uppercase and lowercase letters,
-                                                  decimal digits,
-                                                  hyphen,
-                                                  period,
-                                                  underscore,
-                                                  and tilde only."""
+            print """File name format: uppercase/lowercase letters, decimal digits, hyphen, period, underscore, and tilde only."""                     
             exit(1)
 
     return posts
 
 
-def load_layout(config):
+def load_metacontent(config):
     """Reads templates, scripts, styles and stores them as dictionaries"""
     metacontent = {}
     # Group these by type in config
@@ -100,13 +95,7 @@ def ppsass_by_fname(config, subdir):
 
 def rawcontent_by_fname(config, key):
     """Creates a dictionary of fname->raw_content, where raw_content is config(key)"""
-    return {fname: read(key, fname) for fname in config[key]}
-
-
-def read(subdir, fname):
-    """Reads subdir/<fname> as raw content"""
-    with open(subdir + os.sep + fname, "r") as fin:
-        return fin.read()
+    return {fname: _read(key, fname) for fname in config[key]}
 
 
 def read_markdown(subdir, fname):
@@ -144,10 +133,23 @@ def bake(config, metacontent, posts):
     print content
 
 
+def _format_date(fname, type):
+    """Returns a formatted fname.date"""
+    if type == 'c':
+        return datetime.strptime(time.ctime(os.path.getctime(fname)), "%a %b %d %H:%M:%S %Y").strftime("%m-%d-%y")
+    if type == 'm':
+        return datetime.strptime(time.ctime(os.path.getmtime(fname)), "%a %b %d %H:%M:%S %Y").strftime("%m-%d-%y") 
+    
+
+def _read(subdir, fname):
+    """Reads subdir/<fname> as raw content"""
+    with open(subdir + os.sep + fname, "r") as fin:
+        return fin.read()
+
 def main():
     """Let's cook an Apple Pie"""
     config = load_config()
-    metacontent = load_layout(config)
+    metacontent = load_metacontent(config)
     posts = load_posts(config)
     bake(config, metacontent, posts)
 
