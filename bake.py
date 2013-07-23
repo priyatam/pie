@@ -11,6 +11,7 @@ Generate index.html with included CSS, JS
 """
 
 import os
+import sys
 import re
 import time
 import yaml
@@ -19,10 +20,15 @@ import pystache
 import json
 from datetime import datetime
 
+if sys.argv > 1:
+    config_file_path = sys.argv[1]
+else:
+    config_file_path = "config.yaml"
+
 
 def load_config():
     """Loads configuration from config.yaml"""
-    with open("config.yaml", "r") as fin:
+    with open(config_file_path, "r") as fin:
         return yaml.load(fin.read())
 
 

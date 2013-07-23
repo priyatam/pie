@@ -1,5 +1,7 @@
 *.py[cod]
 
+index.html
+
 .DS_Store
 venv
 build

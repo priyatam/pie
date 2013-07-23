@@ -1,0 +1,13 @@
+title: Some thoughts
+templates:
+  - post.mustache
+  - index.mustache
+
+styles:
+  - index.css
+
+scripts:
+  - index.js
+
+# System Config
+relative_path: /frozen-pie/
