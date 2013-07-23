@@ -112,10 +112,13 @@ def _read_markdown(subdir, fname):
 
 
 def _markstache(post, template):
-    """Expands Mustache templates from local YAML data and renders Markdown as HTML"""
-    raw_md = md.markdown(post['body'].decode("utf-8"))
-    return pystache.render(template, {"body": raw_md})
-
+    """Expands Mustache templates from local YAML data and renders HTML"""
+    html_md = md.markdown(post['body'].decode("utf-8"))
+    _params = {}
+    _params.update(post)
+    _params.update({'body': html_md })
+    return pystache.render(template, _params)
+  
 
 def _invoke_cmd(cmd):
     """Runs 'cmd' on command line"""
