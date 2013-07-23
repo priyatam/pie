@@ -1,5 +1,5 @@
 ---
-title: Be the Change you wish to see
+title: Simplicity
 type: blog
 category: tech
 template: post.mustache
