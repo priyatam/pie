@@ -1,5 +1,5 @@
 ---
-title: Introduction
+title: Have your Pie and Eat it
 type: page
 template: post.mustache
 category: tech
