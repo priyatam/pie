@@ -34,7 +34,7 @@ class BakeTests(unittest.TestCase):
 
 
     def test_read_markdown(self):
-        yaml, post = bake.read_markdown('posts', 'introduction.md')
+        yaml, post = bake._read_markdown('posts', 'introduction.md')
         self.assertEqual(5, len(yaml))
         self.assertIsNotNone(post)
 
@@ -55,7 +55,7 @@ class BakeTests(unittest.TestCase):
                             {{{ body }}}
                         </div>                            
         """
-        stache = bake.markstache(post, template)
+        stache = bake._markstache(post, template)
         self.assertIsNotNone(stache)
  
     def bake(self):
