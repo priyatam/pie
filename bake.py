@@ -9,7 +9,6 @@ For each post, generate complete html by applying Mustache templates
 Generate index.html with included CSS, JS
 
 """
-
 import os
 import sys
 import re
@@ -19,11 +18,17 @@ import markdown as md
 import pystache
 import json
 from datetime import datetime
+import subprocess
 
-if sys.argv > 1:
+if len(sys.argv) > 1:
     config_file_path = sys.argv[1]
 else:
     config_file_path = "config.yaml"
+
+
+def cmd_exists(cmd):
+    return subprocess.call("type " + cmd, shell=True,
+        stdout=subprocess.PIPE, stderr=subprocess.PIPE) == 0
 
 
 def load_config():
@@ -66,6 +71,7 @@ def load_layout(config):
     metacontent = {}
     # Group these by type in config
     templates = rawcontent_by_fname(config, 'templates')
+    config = ppsass_by_fname(config, 'styles')
     styles = rawcontent_by_fname(config, 'styles')
     scripts = rawcontent_by_fname(config, 'scripts')
     # Merge them
@@ -74,6 +80,22 @@ def load_layout(config):
     metacontent.update(scripts)
 
     return metacontent
+
+
+def ppsass_by_fname(config, subdir):
+    for sass_or_css_file in os.listdir(subdir):
+        match = re.search(r'(.+?)\.sass$', sass_or_css_file)
+        if match:
+            if (cmd_exists("sass")):
+                out_file = match.group(1) + ".css"
+                cmd = "sass " + subdir + "/" + sass_or_css_file + " > " + subdir + "/" + out_file
+                os.system(cmd)
+                config[subdir].remove(sass_or_css_file)
+                config[subdir].append(out_file)
+            else:
+                print "sass command not found\ninstall using rubygems"
+                exit(1)
+    return config
 
 
 def rawcontent_by_fname(config, key):
