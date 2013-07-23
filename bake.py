@@ -55,18 +55,21 @@ def load_posts(config):
             
     return posts
 
+def run_asset_pipieline(config):
+    """Run preprocessor asset pipeline """
+    ## SASS
+    config = __sassify(config, 'styles')
+    ## TODO - Use Webassets - http://webassets.readthedocs.org/en/latest/generic/index.html
+
 
 def load_metacontent(config):
     """Reads templates, scripts, styles and stores them as dictionaries"""
     metacontent = {}
     
-    config = __compiledsass_by_fname(config, 'styles')
-    
-    # Group these by type in config
+    # Load templates, styles and scripts into a dict as fname: raw content
     templates = __rawcontent_by_fname(config, 'templates')
     styles = __rawcontent_by_fname(config, 'styles')
     scripts = __rawcontent_by_fname(config, 'scripts')
-    # Merge them
     metacontent.update(templates)
     metacontent.update(styles)
     metacontent.update(scripts)
@@ -76,7 +79,6 @@ def load_metacontent(config):
 
 def bake(config, metacontent, posts):
     """ Parse everything. Wrap results in a final page in Html5, CSS, JS, POSTS """
-    # Stache
     for post in posts:
         post['html'] = _markstache(post, metacontent[post['template']])  # every post can have its template
 
@@ -91,7 +93,6 @@ def bake(config, metacontent, posts):
                                "json_data": json.dumps(posts), "relative_path": config['relative_path'],
                                "title": config['title']})
     return content
-
 
 
 def _read(subdir, fname):
@@ -122,7 +123,8 @@ def _invoke_cmd(cmd):
         stdout=subprocess.PIPE, stderr=subprocess.PIPE) == 0
 
 
-def __compiledsass_by_fname(config, subdir):
+def __sassify(config, subdir):
+    """Compiles SASS assets. FIXME: Do not modify the code"""
     for sass_or_css_file in os.listdir(subdir):
         match = re.search(r'(.+?)\.sass$', sass_or_css_file)
         if match:
@@ -143,17 +145,18 @@ def __rawcontent_by_fname(config, key):
     return {fname: _read(key, fname) for fname in config[key]}
 
 
-def __format_date(fname, type):
+def __format_date(fname, datetype):
     """Returns a formatted fname.date"""
-    if type == 'c':
+    if datetype == 'c':
         return datetime.strptime(time.ctime(os.path.getctime(fname)), "%a %b %d %H:%M:%S %Y").strftime("%m-%d-%y")
-    if type == 'm':
+    if datetype == 'm':
         return datetime.strptime(time.ctime(os.path.getmtime(fname)), "%a %b %d %H:%M:%S %Y").strftime("%m-%d-%y") 
 
 
 def main():
     """Let's cook an Apple Pie"""
     config = load_config()
+    run_asset_pipieline(config)
     metacontent = load_metacontent(config)
     posts = load_posts(config)
     output = bake(config, metacontent, posts)
