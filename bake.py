@@ -5,9 +5,8 @@ python bake.py > index.html
 
 Algo:
 Read config.yaml
-For each post, generate complete html by applying Mustache templates
-Generate index.html with included CSS, JS
-
+For each post.md, process YAML, and apply its Mustache-HAML Template, and generate final HTML
+Combine everything into index.html and included minified CSS, JS
 """
 import os
 import sys
@@ -18,10 +17,11 @@ import json
 import yaml
 import markdown as md
 import pystache
-import json
-from datetime import datetime
+from hamlpy import hamlpy
+import contextlib
 import subprocess
 
+# Set config file path
 if len(sys.argv) > 1:
     config_file_path = sys.argv[1]
 else:
@@ -39,7 +39,7 @@ def load_posts(config):
     posts = []
     for fname in os.listdir("posts"):
         if re.match(r'[A-Za-z\.0-9-_~]+', fname):
-            yaml_data, md_data = _read_markdown('posts', fname)
+            yaml_data, md_data = read_posts('posts', fname)
             fname = 'posts' + os.sep + fname
             post = {
                 "name": fname,
@@ -52,8 +52,9 @@ def load_posts(config):
         else:
             print """File name format: uppercase/lowercase letters, decimal digits, hyphen, period, underscore, and tilde only."""
             exit(1)
-            
+
     return posts
+
 
 def run_asset_pipieline(config):
     """Run preprocessor asset pipeline """
@@ -65,7 +66,7 @@ def run_asset_pipieline(config):
 def load_metacontent(config):
     """Reads templates, scripts, styles and stores them as dictionaries"""
     metacontent = {}
-    
+
     # Load templates, styles and scripts into a dict as fname: raw content
     templates = __rawcontent_by_fname(config, 'templates')
     styles = __rawcontent_by_fname(config, 'styles')
@@ -75,6 +76,17 @@ def load_metacontent(config):
     metacontent.update(scripts)
 
     return metacontent
+
+
+def read_posts(subdir, fname):
+    """Splits Markdown file into a tuple of YAML and content"""
+    with open(subdir + os.sep + fname, "r") as fin:
+        yaml_and_md = fin.read().split('\n---\n')
+        if len(yaml_and_md) == 1:
+            return {}, yaml_and_md[0]
+        else:
+            return yaml.load(yaml_and_md[0]), yaml_and_md[1]
+
 
 
 def bake(config, metacontent, posts):
@@ -100,25 +112,14 @@ def _read(subdir, fname):
     with open(subdir + os.sep + fname, "r") as fin:
         return fin.read()
 
-
-def _read_markdown(subdir, fname):
-    """Splits Markdown file into a tuple of YAML and content"""
-    with open(subdir + os.sep + fname, "r") as fin:
-        yaml_and_md = fin.read().split('\n---\n')
-        if len(yaml_and_md) == 1:
-            return {}, yaml_and_md[0]
-        else:
-            return yaml.load(yaml_and_md[0]), yaml_and_md[1]
-
-
 def _markstache(post, template):
-    """Expands Mustache templates from local YAML data and renders HTML"""
+    """Expands Markdown/Mustache/YAML to HTML"""
     html_md = md.markdown(post['body'].decode("utf-8"))
     _params = {}
     _params.update(post)
     _params.update({'body': html_md })
     return pystache.render(template, _params)
-  
+
 
 def _invoke_cmd(cmd):
     """Runs 'cmd' on command line"""
@@ -127,7 +128,7 @@ def _invoke_cmd(cmd):
 
 
 def __sassify(config, subdir):
-    """Compiles SASS assets. FIXME: Do not modify the code"""
+    """Compiles SASS assets. FIXME: Do not modify config"""
     for sass_or_css_file in os.listdir(subdir):
         match = re.search(r'(.+?)\.sass$', sass_or_css_file)
         if match:
@@ -153,7 +154,7 @@ def __format_date(fname, datetype):
     if datetype == 'c':
         return datetime.strptime(time.ctime(os.path.getctime(fname)), "%a %b %d %H:%M:%S %Y").strftime("%m-%d-%y")
     if datetype == 'm':
-        return datetime.strptime(time.ctime(os.path.getmtime(fname)), "%a %b %d %H:%M:%S %Y").strftime("%m-%d-%y") 
+        return datetime.strptime(time.ctime(os.path.getmtime(fname)), "%a %b %d %H:%M:%S %Y").strftime("%m-%d-%y")
 
 
 def main():
@@ -163,9 +164,9 @@ def main():
     metacontent = load_metacontent(config)
     posts = load_posts(config)
     output = bake(config, metacontent, posts)
-    
+
     print output
-    
+
 
 if __name__ == '__main__':
     main()
