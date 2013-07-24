@@ -11,7 +11,7 @@ import bake
 
 class BakeTests(unittest.TestCase):
     def setUp(self):
-        self.config = {'templates': ['post.html.mustache', 'index.html.mustache'], 'scripts': ['index.js'],
+        self.config = {'templates': ['post.haml.mustache', 'index.html.mustache'], 'scripts': ['index.js'],
                        'styles': ['index.css'], 'relative_path': ['/index.html']}
 
  
@@ -28,7 +28,7 @@ class BakeTests(unittest.TestCase):
     def test_load_assets(self):
         templates = bake.load_assets(self.config)('templates')
         self.assertEqual(types.DictType, type(templates))
-        self.assertIsNotNone(templates['post.html.mustache'])
+        self.assertIsNotNone(templates['post.haml.mustache'])
 
 
     def test_load_posts(self):

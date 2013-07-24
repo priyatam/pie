@@ -1,6 +1,6 @@
 title: Frozen Pie
 templates:
-  - post.html.mustache
+  - post.haml.mustache
   - index.html.mustache
 
 styles:
