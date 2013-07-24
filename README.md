@@ -1,9 +1,7 @@
-        / Frozen Pie /
+# Frozen Pie
         
-“You know you have reached perfection in design, not when there is nothing more to add, but when 
-there is nothing more to be taken away.” 
-               
-                                                                - Antoine de Saint-Exupery
+> You know you have reached perfection in design, not when there is nothing more to add, but when 
+there is nothing more to be taken away - Antoine de Saint-Exupery
 
 
 Today's static site generators require css, markup, templating and programming skills. Their compatibility is broken. A template in one framework doesn't work in the other. You can't convert from LESS to Bourbon, from HTML to HAML, from Ruby closure to a Python inner function. You can't use Clojure's immutable collections to reimplement a default Mustache _loop_ in a straight forward way. You test on browsers, they break, like plugins that blow on your face. 
@@ -32,7 +30,5 @@ serve
 Soon: Recipes.
  
 ---
-Under active development. Not usable until a stable release. 
- 
-License: GPLv3
+Under active development. Not usable until a stable release. License: GPLv3
     
