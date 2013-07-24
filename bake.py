@@ -15,6 +15,7 @@ import pystache
 from hamlpy import hamlpy
 import contextlib
 import subprocess
+from subprocess import Popen, PIPE, STDOUT
 
 
 # Set config file path
@@ -28,7 +29,7 @@ def load_config():
     """Loads configuration from config.yaml"""
     with open(config_file_path, "r") as fin:
         return yaml.load(fin.read())
-    
+
 
 def load_assets(config):
     """Loads assets as raw content into a dictionary, looked up by its fname"""
@@ -44,7 +45,7 @@ def load_posts(config):
             fname = 'posts' + os.sep + fname
             post = {
                 "name": fname,
-                "body": md_content, # raw, unprocessed markdown content
+                "body": md_content,  # raw, unprocessed markdown content
                 "created_date": _format_date(fname, 'c'),
                 "modified_date": _format_date(fname, 'm')
             }
@@ -53,27 +54,28 @@ def load_posts(config):
         else:
             print """Filename format: ['a/A', 2.5, '_', '.', '-', '~']"""
             exit(1)
-            
+
     return posts
 
 
 def load_content(config):
-    """Pre-process and load each asset type into a dict and return a tuple of such dicts"""    
-    
-    # Html pre-procesors: HAML    
+    """Pre-process and load each asset type into a dict and return a tuple of such dicts"""
+
+    # Html pre-procesors: HAML
     templates = load_assets(config)('templates')
     # TODO: hamlstache(config)
-    
-    # CSS pre-processors: SASS, LESS    
-    # TODO: __sassify(config), __lessen(config)    
+
+    # CSS pre-processors: SASS, LESS
+    # TODO: __sassify(config), __lessen(config)
     styles = load_assets(config)('styles')
-    
+    __sassify(styles)
+
     # Js pre-processors: Coffeescript
-    # TODO: make_coffeescript, make_clojurescript 
-    scripts = load_assets(config)('scripts')    
-    
-    posts = load_posts(config) 
-    
+    # TODO: make_coffeescript, make_clojurescript
+    scripts = load_assets(config)('scripts')
+
+    posts = load_posts(config)
+
     return templates, styles, scripts, posts
 
 
@@ -86,14 +88,14 @@ def bake(config, templates, posts, styles, scripts):
 
     style_sheets = [styles[key] for key in config['styles']]
     style_sheet = "".join(style_sheets)
-    scripts = [ scripts[key] for key in config['scripts']]
+    scripts = [scripts[key] for key in config['scripts']]
     script = "".join(scripts)
     content = pystache.render(templates['index.html.mustache'],
-                              {   "style_sheet": style_sheet, 
-                                  "script": script,
-                                  "json_data": json.dumps(posts), "relative_path": config['relative_path'],
-                                  "title": config['title']
-                              })
+                              {"style_sheet": style_sheet,
+                               "script": script,
+                               "json_data": json.dumps(posts), "relative_path": config['relative_path'],
+                               "title": config['title']
+                               })
     return content
 
 
@@ -101,6 +103,7 @@ def _read(fname, subdir):
     """Reads subdir/<fname> as raw content"""
     with open(subdir + os.sep + fname, "r") as fin:
         return fin.read()
+
 
 def _read_posts(subdir, fname):
     """Splits file into a tuple of YAML and Markdown content"""
@@ -121,25 +124,22 @@ def _markstache(post, template):
     return pystache.render(template, _params)
 
 
-def _sassify(config, subdir):
+def __sassify(styles):
     """Compiles SASS assets. FIXME: Do not modify config"""
-    for sass_or_css_file in os.listdir(subdir):
-        match = re.search(r'(.+?)\.sass$', sass_or_css_file)
+    for key in styles.keys():
+        match = re.search(r'(.+?)\.sass$', key)
         if match:
-            if (_invoke_cmd("sass")):
-                out_file = match.group(1) + ".css"
-                cmd = "sass " + subdir + "/" + sass_or_css_file + " > " + subdir + "/" + out_file
-                os.system(cmd)
-                # config[subdir].remove(sass_or_css_file)
-                config[subdir].append(out_file)
+            if (_check_cmd("sass")):
+                p = Popen(['sass', '-s'], stdout=PIPE, stdin=PIPE, stderr=PIPE)
+                stdout_data = p.communicate(input=styles[key])[0]
+                styles[key] = stdout_data  # FIXME: mutation
             else:
                 print "sass command not found. Install using rubygems"
                 exit(1)
-    return config
 
 
-def _invoke_cmd(cmd):
-    """Runs 'cmd' on command line"""
+def _check_cmd(cmd):
+    """Checks if 'cmd' is available on command line"""
     return subprocess.call("type " + cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE) == 0
 
 

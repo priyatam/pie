@@ -5,6 +5,7 @@ templates:
 
 styles:
   - index.css
+  - post.sass
 
 scripts:
   - index.js
