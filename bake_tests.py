@@ -11,7 +11,7 @@ import bake
 
 class BakeTests(unittest.TestCase):
     def setUp(self):
-        self.config = {'templates': ['post.mustache', 'index.mustache'], 'scripts': ['index.js'],
+        self.config = {'templates': ['post.html.mustache', 'index.html.mustache'], 'scripts': ['index.js'],
                        'styles': ['index.css'], 'relative_path': ['/index.html']}
 
  
@@ -25,25 +25,51 @@ class BakeTests(unittest.TestCase):
         self.assertEqual('/index.html', config['relative_path'])
 
 
-    def test_load_layout(self):
-        content = bake.load_metacontent(self.config)
-        self.assertEqual(types.DictType, type(content))
-        for k, v in content.items():
-            self.assertIsNotNone(k in self.config.values())
-            self.assertIsNotNone(v)
+    def test_load_assets(self):
+        templates = bake.load_assets(self.config)('templates')
+        self.assertEqual(types.DictType, type(templates))
+        self.assertIsNotNone(templates['post.html.mustache'])
 
 
-    def test_read_markdown(self):
-        yaml, post = bake.read_posts('posts', 'introduction.md')
-        self.assertEqual(5, len(yaml))
-        self.assertIsNotNone(post)
-
-   
     def test_load_posts(self):
         posts = bake.load_posts(self.config)
         self.assertEqual(2, len(posts))
         self.assertIsNotNone(posts[0]['body'])
 
+
+    def test_load_content(self):
+        templates, styles, scripts, posts = bake.load_content(self.config)
+        self.assertEqual(types.DictType, type(templates))
+        self.assertEqual(types.DictType, type(styles))
+        self.assertEqual(types.DictType, type(scripts))
+        self.assertEqual(types.ListType, type(posts))
+        for post in posts:
+            self.assertEqual(types.DictType, type(post))            
+        
+        for k, v in templates.items():
+            self.assertIsNotNone(k in self.config.values())
+            self.assertIsNotNone(v)
+        for k, v in styles.items():
+            self.assertIsNotNone(k in self.config.values())
+            self.assertIsNotNone(v)
+        for k, v in scripts.items():
+            self.assertIsNotNone(k in self.config.values())
+            self.assertIsNotNone(v)
+        
+    def bake(self):
+        pass
+        
+        
+    def test_read(self):
+        fin = bake._read('bake_tests.py', '.')
+        self.assertTrue('import unittest' in fin)        
+    
+    
+    def test_read_posts(self):
+        yaml, post = bake._read_posts('posts', 'introduction.md')
+        self.assertEqual(5, len(yaml))
+        self.assertIsNotNone(post)  
+        
   
     def test_markstache(self):
         post = {'body': """#What's the point of another static generator ?  
@@ -58,8 +84,15 @@ class BakeTests(unittest.TestCase):
         stache = bake._markstache(post, template)
         self.assertIsNotNone(stache)
  
-    def bake(self):
-        pass #TODO
+ 
+    def test_invoke_cmd(self):
+        cmd = bake._invoke_cmd('ls -l')
+        
+    
+    def test__format_date(self):
+        dt = bake._format_date('bake_tests.py', 'c')
+        self.assertIsNotNone(dt)
+          
         
 if __name__ == '__main__':
     unittest.main()

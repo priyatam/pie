@@ -1,12 +1,7 @@
 #!/usr/bin/env python
 """
-Usage:
-python bake.py > index.html
-
-Algo:
-Read config.yaml
-For each post.md, process YAML, and apply its Mustache-HAML Template, and generate final HTML
-Combine everything into index.html and included minified CSS, JS
+Usage: python bake.py > index.html
+Algo: Read config.yaml. For each post.md, process YAML, and apply its Mustache-HAML Template, and generate final HTML. Combine everything into index.html with minified CSS, JS.
 """
 import os
 import sys
@@ -21,6 +16,7 @@ from hamlpy import hamlpy
 import contextlib
 import subprocess
 
+
 # Set config file path
 if len(sys.argv) > 1:
     config_file_path = sys.argv[1]
@@ -32,6 +28,11 @@ def load_config():
     """Loads configuration from config.yaml"""
     with open(config_file_path, "r") as fin:
         return yaml.load(fin.read())
+    
+
+def load_assets(config):
+    """Loads assets as raw content into a dictionary, looked up by its fname"""
+    return lambda asset_type: {fname: _read(fname, asset_type) for fname in config[asset_type]}
 
 
 def load_posts(config):
@@ -39,47 +40,70 @@ def load_posts(config):
     posts = []
     for fname in os.listdir("posts"):
         if re.match(r'[A-Za-z\.0-9-_~]+', fname):
-            yaml_data, md_data = read_posts('posts', fname)
+            yaml_data, md_content = _read_posts('posts', fname)
             fname = 'posts' + os.sep + fname
             post = {
                 "name": fname,
-                "body": md_data,  # raw, unprocessed md
-                "created_date": __format_date(fname, 'c'),
-                "modified_date": __format_date(fname, 'm')
+                "body": md_content, # raw, unprocessed markdown content
+                "created_date": _format_date(fname, 'c'),
+                "modified_date": _format_date(fname, 'm')
             }
-            post.update(yaml_data)  # Merge Yaml data
+            post.update(yaml_data)  # Merge Yaml data for future lookup
             posts.append(post)
         else:
-            print """File name format: uppercase/lowercase letters, decimal digits, hyphen, period, underscore, and tilde only."""
+            print """Filename format: ['a/A', 2.5, '_', '.', '-', '~']"""
             exit(1)
-
+            
     return posts
 
 
-def run_asset_pipieline(config):
-    """Run preprocessor asset pipeline """
-    ## SASS
-    config = __sassify(config, 'styles')
-    ## TODO - Use Webassets - http://webassets.readthedocs.org/en/latest/generic/index.html
+def load_content(config):
+    """Pre-process and load each asset type into a dict and return a tuple of such dicts"""    
+    
+    # Html pre-procesors: HAML    
+    templates = load_assets(config)('templates')
+    # TODO: hamlstache(config)
+    
+    # CSS pre-processors: SASS, LESS    
+    # TODO: __sassify(config), __lessen(config)    
+    styles = load_assets(config)('styles')
+    
+    # Js pre-processors: Coffeescript
+    # TODO: make_coffeescript, make_clojurescript 
+    scripts = load_assets(config)('scripts')    
+    
+    posts = load_posts(config) 
+    
+    return templates, styles, scripts, posts
 
 
-def load_metacontent(config):
-    """Reads templates, scripts, styles and stores them as dictionaries"""
-    metacontent = {}
+def bake(config, templates, posts, styles, scripts):
+    """Parse everything. Wrap results in a final page in Html5, CSS, JS, POSTS
+       NOTE: This function modifies 'posts' dictionary by adding a new posts['html'] element"""
+    for post in posts:
+        converted_html = _markstache(post, templates[post['template']])  # each post can have its own template
+        post['html'] = converted_html
 
-    # Load templates, styles and scripts into a dict as fname: raw content
-    templates = __rawcontent_by_fname(config, 'templates')
-    styles = __rawcontent_by_fname(config, 'styles')
-    scripts = __rawcontent_by_fname(config, 'scripts')
-    metacontent.update(templates)
-    metacontent.update(styles)
-    metacontent.update(scripts)
+    style_sheets = [styles[key] for key in config['styles']]
+    style_sheet = "".join(style_sheets)
+    scripts = [ scripts[key] for key in config['scripts']]
+    script = "".join(scripts)
+    content = pystache.render(templates['index.html.mustache'],
+                              {   "style_sheet": style_sheet, 
+                                  "script": script,
+                                  "json_data": json.dumps(posts), "relative_path": config['relative_path'],
+                                  "title": config['title']
+                              })
+    return content
 
-    return metacontent
 
+def _read(fname, subdir):
+    """Reads subdir/<fname> as raw content"""
+    with open(subdir + os.sep + fname, "r") as fin:
+        return fin.read()
 
-def read_posts(subdir, fname):
-    """Splits Markdown file into a tuple of YAML and content"""
+def _read_posts(subdir, fname):
+    """Splits file into a tuple of YAML and Markdown content"""
     with open(subdir + os.sep + fname, "r") as fin:
         yaml_and_md = fin.read().split('\n---\n')
         if len(yaml_and_md) == 1:
@@ -88,46 +112,16 @@ def read_posts(subdir, fname):
             return yaml.load(yaml_and_md[0]), yaml_and_md[1]
 
 
-
-def bake(config, metacontent, posts):
-    """ Parse everything. Wrap results in a final page in Html5, CSS, JS, POSTS """
-    for post in posts:
-        post['html'] = _markstache(post, metacontent[post['template']])  # every post can have its template
-
-    style_sheets = [metacontent[key] for key in config['styles']]
-    style_sheet = "".join(style_sheets)
-
-    scripts = [metacontent[key] for key in config['scripts']]
-    script = "".join(scripts)
-
-    content = pystache.render(metacontent['index.mustache'],
-                              {"style_sheet": style_sheet, "script": script,
-                               "json_data": json.dumps(posts), "relative_path": config['relative_path'],
-                               "title": config['title']})
-    return content
-
-
-def _read(subdir, fname):
-    """Reads subdir/<fname> as raw content"""
-    with open(subdir + os.sep + fname, "r") as fin:
-        return fin.read()
-
 def _markstache(post, template):
-    """Expands Markdown/Mustache/YAML to HTML"""
+    """Converts Markdown/Mustache/YAML to HTML."""
     html_md = md.markdown(post['body'].decode("utf-8"))
     _params = {}
-    _params.update(post)
-    _params.update({'body': html_md })
+    _params.update(post) # Post Dict with YAML and other meta data
+    _params.update({'body': html_md})
     return pystache.render(template, _params)
 
 
-def _invoke_cmd(cmd):
-    """Runs 'cmd' on command line"""
-    return subprocess.call("type " + cmd, shell=True,
-        stdout=subprocess.PIPE, stderr=subprocess.PIPE) == 0
-
-
-def __sassify(config, subdir):
+def _sassify(config, subdir):
     """Compiles SASS assets. FIXME: Do not modify config"""
     for sass_or_css_file in os.listdir(subdir):
         match = re.search(r'(.+?)\.sass$', sass_or_css_file)
@@ -144,12 +138,12 @@ def __sassify(config, subdir):
     return config
 
 
-def __rawcontent_by_fname(config, key):
-    """Creates a dictionary of fname->raw_content, where raw_content is config(key)"""
-    return {fname: _read(key, fname) for fname in config[key]}
+def _invoke_cmd(cmd):
+    """Runs 'cmd' on command line"""
+    return subprocess.call("type " + cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE) == 0
 
 
-def __format_date(fname, datetype):
+def _format_date(fname, datetype):
     """Returns a formatted fname.date"""
     if datetype == 'c':
         return datetime.strptime(time.ctime(os.path.getctime(fname)), "%a %b %d %H:%M:%S %Y").strftime("%m-%d-%y")
@@ -160,11 +154,8 @@ def __format_date(fname, datetype):
 def main():
     """Let's cook an Apple Pie"""
     config = load_config()
-    run_asset_pipieline(config)
-    metacontent = load_metacontent(config)
-    posts = load_posts(config)
-    output = bake(config, metacontent, posts)
-
+    templates, styles, scripts, posts = load_content(config)
+    output = bake(config, templates, posts, styles, scripts, )
     print output
 
 
