@@ -18,16 +18,9 @@ import subprocess
 from subprocess import Popen, PIPE, STDOUT
 
 
-# Set config file path
-if len(sys.argv) > 1:
-    config_file_path = sys.argv[1]
-else:
-    config_file_path = "config.yaml"
-
-
-def load_config():
+def load_config(config_filepath):
     """Loads configuration from config.yaml"""
-    with open(config_file_path, "r") as fin:
+    with open(config_filepath, "r") as fin:
         return yaml.load(fin.read())
 
 
@@ -151,13 +144,16 @@ def _format_date(fname, datetype):
         return datetime.strptime(time.ctime(os.path.getmtime(fname)), "%a %b %d %H:%M:%S %Y").strftime("%m-%d-%y")
 
 
-def main():
+def main(config_filepath):
     """Let's cook an Apple Pie"""
-    config = load_config()
+    config = load_config(config_filepath)
     templates, styles, scripts, posts = load_content(config)
     output = bake(config, templates, posts, styles, scripts, )
     print output
 
 
 if __name__ == '__main__':
-    main()
+    config_filepath = "config.yaml"
+    if len(sys.argv) > 1:
+        config_filepath = sys.argv[1]        
+    main(config_filepath)
