@@ -11,7 +11,7 @@ import bake
 
 class BakeTests(unittest.TestCase):
     def setUp(self):
-        self.config = {'templates': ['post.haml.mustache', 'index.html.mustache'], 'scripts': ['index.js'],
+        self.config = {'templates': ['post.haml.mustache', 'index.mustache.html'], 'scripts': ['index.js'],
                        'styles': ['index.css'], 'relative_path': ['/index.html']}
 
  
