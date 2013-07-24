@@ -66,7 +66,7 @@ class BakeTests(unittest.TestCase):
     
     
     def test_read_posts(self):
-        yaml, post = bake._read_posts('posts', 'introduction.md')
+        yaml, post = bake._read_yaml('posts', 'introduction.md')
         self.assertEqual(5, len(yaml))
         self.assertIsNotNone(post)  
         

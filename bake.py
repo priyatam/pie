@@ -13,9 +13,8 @@ import yaml
 import markdown as md
 import pystache
 from hamlpy import hamlpy
-import contextlib
 import subprocess
-from subprocess import Popen, PIPE, STDOUT
+from scss import Scss
 
 
 def load_config(config_filepath):
@@ -25,8 +24,9 @@ def load_config(config_filepath):
 
 
 def load_assets(config):
-    """Loads assets as raw content into a dictionary, looked up by its fname"""
-    return lambda asset_type: {fname: _read(fname, asset_type) for fname in config[asset_type]}
+    """Loads assets as raw content into a dictionary, looked up by its fname.
+    Closure accepts an asset_type ('templates', 'styles', 'posts', 'scripts') and a filter that filters based on file ext"""
+    return lambda asset_type, filter: {fname: _read(fname, asset_type) for fname in os.listdir(asset_type) if fname.endswith(filter)}
 
 
 def load_posts(config):
@@ -34,7 +34,7 @@ def load_posts(config):
     posts = []
     for fname in os.listdir("posts"):
         if re.match(r'[A-Za-z\.0-9-_~]+', fname):
-            yaml_data, md_content = _read_posts('posts', fname)
+            yaml_data, md_content = _read_yaml('posts', fname)
             fname = 'posts' + os.sep + fname
             post = {
                 "name": fname,
@@ -55,17 +55,20 @@ def load_content(config):
     """Pre-process and load each asset type into a dict and return a tuple of such dicts"""
 
     # Html pre-procesors: HAML
-    templates = load_assets(config)('templates')
-    # TODO: hamlstache(config)
+    _hamlify(config)
+    time.sleep(1) # else, next guy won't see the new file
+    templates = load_assets(config)('templates', 'html')
 
     # CSS pre-processors: SASS, LESS
-    # TODO: __sassify(config), __lessen(config)
-    styles = load_assets(config)('styles')
-    __sassify(styles)
-
+    compiled_styles = _scssify(config)
+    css_styles = load_assets(config)('styles', 'css')   
+    styles = {}    
+    styles.update(css_styles)
+    styles.update(compiled_styles)
+    
     # Js pre-processors: Coffeescript
-    # TODO: make_coffeescript, make_clojurescript
-    scripts = load_assets(config)('scripts')
+    # TODO: _make_coffeescript(config)
+    scripts = load_assets(config)('scripts', 'js')
 
     posts = load_posts(config)
 
@@ -79,11 +82,11 @@ def bake(config, templates, posts, styles, scripts):
         converted_html = _markstache(post, templates[post['template']])  # each post can have its own template
         post['html'] = converted_html
 
-    style_sheets = [styles[key] for key in config['styles']]
+    style_sheets = [styles[key] for key in os.listdir("styles")]
     style_sheet = "".join(style_sheets)
-    scripts = [scripts[key] for key in config['scripts']]
+    scripts = [scripts[key] for key in os.listdir("scripts")]
     script = "".join(scripts)
-    content = pystache.render(templates['index.html.mustache'],
+    content = pystache.render(templates['index.mustache.html'],
                               {"style_sheet": style_sheet,
                                "script": script,
                                "json_data": json.dumps(posts), "relative_path": config['relative_path'],
@@ -93,20 +96,20 @@ def bake(config, templates, posts, styles, scripts):
 
 
 def _read(fname, subdir):
-    """Reads subdir/<fname> as raw content"""
+    """Reads subdir/fname as raw content"""
     with open(subdir + os.sep + fname, "r") as fin:
         return fin.read()
 
 
-def _read_posts(subdir, fname):
-    """Splits file into a tuple of YAML and Markdown content"""
+def _read_yaml(subdir, fname):
+    """Splits subdir/fname into a tuple of YAML and raw content"""
     with open(subdir + os.sep + fname, "r") as fin:
-        yaml_and_md = fin.read().split('\n---\n')
-        if len(yaml_and_md) == 1:
-            return {}, yaml_and_md[0]
+        yaml_and_raw = fin.read().split('\n---\n')
+        if len(yaml_and_raw) == 1:
+            return {}, yaml_and_raw[0]
         else:
-            return yaml.load(yaml_and_md[0]), yaml_and_md[1]
-
+            return yaml.load(yaml_and_raw[0]), yaml_and_raw[1]
+        
 
 def _markstache(post, template):
     """Converts Markdown/Mustache/YAML to HTML."""
@@ -117,18 +120,28 @@ def _markstache(post, template):
     return pystache.render(template, _params)
 
 
-def __sassify(styles):
-    """Compiles SASS assets. FIXME: Do not modify config"""
-    for key in styles.keys():
-        match = re.search(r'(.+?)\.sass$', key)
+def _hamlify(config):
+    """Compiles HAML with YAML into data, HTML"""
+    for fname in os.listdir("templates"):
+        if fname.endswith('haml'):
+            data, haml = _read_yaml('templates', fname)
+            fin_html = hamlpy.Compiler().process(haml)
+            fout = open('templates' + os.sep + fname.replace('haml', 'html'), 'w')
+            fout.write(fin_html)
+            return data, haml
+        
+
+def _scssify(config):
+    """Compiles SCSS assets."""
+    styles = {}
+    for sname in os.listdir("styles"):
+        match = re.search(r'(.+?)\.sass$', sname)
         if match:
-            if (_check_cmd("sass")):
-                p = Popen(['sass', '-s'], stdout=PIPE, stdin=PIPE, stderr=PIPE)
-                stdout_data = p.communicate(input=styles[key])[0]
-                styles[key] = stdout_data  # FIXME: mutation
-            else:
-                print "sass command not found. Install using rubygems"
-                exit(1)
+            scss_compiler = Scss()
+            style = _read(sname, "styles")
+            styles[sname] = scss_compiler.compile(style) # add css
+            open('styles' + os.sep + sname.replace('sass', 'css'), 'w').write(style) 
+            return styles
 
 
 def _check_cmd(cmd):
