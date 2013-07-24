@@ -2,7 +2,7 @@
 title: Simplicity
 type: blog
 category: tech
-template: post.html.mustache
+template: post.mustache.html
 author: Priyatam Mudivarti
 ---
 

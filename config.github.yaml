@@ -1,11 +1,12 @@
 title: Frozen Pie
 templates:
-  - post.haml.mustache
-  - index.html.mustache
+  - post.mustache.haml
+  - index.mustache.html
 
 styles:
   - index.css
-
+  - post.sass
+  
 scripts:
   - index.js
 
