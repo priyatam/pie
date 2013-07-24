@@ -1,7 +1,7 @@
-title: Some thoughts
+title: Frozen Pie
 templates:
-  - post.mustache
-  - index.mustache
+  - post.html.mustache
+  - index.html.mustache
 
 styles:
   - index.css
