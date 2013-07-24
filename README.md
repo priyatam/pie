@@ -10,7 +10,7 @@ These toolkits are built for a different web, for a different skillset. It requi
 
 Not in Python.
     
-**Frozen Pie**
+**Frozen Pie** - a static site generator using Markdown, Mustache, and HAML.
    
 create_crust
 > Create content (posts and pages) in Markdown
