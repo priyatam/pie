@@ -123,7 +123,8 @@ def _markstache(post, template):
 def _hamlify(config):
     """Compiles HAML with YAML into data, HTML"""
     for fname in os.listdir("templates"):
-        if fname.endswith('haml'):
+        match = re.search(r'(.+?)\.haml', fname)
+        if match:
             data, haml = _read_yaml('templates', fname)
             fin_html = hamlpy.Compiler().process(haml)
             fout = open('templates' + os.sep + fname.replace('haml', 'html'), 'w')
