@@ -1,0 +1,25 @@
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>{{ title }}</title>
+<head>
+<style type="text/css">
+{{{ style_sheet }}}
+</style>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/0.7.2/mustache.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sammy.js/0.7.4/sammy.min.js"></script>
+
+<script>
+var data = {{{ json_data }}};
+var rel_path = "{{ relative_path }}"
+
+{{{ script }}}
+
+</script>
+</head>
+<body>
+<h1> {{ title }} </h1>
+<div id="main"></div>
+</body>
+</html>
