@@ -13,7 +13,6 @@ import yaml
 import markdown as md
 import pystache
 from hamlpy import hamlpy
-import subprocess
 from scss import Scss
 
 
@@ -146,11 +145,6 @@ def _scssify(config):
             styles[sname] = scss_compiler.compile(style) # add css             
             open('styles' + os.sep + sname.replace('sass', 'css'), 'w').write(style) 
             return styles
-
-
-def _check_cmd(cmd):
-    """Checks if 'cmd' is available on command line"""
-    return subprocess.call("type " + cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE) == 0
 
 
 def _format_date(fname, datetype):
