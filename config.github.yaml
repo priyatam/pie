@@ -5,8 +5,8 @@ templates:
 
 styles:
   - index.css
-  - post.sass
-  
+  - post.scss
+
 scripts:
   - index.js
 

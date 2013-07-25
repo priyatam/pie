@@ -14,6 +14,7 @@ import markdown as md
 import pystache
 from hamlpy import hamlpy
 from scss import Scss
+import coffeescript
 
 
 def load_config(config_path):
@@ -53,20 +54,19 @@ def load_posts(config):
 def load_content(config):
     """Pre-process and load each asset type into a dict and return a tuple of such dicts"""
     # Compile HAML Templates
-    compile_assets(config, 'templates')(compile_haml, 'haml','html')        
+    compile_assets(config, 'templates')(compile_haml, 'haml','html')
     time.sleep(1) # else, next guy won't see the new file
     templates = load_assets(config)('templates', 'html')
 
-    # Compile SASS
-    sass_css = _scssify(config)
-    # sass_css = compile_assets(config, 'styles')(compile_sass, 'sass','css')      
-    css_styles = load_assets(config)('styles', 'css')   
-    styles = __newdict(css_styles, sass_css)    
-    
-    # Js pre-processors: Coffeescript
-    # TODO: _make_coffeescript(config)
-    scripts = load_assets(config)('scripts', 'js')
-   
+    # Compile SCSS
+    scss_css = {fname: compiled_output for compiled_output, fname in compile_assets(config, 'styles')(compile_scss, 'scss','css') }
+    css_styles = load_assets(config)('styles', 'css')
+    styles = __newdict(css_styles, scss_css)
+
+    coffeescripts = {fname: compiled_output for compiled_output, fname in compile_assets(config, 'scripts')(compile_coffee, 'coffee','js') }
+    js_scripts = load_assets(config)('scripts', 'js')
+    scripts = __newdict(js_scripts, coffeescripts)
+
     posts = load_posts(config)
 
     return templates, styles, scripts, posts
@@ -106,7 +106,7 @@ def _read_yaml(subdir, fname):
             return {}, yaml_and_raw[0]
         else:
             return yaml.load(yaml_and_raw[0]), yaml_and_raw[1]
-        
+
 
 def _markstache(post, template):
     """Converts Markdown/Mustache/YAML to HTML."""
@@ -117,34 +117,28 @@ def _markstache(post, template):
 
 def compile_assets(config, asset_type):
     def _compile(__compile, _from, _to,):
+        outputs = []
         for fname in os.listdir(asset_type):
             if fname.endswith(_from):
-                raw_data = __compile(asset_type, fname) # Inner Closure (__compile) applying on outer closure (_compile)
-                open(asset_type + os.sep + fname.replace(_from, _to), 'w').write(raw_data)
-                return raw_data
+                raw_data = __compile(asset_type, fname)  # Inner Closure (__compile) applying on outer closure (_compile)
+                # open(asset_type + os.sep + fname.replace(_from, _to), 'w').write(raw_data)
+                # next run of bake.py will include the output twice.
+                outputs.append((raw_data, fname))
+        return outputs
     return _compile
 
 
 def compile_haml(asset_type, fname):
     data, haml = _read_yaml(asset_type, fname)
     return hamlpy.Compiler().process(haml)
-    
-# FIXME: See compile_assets, compile_haml    
-def compile_sass(asset_type, fname):
-    return Scss().compile(_read(fname, asset_type)) 
 
-# TODO: Remove after compile_sass is working
-def _scssify(config):
-    """Compiles SCSS assets."""
-    styles = {}
-    for sname in os.listdir("styles"):
-        match = re.search(r'(.+?)\.sass$', sname)
-        if match:
-            scss_compiler = Scss() #
-            style = _read(sname, "styles") #
-            styles[sname] = scss_compiler.compile(style) # add css             
-            open('styles' + os.sep + sname.replace('sass', 'css'), 'w').write(style) 
-            return styles
+
+def compile_scss(asset_type, fname):
+    return Scss().compile(_read(fname, asset_type))
+
+
+def compile_coffee(asset_type, fname):
+    return coffeescript.compile(_read(fname, asset_type))
 
 
 def _format_date(fname, datetype):
@@ -154,20 +148,22 @@ def _format_date(fname, datetype):
     if datetype == 'm':
         return datetime.strptime(time.ctime(os.path.getmtime(fname)), "%a %b %d %H:%M:%S %Y").strftime("%m-%d-%y")
 
+
 def __newdict(*dicts):
     _dict = {}
     for d in dicts:
         _dict.update(d)
     return _dict
 
+
 def main(config_path):
     """Let's cook an Apple Pie"""
     config = load_config(config_path)
     templates, styles, scripts, posts = load_content(config)
-    output = bake(config, templates, posts, styles, scripts, )
+    output = bake(config, templates, posts, styles, scripts)
     print output
 
 
 if __name__ == '__main__':
-    config_path = sys.argv[1] if len(sys.argv) > 1 else "config.yaml"             
+    config_path = sys.argv[1] if len(sys.argv) > 1 else "config.yaml"
     main(config_path)

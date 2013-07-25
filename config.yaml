@@ -1,5 +1,15 @@
-# Site title
 title: Frozen Pie
+title: Frozen Pie
+templates:
+  - post.mustache.haml
+  - index.mustache.html
 
-# Context Root (deployment)
+styles:
+  - index.css
+  - post.scss
+
+scripts:
+  - index.js
+
+# System Config
 relative_path: /index.html
