@@ -1,8 +1,8 @@
 $( function () {
 
     var titles_template = '\
-    <div><a href="#/{{ name }}"><span class="post-title">{{ title }}</span></a>\
-    <span class="date"> ( {{ modified_date }} )</span></div>'
+    <span class="date"> {{ post_date }}&nbsp;&nbsp;</span></div>\
+    <span><a href="#/{{ name }}"><span class="post-title">{{ title }}</a></span><br/>'
 
     var app = $.sammy(function() {
         this.element_selector = '#main';
@@ -19,6 +19,7 @@ $( function () {
         });
         this.get(rel_path, function(context) {
             context.app.swap('');
+            data = data.sort( function(a,b) {return a['post_date'] < b['post_date'] } );
             for (var i =0; i < data.length; i++) {
                 context.$element().prepend(Mustache.to_html(titles_template, data[i]));
             }

@@ -1,9 +1,10 @@
 ---
 title: Have your Pie and Eat it
 type: page
-template: post.mustache.html
+template: post.mustache.haml
 category: tech
 author: Sreeharsha Mudivarti
+post_date: 07-23-13
 ---
 
 ### What's the point of another static generator ?  

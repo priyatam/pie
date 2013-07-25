@@ -27,8 +27,18 @@ def load_config(config_path):
 def load_assets(config):
     """Loads assets as raw content into a dictionary, looked up by its fname.
     Closure accepts an asset_type ('templates', 'styles', 'posts', 'scripts') and a filter that filters based on file ext"""
-    return lambda asset_type, filter: {fname: _read(fname, asset_type) for fname in os.listdir(asset_type) if fname.endswith(filter)}
+    return lambda asset_type, filter: {fname: _read(fname, asset_type) for fname in os.listdir(asset_type) if fname.endswith(filter) and not fname.startswith("_")}
 
+
+def load_recipes():
+    recipe_defs = dir(recipes)
+    recipes_dict = {}
+    for recipe_def in recipe_defs:
+        if not recipe_def.startswith("__"):
+            current_def = getattr(recipes, recipe_def)
+            recipes_dict.update({recipe_def: current_def})
+    return recipes_dict
+ 
 
 def load_posts(config):
     """Creates a dictionary of Post meta data, including body as 'raw content'"""
@@ -40,8 +50,7 @@ def load_posts(config):
             post = {
                 "name": fname,
                 "body": md_content,  # raw, unprocessed markdown content
-                "created_date": _format_date(fname, 'c'),
-                "modified_date": _format_date(fname, 'm')
+                "modified_date": _format_date(fname)
             }
             post.update(yaml_data)  # Merge Yaml data for future lookup
             posts.append(post)
@@ -55,9 +64,10 @@ def load_posts(config):
 def load_content(config):
     """Pre-process and load each asset type into a dict and return a tuple of such dicts"""
     # Compile HAML Templates
-    compile_assets(config, 'templates')(compile_haml, 'haml','html')
+    haml_html = {fname: compiled_output for compiled_output, fname in compile_assets(config, 'templates')(compile_haml, 'haml','html')}
     time.sleep(1) # else, next guy won't see the new file
-    templates = load_assets(config)('templates', 'html')
+    templates_css = load_assets(config)('templates', 'html')
+    templates = __newdict(templates_css, haml_html)
 
     # Compile SCSS
     scss_css = {fname: compiled_output for compiled_output, fname in compile_assets(config, 'styles')(compile_scss, 'scss','css') }
@@ -77,12 +87,12 @@ def bake(config, templates, posts, styles, scripts):
     """Parse everything. Wrap results in a final page in Html5, CSS, JS, POSTS
        NOTE: This function modifies 'posts' dictionary by adding a new posts['html'] element"""
     for post in posts:
-        converted_html = _markstache(post, templates[post['template']])  # each post can have its own template
+        converted_html = _markstache(post, _get_template_path(templates, post['template']))  # each post can have its own template
         post['html'] = converted_html
 
-    style_sheets = [styles[key] for key in os.listdir("styles")]
+    style_sheets = styles.values()
     style_sheet = "".join(style_sheets)
-    scripts = [scripts[key] for key in os.listdir("scripts")]
+    scripts = scripts.values()
     script = "".join(scripts)
     content = pystache.render(templates['index.mustache.html'],
                               {"style_sheet": style_sheet,
@@ -91,6 +101,14 @@ def bake(config, templates, posts, styles, scripts):
                                "title": config['title']
                                })
     return content
+
+
+def _get_template_path(templates, post_template_name):
+    if post_template_name.endswith(".haml"):
+        key = "_" + post_template_name.replace(".haml", ".html")
+        return templates[key]
+    else:
+        return templates[post_template_name]
 
 
 def _read(fname, subdir):
@@ -113,13 +131,8 @@ def _markstache(post, template):
     """Converts Markdown/Mustache/YAML to HTML."""
     html_md = md.markdown(post['body'].decode("utf-8"))
     _params = __newdict(post, {'body': html_md})
-    recipe_defs = dir(recipes)
-    recipe_dict = {}
-    for recipe_def in recipe_defs:
-        if not recipe_def.startswith("__"):
-            current_def = getattr(recipes, recipe_def)
-            recipe_dict.update({recipe_def: current_def})
-    _params.update(recipe_dict)
+    recipes_dict =load_recipes()
+    _params.update(recipes_dict)
     return pystache.render(template, _params)
 
 
@@ -129,15 +142,17 @@ def compile_assets(config, asset_type):
         for fname in os.listdir(asset_type):
             if fname.endswith(_from):
                 raw_data = __compile(asset_type, fname)  # Inner Closure (__compile) applying on outer closure (_compile)
-                # open(asset_type + os.sep + fname.replace(_from, _to), 'w').write(raw_data)
+                new_filename = "_" + fname.replace(_from, _to)
+                open( asset_type + os.sep + new_filename, 'w').write(raw_data)
                 # next run of bake.py will include the output twice.
-                outputs.append((raw_data, fname))
+                # hence the _ convention
+                outputs.append((raw_data, new_filename))
         return outputs
     return _compile
 
 
 def compile_haml(asset_type, fname):
-    data, haml = _read_yaml(asset_type, fname)
+    haml = _read(fname, asset_type)
     return hamlpy.Compiler().process(haml)
 
 
@@ -149,12 +164,9 @@ def compile_coffee(asset_type, fname):
     return coffeescript.compile(_read(fname, asset_type))
 
 
-def _format_date(fname, datetype):
+def _format_date(fname):
     """Returns a formatted fname.date"""
-    if datetype == 'c':
-        return datetime.strptime(time.ctime(os.path.getctime(fname)), "%a %b %d %H:%M:%S %Y").strftime("%m-%d-%y")
-    if datetype == 'm':
-        return datetime.strptime(time.ctime(os.path.getmtime(fname)), "%a %b %d %H:%M:%S %Y").strftime("%m-%d-%y")
+    return datetime.strptime(time.ctime(os.path.getmtime(fname)), "%a %b %d %H:%M:%S %Y").strftime("%m-%d-%y")
 
 
 def __newdict(*dicts):

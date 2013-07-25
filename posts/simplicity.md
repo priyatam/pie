@@ -2,8 +2,9 @@
 title: Simplicity
 type: blog
 category: tech
-template: post.mustache.html
+template: post.mustache.haml
 author: Priyatam Mudivarti
+post_date: 07-20-13
 ---
 
 Today's static site generators require css, markup, templating and programming skills. Their compatibility is broken. 

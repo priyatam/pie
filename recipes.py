@@ -1,5 +1,3 @@
-def to():
-    return "Pizza"
+def hello_world():
+    return "Hello World"
 
-def fm():
-    return "Cheese"

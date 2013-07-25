@@ -1,1 +1,1 @@
-foo = 5 if 42
+console.log "Coffeescript Loaded"
