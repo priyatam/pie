@@ -15,6 +15,7 @@ import pystache
 from hamlpy import hamlpy
 from scss import Scss
 import coffeescript
+import recipes
 
 
 def load_config(config_path):
@@ -112,6 +113,13 @@ def _markstache(post, template):
     """Converts Markdown/Mustache/YAML to HTML."""
     html_md = md.markdown(post['body'].decode("utf-8"))
     _params = __newdict(post, {'body': html_md})
+    recipe_defs = dir(recipes)
+    recipe_dict = {}
+    for recipe_def in recipe_defs:
+        if not recipe_def.startswith("__"):
+            current_def = getattr(recipes, recipe_def)
+            recipe_dict.update({recipe_def: current_def})
+    _params.update(recipe_dict)
     return pystache.render(template, _params)
 
 
