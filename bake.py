@@ -100,18 +100,14 @@ def bake(config, templates, posts, styles, scripts, recipes):
     for post in posts:
         converted_html = _markstache(config, post, _get_template_path(templates, post['template']))  # each post can have its own template
         post['html'] = converted_html
-
-    style_sheets = styles.values()
-    style_sheet = "".join(style_sheets)
-    scripts = scripts.values()
-    script = "".join(scripts)
-    content = pystache.render(templates['index.mustache.html'],
-                              {"style_sheet": style_sheet,
-                               "script": script,
-                               "json_data": json.dumps(posts), "relative_path": config['relative_path'],
+    
+    return pystache.render(templates['index.mustache.html'],
+                              {"style_sheet": "".join(styles.values()),
+                               "script": "".join(scripts.values()),
+                               "json_data": json.dumps(posts), 
+                               "relative_path": config['relative_path'],
                                "title": config['title']
                                })
-    return content
 
 
 def _get_template_path(templates, post_template_name):
@@ -142,8 +138,7 @@ def _markstache(config, post, template, recipes=None):
     """Converts Markdown/Mustache/YAML to HTML."""
     html_md = md.markdown(post['body'].decode("utf-8"))
     _params = __newdict(post, {'body': html_md})
-    if recipes:
-        _params.update(recipes)
+    _params.update(recipes) if recipes else None        
     return pystache.render(template, _params)
 
 
