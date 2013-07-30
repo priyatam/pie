@@ -61,20 +61,37 @@ def load_posts(config):
     return posts
 
 
+def compile_assets(config, asset_type):
+    """Compiles asset types: css, js, html using pre-processors.
+       Currently supports haml, scss, coffeescript."""
+    def _compile(__compile, _from, _to,):
+        outputs = []
+        for fname in os.listdir(asset_type):
+            if fname.endswith(_from):
+                raw_data = __compile(asset_type, fname)  # Inner Closure (__compile) applying on outer closure (_compile)
+                new_filename = "_" + fname.replace(_from, _to)
+                open( asset_type + os.sep + new_filename, 'w').write(raw_data)
+                # next run of bake.py will include the output twice.
+                # hence the _ convention
+                outputs.append((raw_data, new_filename))
+        return outputs
+    return _compile
+
+
 def load_content(config):
     """Pre-process and load each asset type into a dict and return a tuple of such dicts"""
     # Compile HAML Templates
-    haml_html = {fname: compiled_output for compiled_output, fname in compile_assets(config, 'templates')(compile_haml, 'haml','html')}
+    haml_html = {fname: compiled_output for compiled_output, fname in compile_assets(config, 'templates')(_compile_haml, 'haml','html')}
     time.sleep(1) # else, next guy won't see the new file
     templates_css = load_assets(config)('templates', 'html')
     templates = __newdict(templates_css, haml_html)
 
     # Compile SCSS
-    scss_css = {fname: compiled_output for compiled_output, fname in compile_assets(config, 'styles')(compile_scss, 'scss','css') }
+    scss_css = {fname: compiled_output for compiled_output, fname in compile_assets(config, 'styles')(_compile_scss, 'scss','css') }
     css_styles = load_assets(config)('styles', 'css')
     styles = __newdict(css_styles, scss_css)
 
-    coffeescripts = {fname: compiled_output for compiled_output, fname in compile_assets(config, 'scripts')(compile_coffee, 'coffee','js') }
+    coffeescripts = {fname: compiled_output for compiled_output, fname in compile_assets(config, 'scripts')(_compile_coffee, 'coffee','js') }
     js_scripts = load_assets(config)('scripts', 'js')
     scripts = __newdict(js_scripts, coffeescripts)
 
@@ -131,35 +148,20 @@ def _markstache(post, template):
     """Converts Markdown/Mustache/YAML to HTML."""
     html_md = md.markdown(post['body'].decode("utf-8"))
     _params = __newdict(post, {'body': html_md})
-    recipes_dict =load_recipes()
+    recipes_dict = load_recipes()
     _params.update(recipes_dict)
     return pystache.render(template, _params)
 
 
-def compile_assets(config, asset_type):
-    def _compile(__compile, _from, _to,):
-        outputs = []
-        for fname in os.listdir(asset_type):
-            if fname.endswith(_from):
-                raw_data = __compile(asset_type, fname)  # Inner Closure (__compile) applying on outer closure (_compile)
-                new_filename = "_" + fname.replace(_from, _to)
-                open( asset_type + os.sep + new_filename, 'w').write(raw_data)
-                # next run of bake.py will include the output twice.
-                # hence the _ convention
-                outputs.append((raw_data, new_filename))
-        return outputs
-    return _compile
-
-
-def compile_haml(asset_type, fname):
+def _compile_haml(asset_type, fname):
     return hamlpy.Compiler().process(_read(fname, asset_type))
 
 
-def compile_scss(asset_type, fname):
+def _compile_scss(asset_type, fname):
     return Scss().compile(_read(fname, asset_type))
 
 
-def compile_coffee(asset_type, fname):
+def _compile_coffee(asset_type, fname):
     return coffeescript.compile(_read(fname, asset_type))
 
 
@@ -184,5 +186,5 @@ def main(config_path):
 
 
 if __name__ == '__main__':
-    config_path = sys.argv[1] if len(sys.argv) > 1 else "config.yaml"
-    main(config_path)
+    __config_path = sys.argv[1] if len(sys.argv) > 1 else "config.yaml"
+    main(__config_path)
