@@ -7,10 +7,8 @@ import sys
 import time
 from datetime import datetime
 import json
-
 import os
 import re
-from recipes import default
 import yaml
 import markdown as md
 import pystache
@@ -28,7 +26,7 @@ def load_config(config_path):
 def load_assets(config):
     """Loads assets as raw content into a dictionary, looked up by its fname.
     Closure accepts an asset_type ('templates', 'styles', 'posts', 'scripts') and a filter that filters based on file ext"""
-    return lambda asset_type, filter: {fname: _read(fname, asset_type) for fname in os.listdir(asset_type) if fname.endswith(filter) and not fname.startswith("_")}
+    return lambda asset_type, filter: { fname: _read(fname, asset_type) for fname in os.listdir(asset_type) if fname.endswith(filter) }
 
 
 def load_recipes(config):
@@ -76,27 +74,27 @@ def compile_assets(config, asset_type):
 
 def load_content(config):
     """Pre-process and load each asset type into a dict and return a tuple of such dicts"""
-    # Compile HAML Templates
-    haml_html = {fname: compiled_output for compiled_output, fname in compile_assets(config, 'templates')(_compile_haml, 'haml','html')}
-    time.sleep(1) # else, next guy won't see the new file
-    templates_css = load_assets(config)('templates', 'html')
-    templates = __newdict(templates_css, haml_html)
+    
+    # Compile HAML
+    _haml = {fname: compiled_output for compiled_output, fname in compile_assets(config, 'templates')(_compile_haml, 'haml','html')}
+    _html = load_assets(config)('templates', 'html')
+    templates = __newdict(_html, _haml)
 
     # Compile SCSS
-    scss_css = {fname: compiled_output for compiled_output, fname in compile_assets(config, 'styles')(_compile_scss, 'scss','css') }
-    css_styles = load_assets(config)('styles', 'css')
-    styles = __newdict(css_styles, scss_css)
-
-    coffeescripts = {fname: compiled_output for compiled_output, fname in compile_assets(config, 'scripts')(_compile_coffee, 'coffee','js') }
-    js_scripts = load_assets(config)('scripts', 'js')
-    scripts = __newdict(js_scripts, coffeescripts)
+    _scss = {fname: compiled_output for compiled_output, fname in compile_assets(config, 'styles')(_compile_scss, 'scss','css') }
+    _css = load_assets(config)('styles', 'css')
+    styles = __newdict(_css, _scss)
+    
+    # Compile Coffeescript
+    _cs = {fname: compiled_output for compiled_output, fname in compile_assets(config, 'scripts')(_compile_coffee, 'coffee','js') }
+    _js = load_assets(config)('scripts', 'js')
+    scripts = __newdict(_js, _cs)
 
     posts = load_posts(config)
-
     return templates, styles, scripts, posts
 
 
-def bake(config, templates, posts, styles, scripts):
+def bake(config, templates, posts, styles, scripts, recipes):
     """Parse everything. Wrap results in a final page in Html5, CSS, JS, POSTS
        NOTE: This function modifies 'posts' dictionary by adding a new posts['html'] element"""
     for post in posts:
@@ -140,12 +138,12 @@ def _read_yaml(subdir, fname):
             return yaml.load(yaml_and_raw[0]), yaml_and_raw[1]
 
 
-def _markstache(config, post, template):
+def _markstache(config, post, template, recipes=None):
     """Converts Markdown/Mustache/YAML to HTML."""
     html_md = md.markdown(post['body'].decode("utf-8"))
     _params = __newdict(post, {'body': html_md})
-    recipes_dict = load_recipes(config)
-    _params.update(recipes_dict)
+    if recipes:
+        _params.update(recipes)
     return pystache.render(template, _params)
 
 
@@ -172,7 +170,7 @@ def __newdict(*dicts):
     return _dict
 
 def __recipes():
-    __import__(os.listdir("recipes"))
+    return __import__([ f for f in os.listdir('recipes') if f.endswith('py') and not f.endswith('__init__.py') ])
     
     
 def main(config_path):
@@ -180,7 +178,7 @@ def main(config_path):
     config = load_config(config_path)
     templates, styles, scripts, posts = load_content(config)
     recipes = load_recipes(config)
-    output = bake(config, templates, posts, styles, scripts)
+    output = bake(config, templates, posts, styles, scripts, recipes)
     print output
 
 
