@@ -21,14 +21,15 @@ put_in_pan
 add_filling
 > Add config data in any content or template with YAML 
     
+add_recipes
+> Add someone else's flavors
+
 bake_in_oven
 > Compile everything into a single index.html, scripts and styles included
     
 serve
 > git push index.html :gh-pages
     
-Soon: Recipes.
- 
----
+
 Under active development. Not usable until a stable release. License: GPLv3
     
