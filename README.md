@@ -8,24 +8,26 @@ Today's static site generators require css, markup, templating and programming s
 
 And then you check for hosting, browser compatibility, plugins that blow on your face. 
  
-These toolkits are built for a different mindset. For different abstractions. It requires a lot of work to perform simple tasks, like changing design on the fly, add behavior on the fly with a single lambda, cook a frozen pie from recipe. Things shouldn’t be this way. Not in Python.
+These toolkits are built for a different mindset. For different abstractions. It requires a lot of work to perform simple tasks, like changing design on the fly, add behavior on the fly with a single lambda, cook a frozen pie from recipe. Things shouldn’t be this way. 
+
+Not in Python.
     
 **Frozen Pie** - a static site generator using Markdown, Mustache, and HAML.
    
 create_crust
-> Create content (posts and pages) in Markdown
+> Create posts (blog, wiki, pages) in Markdown
     
 put_in_pan
-> Put in a logic-less templates with HAML-Mustache
+> Markup with HAML--your haiku for HTML, combine logic with Mustache
     
 add_filling
-> Add config data in any content or template with YAML 
+> Vary anything with config data injected with YAML 
     
 add_recipes
-> Add someone else's flavors
+> Add someone else's flavors, simply click and add.
 
 bake_in_oven
-> Compile everything into a single index.html, scripts and styles included
+> Compile everything into a single index.html, _everything_ included
     
 serve
 > git push index.html :gh-pages
