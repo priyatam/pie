@@ -3,19 +3,20 @@
 Usage: python bake.py > index.html
 Algo: Read config.yaml. For each post.md, process YAML, and apply its Mustache-HAML Template, and generate final HTML. Combine everything into index.html with minified CSS, JS.
 """
-import os
 import sys
-import re
 import time
 from datetime import datetime
 import json
+
+import os
+import re
+from recipes import default
 import yaml
 import markdown as md
 import pystache
 from hamlpy import hamlpy
 from scss import Scss
 import coffeescript
-import recipes
 
 
 def load_config(config_path):
@@ -30,14 +31,9 @@ def load_assets(config):
     return lambda asset_type, filter: {fname: _read(fname, asset_type) for fname in os.listdir(asset_type) if fname.endswith(filter) and not fname.startswith("_")}
 
 
-def load_recipes():
-    recipe_defs = dir(recipes)
-    recipes_dict = {}
-    for recipe_def in recipe_defs:
-        if not recipe_def.startswith("__"):
-            current_def = getattr(recipes, recipe_def)
-            recipes_dict.update({recipe_def: current_def})
-    return recipes_dict
+def load_recipes(config):
+    """Loads recipes as a module of pure functions defined in recipe-name.py"""
+    return { recipe_def: getattr(__recipes, recipe_def) for recipe_def in dir(__recipes) if not recipe_def.startswith("__") }       
 
 
 def load_posts(config):
@@ -104,7 +100,7 @@ def bake(config, templates, posts, styles, scripts):
     """Parse everything. Wrap results in a final page in Html5, CSS, JS, POSTS
        NOTE: This function modifies 'posts' dictionary by adding a new posts['html'] element"""
     for post in posts:
-        converted_html = _markstache(post, _get_template_path(templates, post['template']))  # each post can have its own template
+        converted_html = _markstache(config, post, _get_template_path(templates, post['template']))  # each post can have its own template
         post['html'] = converted_html
 
     style_sheets = styles.values()
@@ -144,11 +140,11 @@ def _read_yaml(subdir, fname):
             return yaml.load(yaml_and_raw[0]), yaml_and_raw[1]
 
 
-def _markstache(post, template):
+def _markstache(config, post, template):
     """Converts Markdown/Mustache/YAML to HTML."""
     html_md = md.markdown(post['body'].decode("utf-8"))
     _params = __newdict(post, {'body': html_md})
-    recipes_dict = load_recipes()
+    recipes_dict = load_recipes(config)
     _params.update(recipes_dict)
     return pystache.render(template, _params)
 
@@ -166,7 +162,6 @@ def _compile_coffee(asset_type, fname):
 
 
 def _format_date(fname):
-    """Returns a formatted fname.date"""
     return datetime.strptime(time.ctime(os.path.getmtime(fname)), "%a %b %d %H:%M:%S %Y").strftime("%m-%d-%y")
 
 
@@ -176,11 +171,15 @@ def __newdict(*dicts):
         _dict.update(d)
     return _dict
 
-
+def __recipes():
+    __import__(os.listdir("recipes"))
+    
+    
 def main(config_path):
     """Let's cook an Apple Pie"""
     config = load_config(config_path)
     templates, styles, scripts, posts = load_content(config)
+    recipes = load_recipes(config)
     output = bake(config, templates, posts, styles, scripts)
     print output
 
