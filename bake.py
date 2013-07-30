@@ -38,7 +38,7 @@ def load_recipes():
             current_def = getattr(recipes, recipe_def)
             recipes_dict.update({recipe_def: current_def})
     return recipes_dict
- 
+
 
 def load_posts(config):
     """Creates a dictionary of Post meta data, including body as 'raw content'"""
@@ -152,8 +152,7 @@ def compile_assets(config, asset_type):
 
 
 def compile_haml(asset_type, fname):
-    haml = _read(fname, asset_type)
-    return hamlpy.Compiler().process(haml)
+    return hamlpy.Compiler().process(_read(fname, asset_type))
 
 
 def compile_scss(asset_type, fname):
