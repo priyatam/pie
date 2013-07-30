@@ -3,3 +3,4 @@ PyYaml
 pystache
 hamlpy
 Coffeescript
+pyScss
