@@ -30,12 +30,15 @@ def load_assets(config):
     """Loads assets as raw content into a dictionary, looked up by its fname.
     Closure accepts an asset ('templates', 'styles', 'posts', 'scripts') and a filter that filters based on file ext"""
     return lambda asset, filter: {fname: _read(fname, asset) for fname in os.listdir(asset) if fname.endswith(filter)}
-                                       
+
 
 def load_recipes(config):
     """Loads all pure functions from each module under recipes/ as a dictionary lookup by funcion name"""
-    modules = [ import_module('.' + recipe, 'recipes') for recipe in _recipes()]   
-    return {funcname: getattr(mod, funcname) for mod in modules for funcname in dir(mod) if not funcname.startswith("__") }  
+    modules = [import_module("recipes." + recipe) for recipe in _recipes()]
+    # To avoud namespace collisions, filename is a prefix to all functions defined in it
+    # So default_hello_world
+    functions_dict = {mod.__name__.strip("recipes.") + "_" + funcname: getattr(mod, funcname) for mod in modules for funcname in dir(mod) if not funcname.startswith("__")}
+    return functions_dict
 
 
 def load_posts(config):
@@ -67,8 +70,8 @@ def compile_assets(config, asset_type):
         outputs = []
         for fname in os.listdir(asset_type):
             if fname.endswith(_from):
-                raw_data = __compile(asset_type,  fname)                                      
-                # Avoid including the output twice. Hint bake,oy by adding a _ filename convention             
+                raw_data = __compile(asset_type,  fname)
+                # Avoid including the output twice. Hint bake, by adding a _ filename convention
                 new_filename = "_" + fname.replace(_from, _to)
                 open(asset_type + os.sep + new_filename, 'w').write(raw_data)
                 outputs.append((raw_data, new_filename))
@@ -97,7 +100,7 @@ def load_content(config):
 
     # All Posts
     posts = load_posts(config)
-    
+
     return templates, styles, scripts, posts
 
 
@@ -106,16 +109,19 @@ def bake(config, templates, posts, styles, scripts, recipes):
        NOTE: This function modifies 'posts' dictionary by adding a new posts['html'] element"""
     for post in posts:
         converted_html = _markstache(config, post, _get_template_path(templates, post[
-            'template']))  # each post can have its own template
+            'template']), recipes=recipes)  # each post can have its own template
         post['html'] = converted_html
 
-    return pystache.render(templates['index.mustache.html'],
-                           {"style_sheet": "".join(styles.values()),
-                            "script": "".join(scripts.values()),
-                            "json_data": json.dumps(posts),
-                            "relative_path": config['relative_path'],
-                            "title": config['title']
-                           })
+    _params = {"style_sheet": "".join(styles.values()), 
+               "script": "".join(scripts.values()),
+               "json_data": json.dumps(posts),
+               "relative_path": config['relative_path'],
+               "title": config['title']
+              }
+
+    _params.update(recipes)
+    return pystache.render(templates['index.mustache.html'], _params)
+
 
 
 def _get_template_path(templates, post_template_name):
@@ -167,7 +173,7 @@ def _format_date(fname):
 
 
 def _recipes():
-    return [f.strip('.py') for f in os.listdir('recipes') if f.endswith('py') and not f.endswith('__init__.py')]
+    return [f.strip('.py') for f in os.listdir('recipes') if f.endswith('py') and not f.startswith("__")]
 
 
 def __newdict(*dicts):
