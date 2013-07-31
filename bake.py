@@ -110,7 +110,7 @@ def load_content(config):
     return templates, styles, scripts, posts
 
 
-def bake(config, templates, posts, styles, scripts, recipes, minify=False):
+def bake(config, templates, posts, styles, scripts, recipes, serve=False):
     """Parse everything. Wrap results in a final page in Html5, CSS, JS, POSTS
        NOTE: This function modifies 'posts' dictionary by adding a new posts['html'] element"""
     for post in posts:
@@ -120,7 +120,7 @@ def bake(config, templates, posts, styles, scripts, recipes, minify=False):
 
     _params = {}
 
-    if minify:
+    if serve:
         print "Minifying CSS/JS"
         _params = {"style_sheet": cssmin.cssmin("".join(styles.values())),
                 "script": jsmin.jsmin("".join(scripts.values())),
@@ -161,7 +161,7 @@ def serve_github(config):
     time.sleep(1)
     os.system("git checkout master")
     time.sleep(1)
-    os.system("git stash pop")    
+    os.system("git stash pop")
 
 
 def _get_template_path(templates, post_template_name):
@@ -228,12 +228,12 @@ def __newdict(*dicts):
     return _dict
 
 
-def main(config_path, minify=False, serve=False):
+def main(config_path, serve=False):
     """Let's cook an Apple Pie"""
     config = load_config(config_path)
     templates, styles, scripts, posts = load_content(config)
     recipes = load_recipes(config)
-    output = bake(config, templates, posts, styles, scripts, recipes, minify=minify)
+    output = bake(config, templates, posts, styles, scripts, recipes, serve=serve)
     open('index.html', 'w').write(output)
     print 'Generated index.html'
 
@@ -247,13 +247,14 @@ if __name__ == '__main__':
     parser.add_argument("--config", nargs=1, default=["config.yaml"])
     args = parser.parse_args(sys.argv[1:])
     __config_path = args.config[0]
-    minify = False
     serve = False
-    if "min" in args.string_options: minify = True
-    if "serve" in args.string_options: serve = True
-
+    if "serve" in args.string_options:
+        serve = True
+        __config_path = "config.github.yaml"
+        try:
+            with open(__config_path): pass
+        except IOError:
+            print 'You need a config.github.yaml for serve.'
+            exit(1)
     print "Using config from " + __config_path
-
-    main(__config_path, minify=minify, serve=serve)
-
-
+    main(__config_path, serve=serve)
