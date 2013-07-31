@@ -140,7 +140,7 @@ def bake(config, templates, posts, styles, scripts, recipes, minify=False):
     return pystache.render(templates['index.mustache.html'], _params)
 
 
-def serve(config):
+def serve_github(config):
     pipe_git = Popen(['git', 'branch'], stdout=PIPE, stderr=PIPE, stdin=PIPE)
     branches = pipe_git.stdout.read()
     if not re.search("gh-pages\n", branches):
@@ -162,7 +162,7 @@ def serve(config):
     os.system("git checkout master")
     time.sleep(1)
     os.system("git stash pop")    
-    
+
 
 def _get_template_path(templates, post_template_name):
     if post_template_name.endswith(".haml"):
@@ -236,26 +236,24 @@ def main(config_path, minify=False, serve=False):
     output = bake(config, templates, posts, styles, scripts, recipes, minify=minify)
     open('index.html', 'w').write(output)
     print 'Generated index.html'
-    
-    serve(config) if serve else None
+
+    serve_github(config) if serve else None
 
 
 if __name__ == '__main__':
     # Parse commmand line options
     parser = argparse.ArgumentParser(description='Some options.')
-    parser.add_argument('string_options', type=str, nargs="+", default=[])
+    parser.add_argument('string_options', type=str, nargs="*", default=[])
     parser.add_argument("--config", nargs=1, default=["config.yaml"])
     args = parser.parse_args(sys.argv[1:])
-    __config_path = args.config[0]    
+    __config_path = args.config[0]
     minify = False
     serve = False
     if "min" in args.string_options: minify = True
-    if "serve" in args.string_options: serve = True 
-    
+    if "serve" in args.string_options: serve = True
+
     print "Using config from " + __config_path
-    
+
     main(__config_path, minify=minify, serve=serve)
 
-  
-       
 
