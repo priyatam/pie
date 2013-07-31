@@ -140,7 +140,17 @@ def bake(config, templates, posts, styles, scripts, recipes, serve=False):
     return pystache.render(templates['index.mustache.html'], _params)
 
 
-def serve_github(config):
+def serve_github(config, version=None):
+    """
+    Algo:
+        create a deploy folder in current dir
+        mv to deploy
+        git clone -b gh-pages https://github.com/priyatam/frozen-pie.git if deploy is Empty else (cd froze-pie + git pull)
+        cd frozen-pie
+        cp ../index.html frozen-pie/
+        git commit index.html -m "deployed new version: "+version
+        git push
+    """
     pipe_git = Popen(['git', 'branch'], stdout=PIPE, stderr=PIPE, stdin=PIPE)
     branches = pipe_git.stdout.read()
     if not re.search("gh-pages\n", branches):
