@@ -4,3 +4,6 @@ pystache
 hamlpy
 Coffeescript
 pyScss
+cssmin
+jsmin
+

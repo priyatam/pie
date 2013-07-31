@@ -1,7 +1,12 @@
 #!/usr/bin/env python
 """
-Usage: bake.py
-Algo: Read config.yaml. For each post.md, process YAML, and apply its Mustache-HAML Template, and generate final HTML. 
+Usage:
+./bake.py
+./bake.py min                                               For CSS/JS minification
+./bake.py min serve --config config.github.yaml             To serve in gh-pages
+
+Algo:
+Read config.yaml. For each post.md, process YAML, and apply its Mustache-HAML Template, and generate final HTML. 
 Lastly, combine everything into a single index.html with a minified CSS, JS.
 """
 
@@ -230,6 +235,7 @@ if __name__ == '__main__':
         os.system("git stash")
         time.sleep(1)
         os.system("cp index.html /tmp")
+        time.sleep(1)
         os.system("git checkout gh-pages")
         time.sleep(1)
         os.system("cp /tmp/index.html index.html")
