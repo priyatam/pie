@@ -8,6 +8,7 @@ Lastly, combine everything into a single index.html with a minified CSS, JS.
 import sys
 import time
 from datetime import datetime
+from importlib import import_module
 import json
 import os
 import re
@@ -32,14 +33,13 @@ def load_assets(config):
                                        
 
 def load_recipes(config):
-    """Loads all pure functions in each module under recipes/ as a dictionary
-        {recipe-name: func-def} """
+    """Loads all pure functions from each module under recipes/ as a dictionary lookup by funcion name"""
+    modules = [ import_module('.' + recipe, 'recipes') for recipe in _recipes()]   
     recipes = {}
-    for recipe in _recipes():
-        recipes.update({ recipe_def: getattr(__import__(recipe), recipe_def) for recipe_def in dir(__import__(recipe)) })   
+    # TODO: If readable, convert to list compr
+    for mod in modules:        
+        recipes.update({funcname: getattr(mod, funcname) for funcname in dir(mod) if not funcname.startswith("__")})
     return recipes    
-    # FIXME
-    #return { {recipe_def: getattr(recipe, recipe_def) for recipe_def in dir(recipe)} for recipe in _recipes() }
 
 
 def load_posts(config):
@@ -174,7 +174,7 @@ def _format_date(fname):
 
 
 def _recipes():
-    return [f for f in os.listdir('recipes') if f.endswith('py') and not f.endswith('__init__.py')]
+    return [f.strip('.py') for f in os.listdir('recipes') if f.endswith('py') and not f.endswith('__init__.py')]
 
 
 def __newdict(*dicts):
