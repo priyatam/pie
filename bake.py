@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Usage: python bake.py > index.html
+Usage: bake.py
 Algo: Read config.yaml. For each post.md, process YAML, and apply its Mustache-HAML Template, and generate final HTML. 
 Lastly, combine everything into a single index.html with a minified CSS, JS.
 """
@@ -60,19 +60,17 @@ def load_posts(config):
 
 
 def compile_assets(config, asset_type):
-    """Compiles asset types: css, js, html using pre-processors.
+    """Closure: Compiles asset types: css, js, html using pre-processors.
        Currently supports haml, scss, coffeescript."""
 
     def _compile(__compile, _from, _to, ):
         outputs = []
         for fname in os.listdir(asset_type):
             if fname.endswith(_from):
-                raw_data = __compile(asset_type,
-                                     fname)  # Inner Closure (__compile) applying on outer closure (_compile)
+                raw_data = __compile(asset_type,  fname)                                      
+                # Avoid including the output twice. Hint bake,oy by adding a _ filename convention             
                 new_filename = "_" + fname.replace(_from, _to)
                 open(asset_type + os.sep + new_filename, 'w').write(raw_data)
-                # next run of bake.py will include the output twice.
-                # hence the _ convention
                 outputs.append((raw_data, new_filename))
         return outputs
 
@@ -83,24 +81,23 @@ def load_content(config):
     """Pre-process and load each asset type into a dict and return a tuple of such dicts"""
 
     # Compile HAML
-    _haml = {fname: compiled_output for compiled_output, fname in
-             compile_assets(config, 'templates')(_compile_haml, 'haml', 'html')}
+    _haml = {fname: compiled_out for compiled_out, fname in compile_assets(config, 'templates')(_compile_haml, 'haml', 'html')}
     _html = load_assets(config)('templates', 'html')
     templates = __newdict(_html, _haml)
 
     # Compile SCSS
-    _scss = {fname: compiled_output for compiled_output, fname in
-             compile_assets(config, 'styles')(_compile_scss, 'scss', 'css')}
+    _scss = {fname: compiled_out for compiled_out, fname in compile_assets(config, 'styles')(_compile_scss, 'scss', 'css')}
     _css = load_assets(config)('styles', 'css')
     styles = __newdict(_css, _scss)
 
     # Compile Coffeescript
-    _cs = {fname: compiled_output for compiled_output, fname in
-           compile_assets(config, 'scripts')(_compile_coffee, 'coffee', 'js')}
+    _cs = {fname: compiled_out for compiled_out, fname in compile_assets(config, 'scripts')(_compile_coffee, 'coffee', 'js')}
     _js = load_assets(config)('scripts', 'js')
     scripts = __newdict(_js, _cs)
 
+    # All Posts
     posts = load_posts(config)
+    
     return templates, styles, scripts, posts
 
 
@@ -186,7 +183,8 @@ def main(config_path):
     templates, styles, scripts, posts = load_content(config)
     recipes = load_recipes(config)
     output = bake(config, templates, posts, styles, scripts, recipes)
-    print output
+    open('index.html', 'w').write(output)
+    print 'Generated index.html'
 
 
 if __name__ == '__main__':
