@@ -2,11 +2,12 @@
 """
 Usage:
 ./bake.py
-./bake.py min                                               For CSS/JS minification
-./bake.py min serve --config config.github.yaml             To serve in gh-pages
+
+To serve in gh-pages
+./bake.py serve
 
 Algo:
-Read config.yaml. For each post.md, process YAML, and apply its Mustache-HAML Template, and generate final HTML. 
+Read config.yaml. For each post.md, process YAML, and apply its Mustache-HAML Template, and generate final HTML.
 Lastly, combine everything into a single index.html with a minified CSS, JS.
 """
 
@@ -143,11 +144,10 @@ def bake(config, templates, posts, styles, scripts, recipes, serve=False):
 def serve_github(config, version=None):
     """
     Algo:
-        git clone -b gh-pages https://github.com/priyatam/frozen-pie.git if deploy is Empty else (cd froze-pie + git pull)
-        cd frozen-pie
-        cp ../index.html frozen-pie/
-        git commit index.html -m "deployed new version: "+version
-        git push
+        create or replace deploy
+        clone gh-pages into deploy
+        git commit index.html -m "hash" (deploy/index.html can always be recreated from src hash)
+        git push gh-pages
     """
     proc = Popen(['git','config', "--get","remote.origin.url"],stdout=PIPE)
     url = proc.stdout.readline().rstrip("\n")
@@ -210,7 +210,7 @@ def _recipes():
 
 
 def _funcname(str):
-    """To avoud namespace collisions, filename is a prefix to all functions defined in it. Ex: default_hello_world """    
+    """To avoud namespace collisions, filename is a prefix to all functions defined in it. Ex: default_hello_world """
     return str.__name__.strip("recipes.") + "_" + str
 
 
