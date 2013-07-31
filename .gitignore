@@ -1,7 +1,6 @@
 _*
 *.py[cod]
 
-index.html
 .sass-cache
 
 .DS_Store

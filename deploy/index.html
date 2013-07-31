@@ -1,0 +1,219 @@
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Frozen Pie</title>
+<head>
+<style type="text/css">
+#main {
+  padding-bottom: 120px
+}
+
+.date {
+  font-size: 18px
+}
+
+.post-title {
+  font-size: 22px
+}
+
+body {
+  font-size: 1.5em
+}
+
+#main{padding-bottom:120px}.date{font-size:18px}.post-title{font-size:22px}body{font-size:1.5em}@import url(http://fonts.googleapis.com/css?family=Vollkorn:400,400italic,700,700italic&subset=latin);
+
+html, body {
+        padding:1em;
+        margin:auto;
+        max-width:42em;
+        background:#fefefe;
+	}
+body {
+	font: 1.3em "Vollkorn", Palatino, Times;
+	color: #333;
+	line-height: 1.4;
+	text-align: justify;
+	}
+header, nav, article, footer {
+	width: 700px;
+	margin:0 auto;
+	}
+article {
+	margin-top: 4em;
+	margin-bottom: 4em;
+	min-height: 400px;
+	}
+footer {
+	margin-bottom:50px;
+	}
+video {
+	margin: 2em 0;
+	border:1px solid #ddd;
+	}
+
+nav {
+	font-size: .9em;
+	font-style: italic;
+	border-bottom: 1px solid #ddd;
+	padding: 1em 0;
+	}
+nav p {
+	margin: 0;
+	}
+
+/* Typography
+-------------------------------------------------------- */
+
+h1 {
+	margin-top: 0;
+	font-weight: normal;
+	}
+h2 {
+	font-weight: normal;
+	}
+h3 {
+	font-weight: normal;
+	font-style: italic;
+	margin-top:3em;
+	}
+p {
+	margin-top:0;
+	-webkit-hypens:auto;
+	-moz-hypens:auto;
+	hyphens:auto;
+	}
+ul {
+	list-style: square;
+	padding-left:1.2em;
+	}
+ol {
+	padding-left:1.2em;
+	}
+blockquote {
+	margin-left: 1em;
+	padding-left: 1em;
+	border-left: 1px solid #ddd;
+	}
+code {
+	font-family: "Consolas", "Menlo", "Monaco", monospace, serif;
+	font-size: .9em;
+	background: white;
+	}
+a {
+	color: #2484c1;
+	text-decoration: none;
+	}
+a:hover {
+	text-decoration: underline;
+	}
+a img {
+	border:none;
+	}
+h1 a, h1 a:hover {
+	color: #333;
+	text-decoration: none;
+	}
+hr {
+	color : #ddd;
+	height : 1px;
+	margin: 2em 0;
+	border-top : solid 1px #ddd;
+	border-bottom : none;
+	border-left: 0;
+	border-right: 0;
+	}
+p#heart{
+	font-size: 2em;
+	line-height: 1;
+	text-align: center;
+	color: #ccc;
+	}
+.red {
+	color:#B50000;
+	}
+
+/* Home Page
+--------------------------- */
+
+body#index li {
+	margin-bottom: 1em;
+	}
+
+
+/* iPad
+-------------------------------------------------------- */
+@media only screen and (max-device-width: 1024px) {
+body {
+	font-size: 120%;
+	line-height: 1.4;
+	}
+} /* @iPad */
+
+/* iPhone
+-------------------------------------------------------- */
+@media only screen and (max-device-width: 480px) {
+body {
+	text-align: left;
+	}
+article, footer {
+	width: auto;
+	}
+article {
+	padding: 0 10px;
+	}
+} /* @iPhone */
+
+
+</style>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/0.7.2/mustache.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sammy.js/0.7.4/sammy.min.js"></script>
+
+<script>
+var data = [{"body": "\n## What are recipes ?\n\nFunctions in recipes/*, rendered in your mustache template.\n> Here's the hello_world from recipes/default.py recipe saying something,\n\n\n", "modified_date": "07-31-13", "name": "posts/recipes.md", "author": "Sreeharsha Mudivarti", "title": "Recipes", "post_date": "07-25-13", "html": "<div class='post'>\n  <div class='body'>\n     <h2>What are recipes ?</h2>\n<p>Functions in recipes/*, rendered in your mustache template.</p>\n<blockquote>\n<p>Here's the hello_world from recipes/default.py recipe saying something,</p>\n</blockquote>\nHello        reader\n from Frozen Pie\n  </div>\n</div>\n", "template": "recipes.mustache.haml", "category": "features", "type": "blog"}, {"body": "\nToday's static site generators require css, markup, templating and programming skills. Their compatibility is broken. \nA template in one framework doesn't work in the other. You can't mix and match languages, and add custom features in\na decoupled way. You can't take a Designer's template and pipe data structures and lambdas. And then you check for\nhosting, browser compatibility, plugins that blow on your face. \n \nThese toolkits are built for a different skillset. It requires a lot of work to perform simple tasks. Things shouldn\u2019t \nbe this way. Not in Python.\n", "modified_date": "07-31-13", "name": "posts/simplicity.md", "author": "Priyatam Mudivarti", "title": "Simplicity", "post_date": "07-20-13", "html": "<div class='post'>\n<h2>Simplicity <em>by</em> Priyatam Mudivarti</h2>    <div class='body'>\n        <p>Today's static site generators require css, markup, templating and programming skills. Their compatibility is broken. \nA template in one framework doesn't work in the other. You can't mix and match languages, and add custom features in\na decoupled way. You can't take a Designer's template and pipe data structures and lambdas. And then you check for\nhosting, browser compatibility, plugins that blow on your face. </p>\n<p>These toolkits are built for a different skillset. It requires a lot of work to perform simple tasks. Things shouldn\u2019t \nbe this way. Not in Python.</p>\n\n    </div>\n</div>\n", "template": "post.mustache.haml", "category": "tech", "type": "blog"}, {"body": "\n### What's the point of another static generator ?  \n\n> It's a *single file* static generator with all the bells and whistles.  \nWrite all your md posts in posts/. Your file name becomes the url.  \n>\n> ./bake.py\n>\n> Copy the single file, you are done.  \n\n### How can a single file show multiple posts in an interactive manner ?  \n> Sammy.js  \n\n### Bookmarkable, Back button ?\n> Yes  \n\n### What about styles ?  \n> <https://github.com/jasonm23/markdown-css-themes/> and see the config.  \n\n### What about templates ?  \n> See the mustache templates in templates/  \n\n", "modified_date": "07-31-13", "name": "posts/introduction.md", "author": "Sreeharsha Mudivarti", "title": "Have your Pie and Eat it", "post_date": "07-23-13", "html": "<div class='post'>\n<h2>Have your Pie and Eat it <em>by</em> Sreeharsha Mudivarti</h2>    <div class='body'>\n        <h3>What's the point of another static generator ?</h3>\n<blockquote>\n<p>It's a <em>single file</em> static generator with all the bells and whistles.<br />\nWrite all your md posts in posts/. Your file name becomes the url.  </p>\n<p>./bake.py</p>\n<p>Copy the single file, you are done.  </p>\n</blockquote>\n<h3>How can a single file show multiple posts in an interactive manner ?</h3>\n<blockquote>\n<p>Sammy.js  </p>\n</blockquote>\n<h3>Bookmarkable, Back button ?</h3>\n<blockquote>\n<p>Yes  </p>\n</blockquote>\n<h3>What about styles ?</h3>\n<blockquote>\n<p><a href=\"https://github.com/jasonm23/markdown-css-themes/\">https://github.com/jasonm23/markdown-css-themes/</a> and see the config.  </p>\n</blockquote>\n<h3>What about templates ?</h3>\n<blockquote>\n<p>See the mustache templates in templates/  </p>\n</blockquote>\n\n    </div>\n</div>\n", "template": "post.mustache.haml", "category": "tech", "type": "page"}];
+var rel_path = "/index.html";
+
+(function() {
+
+  console.log("Coffeescript Loaded");
+
+}).call(this);
+$( function () {
+
+    var titles_template = '\
+    <span class="date"> {{ post_date }}&nbsp;&nbsp;</span></div>\
+    <span><a href="#/{{ name }}"><span class="post-title">{{ title }}</a></span><br/>'
+
+    var app = $.sammy(function() {
+        this.element_selector = '#main';
+        this.get(rel_path + '#/posts/(.*)', function (context) {
+            var dhash = document.location.hash;
+            post_name = dhash.substring(2);
+            for (var i =0; i < data.length; i++) {
+                if (data[i]['name'] === post_name) {
+                    break;
+                }
+            }
+            context.app.swap('');
+            context.$element().html(data[i]['html'])
+        });
+        this.get(rel_path, function(context) {
+            context.app.swap('');
+            data = data.sort( function(a,b) {return a['post_date'] < b['post_date'] } );
+            for (var i =0; i < data.length; i++) {
+                context.$element().prepend(Mustache.to_html(titles_template, data[i]));
+            }
+        });
+    });
+    app.run()
+});
+
+
+
+</script>
+</head>
+<body>
+<h1> Frozen Pie </h1>
+<div id="main"></div>
+</body>
+</html>

@@ -143,35 +143,18 @@ def bake(config, templates, posts, styles, scripts, recipes, serve=False):
 def serve_github(config, version=None):
     """
     Algo:
-        create a deploy folder in current dir
-        mv to deploy
         git clone -b gh-pages https://github.com/priyatam/frozen-pie.git if deploy is Empty else (cd froze-pie + git pull)
         cd frozen-pie
         cp ../index.html frozen-pie/
         git commit index.html -m "deployed new version: "+version
         git push
     """
-    pipe_git = Popen(['git', 'branch'], stdout=PIPE, stderr=PIPE, stdin=PIPE)
-    branches = pipe_git.stdout.read()
-    if not re.search("gh-pages\n", branches):
-        os.system("git branch gh-pages")
-    os.system("git stash")
-    time.sleep(1)
-    os.system("cp index.html /tmp")
-    time.sleep(1)
-    os.system("git checkout gh-pages")
-    time.sleep(1)
-    os.system("cp /tmp/index.html index.html")
-    time.sleep(1)
-    os.system("git add index.html")
-    time.sleep(1)
-    os.system("git commit -m \"new index.html\"")
-    time.sleep(1)
-    os.system("git push origin gh-pages")
-    time.sleep(1)
-    os.system("git checkout master")
-    time.sleep(1)
-    os.system("git stash pop")
+    proc = Popen(['git','config', "--get","remote.origin.url"],stdout=PIPE)
+    url = proc.stdout.readline()
+    os.system("rm -rf /tmp/frozen-pie")
+    os.system("git clone -b gh-pages " + url + " /tmp/frozen-pie")
+    os.system("cp deploy/index.html /tmp/frozen-pie/")
+    os.system("cd /tmp/frozen-pie; git add index.html; git commit -m 'new deploy'; git push --force origin gh-pages")
 
 
 def _get_template_path(templates, post_template_name):
@@ -243,12 +226,11 @@ def main(config_path, serve=False):
     config = load_config(config_path)
     templates, styles, scripts, posts = load_content(config)
     recipes = load_recipes(config)
-    print recipes
     output = bake(config, templates, posts, styles, scripts, recipes, serve=serve)
-    open('index.html', 'w').write(output)
+    open('deploy/index.html', 'w').write(output)
     print 'Generated index.html'
-
-#    serve_github(config) if serve else None
+    if serve:
+        serve_github(config)
 
 
 if __name__ == '__main__':
