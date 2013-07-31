@@ -23,7 +23,6 @@ import pystache
 from hamlpy import hamlpy
 from scss import Scss
 import coffeescript
-
 import cssmin
 import jsmin
 import argparse
@@ -45,12 +44,9 @@ def load_assets(config):
 def load_recipes(config):
     """Loads all pure functions from each module under recipes/ as a dictionary lookup by funcion name"""
     modules = [import_module("recipes." + recipe) for recipe in _recipes()]
-    # To avoud namespace collisions, filename is a prefix to all functions defined in it
-    # So default_hello_world
-    functions_dict = {mod.__name__.strip("recipes.") + "_" + funcname: getattr(mod, funcname) for mod in modules for funcname in dir(mod) if not funcname.startswith("__")}
-    return functions_dict
-
-
+    return {_funcname: getattr(mod, funcname) for mod in modules for funcname in dir(mod) if not funcname.startswith("__")}
+    
+    
 def load_posts(config):
     """Creates a dictionary of Post meta data, including body as 'raw content'"""
     posts = []
@@ -144,6 +140,29 @@ def bake(config, templates, posts, styles, scripts, recipes, minify=False):
     return pystache.render(templates['index.mustache.html'], _params)
 
 
+def serve(config):
+    pipe_git = Popen(['git', 'branch'], stdout=PIPE, stderr=PIPE, stdin=PIPE)
+    branches = pipe_git.stdout.read()
+    if not re.search("gh-pages\n", branches):
+        os.system("git branch gh-pages")
+    os.system("git stash")
+    time.sleep(1)
+    os.system("cp index.html /tmp")
+    time.sleep(1)
+    os.system("git checkout gh-pages")
+    time.sleep(1)
+    os.system("cp /tmp/index.html index.html")
+    time.sleep(1)
+    os.system("git add index.html")
+    time.sleep(1)
+    os.system("git commit -m \"new index.html\"")
+    time.sleep(1)
+    os.system("git push origin gh-pages")
+    time.sleep(1)
+    os.system("git checkout master")
+    time.sleep(1)
+    os.system("git stash pop")    
+    
 
 def _get_template_path(templates, post_template_name):
     if post_template_name.endswith(".haml"):
@@ -197,6 +216,11 @@ def _recipes():
     return [f.strip('.py') for f in os.listdir('recipes') if f.endswith('py') and not f.startswith("__")]
 
 
+def _funcname(str):
+    """To avoud namespace collisions, filename is a prefix to all functions defined in it. Ex: default_hello_world """    
+    return str.__name__.strip("recipes.") + "_" + str
+
+
 def __newdict(*dicts):
     _dict = {}
     for d in dicts:
@@ -204,7 +228,7 @@ def __newdict(*dicts):
     return _dict
 
 
-def main(config_path, minify=False):
+def main(config_path, minify=False, serve=False):
     """Let's cook an Apple Pie"""
     config = load_config(config_path)
     templates, styles, scripts, posts = load_content(config)
@@ -212,41 +236,26 @@ def main(config_path, minify=False):
     output = bake(config, templates, posts, styles, scripts, recipes, minify=minify)
     open('index.html', 'w').write(output)
     print 'Generated index.html'
+    
+    serve(config) if serve else None
 
 
 if __name__ == '__main__':
+    # Parse commmand line options
     parser = argparse.ArgumentParser(description='Some options.')
     parser.add_argument('string_options', type=str, nargs="+", default=[])
     parser.add_argument("--config", nargs=1, default=["config.yaml"])
     args = parser.parse_args(sys.argv[1:])
-    __config_path = args.config[0]
+    __config_path = args.config[0]    
     minify = False
     serve = False
     if "min" in args.string_options: minify = True
-    if "serve" in args.string_options: serve = True
+    if "serve" in args.string_options: serve = True 
+    
     print "Using config from " + __config_path
-    main(__config_path, minify=minify)
+    
+    main(__config_path, minify=minify, serve=serve)
 
-    if serve:
-        pipe_git = Popen(['git', 'branch'], stdout=PIPE, stderr=PIPE, stdin=PIPE)
-        branches = pipe_git.stdout.read()
-        if not re.search("gh-pages\n", branches):
-            os.system("git branch gh-pages")
-        os.system("git stash")
-        time.sleep(1)
-        os.system("cp index.html /tmp")
-        time.sleep(1)
-        os.system("git checkout gh-pages")
-        time.sleep(1)
-        os.system("cp /tmp/index.html index.html")
-        time.sleep(1)
-        os.system("git add index.html")
-        time.sleep(1)
-        os.system("git commit -m \"new index.html\"")
-        time.sleep(1)
-        os.system("git push origin gh-pages")
-        time.sleep(1)
-        os.system("git checkout master")
-        time.sleep(1)
-        os.system("git stash pop")
+  
+       
 
