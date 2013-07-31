@@ -21,6 +21,8 @@ import coffeescript
 
 import cssmin
 import jsmin
+import argparse
+from subprocess import Popen, PIPE
 
 
 def load_config(config_path):
@@ -208,19 +210,37 @@ def main(config_path, minify=False):
 
 
 if __name__ == '__main__':
-    import argparse
     parser = argparse.ArgumentParser(description='Some options.')
-    parser.add_argument('minify', nargs='?', default=False)
-    parser.add_argument('serve', nargs='?', default=False)
+    parser.add_argument('string_options', type=str, nargs="+", default=[])
     parser.add_argument("--config", nargs=1, default=["config.yaml"])
     args = parser.parse_args(sys.argv[1:])
     __config_path = args.config[0]
+    minify = False
+    serve = False
+    if "min" in args.string_options: minify = True
+    if "serve" in args.string_options: serve = True
     print "Using config from " + __config_path
-    main(__config_path, minify=args.minify)
+    main(__config_path, minify=minify)
 
-    if args.serve:
-        if re.search("gh-pages\n", os.system("git branch")):
-            #os.system("git branch gh-pages")
-            pass
-        os.system("echo \"Git Magic Here\"")
+    if serve:
+        pipe_git = Popen(['git', 'branch'], stdout=PIPE, stderr=PIPE, stdin=PIPE)
+        branches = pipe_git.stdout.read()
+        if not re.search("gh-pages\n", branches):
+            os.system("git branch gh-pages")
+        os.system("git stash")
+        time.sleep(1)
+        os.system("cp index.html /tmp")
+        os.system("git checkout gh-pages")
+        time.sleep(1)
+        os.system("cp /tmp/index.html index.html")
+        time.sleep(1)
+        os.system("git add index.html")
+        time.sleep(1)
+        os.system("git commit -m \"new index.html\"")
+        time.sleep(1)
+        os.system("git push origin gh-pages")
+        time.sleep(1)
+        os.system("git checkout master")
+        time.sleep(1)
+        os.system("git stash pop")
 
