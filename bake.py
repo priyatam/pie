@@ -237,7 +237,7 @@ def main(config_path, serve=False):
     open('index.html', 'w').write(output)
     print 'Generated index.html'
 
-    serve_github(config) if serve else None
+#    serve_github(config) if serve else None
 
 
 if __name__ == '__main__':
