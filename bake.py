@@ -44,9 +44,9 @@ def load_assets(config):
 def load_recipes(config):
     """Loads all pure functions from each module under recipes/ as a dictionary lookup by funcion name"""
     modules = [import_module("recipes." + recipe) for recipe in _recipes()]
-    return {_funcname: getattr(mod, funcname) for mod in modules for funcname in dir(mod) if not funcname.startswith("__")}
-    
-    
+    return {funcname: getattr(mod, funcname) for mod in modules for funcname in dir(mod) if not funcname.startswith("__")}
+
+
 def load_posts(config):
     """Creates a dictionary of Post meta data, including body as 'raw content'"""
     posts = []
@@ -233,6 +233,7 @@ def main(config_path, serve=False):
     config = load_config(config_path)
     templates, styles, scripts, posts = load_content(config)
     recipes = load_recipes(config)
+    print recipes
     output = bake(config, templates, posts, styles, scripts, recipes, serve=serve)
     open('index.html', 'w').write(output)
     print 'Generated index.html'
