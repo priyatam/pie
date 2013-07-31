@@ -1,3 +1,3 @@
-def hello_world():
-    return "Hello World from Frozen Pie"
+def hello_world(text):
+    return "Hello %s from Frozen Pie" % text
 
