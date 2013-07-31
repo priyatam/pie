@@ -19,6 +19,9 @@ from hamlpy import hamlpy
 from scss import Scss
 import coffeescript
 
+import cssmin
+import jsmin
+
 
 def load_config(config_path):
     """Loads configuration from config.yaml"""
@@ -104,7 +107,7 @@ def load_content(config):
     return templates, styles, scripts, posts
 
 
-def bake(config, templates, posts, styles, scripts, recipes):
+def bake(config, templates, posts, styles, scripts, recipes, minify=False):
     """Parse everything. Wrap results in a final page in Html5, CSS, JS, POSTS
        NOTE: This function modifies 'posts' dictionary by adding a new posts['html'] element"""
     for post in posts:
@@ -112,12 +115,23 @@ def bake(config, templates, posts, styles, scripts, recipes):
             'template']), recipes=recipes)  # each post can have its own template
         post['html'] = converted_html
 
-    _params = {"style_sheet": "".join(styles.values()), 
-               "script": "".join(scripts.values()),
-               "json_data": json.dumps(posts),
-               "relative_path": config['relative_path'],
-               "title": config['title']
-              }
+    _params = {}
+
+    if minify:
+        print "Minifying CSS/JS"
+        _params = {"style_sheet": cssmin.cssmin("".join(styles.values())),
+                "script": jsmin.jsmin("".join(scripts.values())),
+                "json_data": json.dumps(posts),
+                "relative_path": config['relative_path'],
+                "title": config['title']
+                }
+    else:
+        _params = {"style_sheet": "".join(styles.values()),
+                "script": "".join(scripts.values()),
+                "json_data": json.dumps(posts),
+                "relative_path": config['relative_path'],
+                "title": config['title']
+                }
 
     _params.update(recipes)
     return pystache.render(templates['index.mustache.html'], _params)
@@ -183,16 +197,30 @@ def __newdict(*dicts):
     return _dict
 
 
-def main(config_path):
+def main(config_path, minify=False):
     """Let's cook an Apple Pie"""
     config = load_config(config_path)
     templates, styles, scripts, posts = load_content(config)
     recipes = load_recipes(config)
-    output = bake(config, templates, posts, styles, scripts, recipes)
+    output = bake(config, templates, posts, styles, scripts, recipes, minify=minify)
     open('index.html', 'w').write(output)
     print 'Generated index.html'
 
 
 if __name__ == '__main__':
-    __config_path = sys.argv[1] if len(sys.argv) > 1 else "config.yaml"
-    main(__config_path)
+    import argparse
+    parser = argparse.ArgumentParser(description='Some options.')
+    parser.add_argument('minify', nargs='?', default=False)
+    parser.add_argument('serve', nargs='?', default=False)
+    parser.add_argument("--config", nargs=1, default=["config.yaml"])
+    args = parser.parse_args(sys.argv[1:])
+    __config_path = args.config[0]
+    print "Using config from " + __config_path
+    main(__config_path, minify=args.minify)
+
+    if args.serve:
+        if re.search("gh-pages\n", os.system("git branch")):
+            #os.system("git branch gh-pages")
+            pass
+        os.system("echo \"Git Magic Here\"")
+
