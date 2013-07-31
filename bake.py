@@ -150,11 +150,11 @@ def serve_github(config, version=None):
         git push
     """
     proc = Popen(['git','config', "--get","remote.origin.url"],stdout=PIPE)
-    url = proc.stdout.readline()
-    os.system("rm -rf /tmp/frozen-pie")
-    os.system("git clone -b gh-pages " + url + " /tmp/frozen-pie")
-    os.system("cp deploy/index.html /tmp/frozen-pie/")
-    os.system("cd /tmp/frozen-pie; git add index.html; git commit -m 'new deploy'; git push --force origin gh-pages")
+    url = proc.stdout.readline().rstrip("\n")
+    os.system("rm -rf build")
+    os.system("git clone -b gh-pages " + url + " build")
+    os.system("cp deploy/index.html build/")
+    os.system("cd build; git add index.html; git commit -m 'new deploy'; git push --force origin gh-pages")
 
 
 def _get_template_path(templates, post_template_name):
