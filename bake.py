@@ -35,11 +35,7 @@ def load_assets(config):
 def load_recipes(config):
     """Loads all pure functions from each module under recipes/ as a dictionary lookup by funcion name"""
     modules = [ import_module('.' + recipe, 'recipes') for recipe in _recipes()]   
-    recipes = {}
-    # TODO: If readable, convert to list compr
-    for mod in modules:        
-        recipes.update({funcname: getattr(mod, funcname) for funcname in dir(mod) if not funcname.startswith("__")})
-    return recipes    
+    return {funcname: getattr(mod, funcname) for mod in modules for funcname in dir(mod) if not funcname.startswith("__") }  
 
 
 def load_posts(config):
