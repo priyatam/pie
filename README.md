@@ -11,11 +11,15 @@ These toolkits are built for developers. For different abstractions. It requires
 
 Things shouldn’t be this way.
 
-## Technical Overview
+## How it works
 
-Frozen-Pie is built in Python (soon, in Clojure) with pure functional programming techniques. There is no state, no framework, just a single workflow that works for content creators, designers, and developers. It builds on popular specs that promote simplicity: Markdown, Mustache, and HAML.
+Frozen is built on three principles:
 
-A typical workflow looks like this:
+1. Content is King
+2. Design once, View anywhere (Responsive Web Design)
+3. Logic should be composed of simple, declarative tasks (lambdas)
+
+Here's a sample workflow:
 
 create_crust
 > Content creator creates Posts and Pages in Markdown, with optional YAML meta-data
@@ -32,7 +36,13 @@ bake_in_oven
 serve
 > Content creator runs the script to push index.html onto his/her github :gh-pages
 
-As easy as _Frozen_ Pie.
+As easy as Frozen Pie.
+
+## Technical Overview
+
+Frozen-Pie is built in Python (soon, in Clojure) with pure functional programming techniques. There is no state, no framework, just a simple workflow that lets content creators, designers, and developers work in parallel.
+
+It builds on popular specs that promote simplicity: Markdown, Mustache, and HAML.
 
 ## Documentation
 Under active development.
