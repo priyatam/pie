@@ -3,21 +3,23 @@
 > You know you have reached perfection in design, not when there is nothing more to add, but when there is nothing more to be taken away -- Antoine de Saint-Exupery
 
 ## Abstract
-Have you ever asked your non-programmer friend to create a custom website?
+Have you ever asked someone to put their content—text and images, on a custom designed website?
 
-Reality check: evaluate a framework, filter on language, understand its templating syntax, its internals to customize a workflow, modify non-portable css styles, create some, check browser compatibility and responsiveness, evaluate hosting and pricing, avoid plugins that blow on your face, and so on.
+Reality check: evaluate a CMS, understand templating concepts, filter programming languages, pick a framework, read documentation on their internals to customize a workflow, create or modify non-portable css styles, check browser compatibility, check mobile-readiness and responsiveness, plugins for adding simple logic, evaluate hosting and pricing options, and so on.
 
-These toolkits are built for developers. For different abstractions. It requires a lot of work for an average, yet smart user to perform simple tasks, like changing content and design on the fly, adding simple logic to analyze data, build, and filter content from any device.
+These toolkits are built for developers. For different abstractions. 
 
-Things shouldn’t be this way.
+It requires a lot of work for an average, yet smart user to perform simple tasks, like moving content from one site to another, changing design on the fly, modifying templates that are user-friendly, adding simple logic to analyze, filter, and distribute content as data from any device.
+
+Things shouldn’t be this way. Not in 2013.
 
 ## How it works
 
-Frozen is built on three principles:
+Frozen Pie is built on _three principles_:
 
 1. Content is King
 2. Design once, View anywhere (Responsive Web Design)
-3. Logic should be composed of simple, declarative tasks (lambdas)
+3. Logic should be declarative, composed of single tasks (Lambdas)
 
 Here's a sample workflow:
 
@@ -42,7 +44,9 @@ As easy as Frozen Pie.
 
 Frozen-Pie is built in Python (soon, in Clojure) with pure functional programming techniques. There is no state, no framework, just a simple workflow that lets content creators, designers, and developers work in parallel.
 
-It builds on popular specs that promote simplicity: Markdown, Mustache, and HAML.
+It builds on popular specs that promote simplicity: Markdown, Mustache, and HAML. 
+
+It can use lambdas to analyze content, realtime, with data stored elsewhere.
 
 ## Documentation
 Under active development.
