@@ -119,25 +119,25 @@ def bake(config, templates, posts, styles, scripts, recipes, serve=False):
             'template']), recipes=recipes)  # each post can have its own template
         post['html'] = converted_html
 
-    _params = {}
+    _params = { "relative_path": config['relative_path'],
+                "title": config['title'],
+                "posts": posts
+              }
 
     if serve:
         print "Minifying CSS/JS"
-        _params = {"style_sheet": cssmin.cssmin("".join(styles.values())),
-                "script": jsmin.jsmin("".join(scripts.values())),
-                "json_data": json.dumps(posts),
-                "relative_path": config['relative_path'],
-                "title": config['title']
-                }
+        _params.update({"style_sheet": cssmin.cssmin("".join(styles.values())),
+                        "script": jsmin.jsmin("".join(scripts.values())),
+                        "json_data": json.dumps(posts),
+                        })
     else:
-        _params = {"style_sheet": "".join(styles.values()),
-                "script": "".join(scripts.values()),
-                "json_data": json.dumps(posts),
-                "relative_path": config['relative_path'],
-                "title": config['title']
-                }
+        _params.update({"style_sheet": "".join(styles.values()),
+                        "script": "".join(scripts.values()),
+                        "json_data": json.dumps(posts),
+                        })
 
     _params.update(recipes)
+    print posts
     return pystache.render(templates['index.mustache.html'], _params)
 
 
@@ -154,7 +154,7 @@ def serve_github(config, version=None):
     os.system("rm -rf build")
     os.system("git clone -b gh-pages " + url + " build")
     os.system("cp deploy/index.html build/")
-    os.system("cd build; git add index.html; git commit -m 'new deploy'; git push --force origin gh-pages")
+    os.system("cd build; git add index.html; git commit -m 'new deploy " + datetime.now() + "'; git push --force origin gh-pages")
 
 
 def _get_template_path(templates, post_template_name):
