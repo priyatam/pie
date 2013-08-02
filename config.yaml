@@ -1,5 +1,11 @@
+# Develop
+content: content
+templates: templates
+styles: styles
+scripts: scripts
+lambdas: lambdas
+
+# Deploy
 title: Frozen Pie
 github_repo: https://github.com/Facjure/frozen-pie
-content_dir: content
-templates_dir: templates
 relative_path: /index.html
