@@ -53,11 +53,11 @@ def load_posts(config):
     posts = []
     for fname in os.listdir("posts"):
         if re.match(r'[A-Za-z\.0-9-_~]+', fname):
-            yaml_data, md_content = _read_yaml('posts', fname)
+            yaml_data, content = _read_yaml('posts', fname)
             fname = 'posts' + os.sep + fname
             post = {
                 "name": fname,
-                "body": md_content, # raw, unprocessed markdown content
+                "body": content, # raw, unprocessed content
                 "modified_date": _format_date(fname)
             }
             post.update(yaml_data)  # Merge Yaml data for future lookup
@@ -114,28 +114,33 @@ def load_content(config):
 def bake(config, templates, posts, styles, scripts, recipes, serve=False):
     """Parse everything. Wrap results in a final page in Html5, CSS, JS, POSTS
        NOTE: This function modifies 'posts' dictionary by adding a new posts['html'] element"""
-    for post in posts:
-        converted_html = _markstache(config, post, _get_template_path(templates, post[
-            'template']), recipes=recipes)  # each post can have its own template
-        post['html'] = converted_html
+    content_processor_dict = {".txt": _textstache,
+                              ".md": _markstache
+                              }
 
-    _params = {}
+    for post in posts:
+        for key in content_processor_dict.keys():
+            if post['name'].endswith(key):
+                html = content_processor_dict[key](config, post, _get_template_path(templates, post[
+                                                   'template']), recipes=recipes)  # each post can have its own template
+        post['html'] = html
+
+    _params = {"relative_path": config['relative_path'],
+               "title": config['title'],
+               "posts": posts
+               }
 
     if serve:
         print "Minifying CSS/JS"
-        _params = {"style_sheet": cssmin.cssmin("".join(styles.values())),
-                "script": jsmin.jsmin("".join(scripts.values())),
-                "json_data": json.dumps(posts),
-                "relative_path": config['relative_path'],
-                "title": config['title']
-                }
+        _params.update({"style_sheet": cssmin.cssmin("".join(styles.values())),
+                        "script": jsmin.jsmin("".join(scripts.values())),
+                        "json_data": json.dumps(posts),
+                        })
     else:
-        _params = {"style_sheet": "".join(styles.values()),
-                "script": "".join(scripts.values()),
-                "json_data": json.dumps(posts),
-                "relative_path": config['relative_path'],
-                "title": config['title']
-                }
+        _params.update({"style_sheet": "".join(styles.values()),
+                        "script": "".join(scripts.values()),
+                        "json_data": json.dumps(posts),
+                        })
 
     _params.update(recipes)
     return pystache.render(templates['index.mustache.html'], _params)
@@ -154,7 +159,7 @@ def serve_github(config, version=None):
     os.system("rm -rf build")
     os.system("git clone -b gh-pages " + url + " build")
     os.system("cp deploy/index.html build/")
-    os.system("cd build; git add index.html; git commit -m 'new deploy'; git push --force origin gh-pages")
+    os.system("cd build; git add index.html; git commit -m 'new deploy " + datetime.now() + "'; git push --force origin gh-pages")
 
 
 def _get_template_path(templates, post_template_name):
@@ -185,6 +190,14 @@ def _markstache(config, post, template, recipes=None):
     """Converts Markdown/Mustache/YAML to HTML."""
     html_md = md.markdown(post['body'].decode("utf-8"))
     _params = __newdict(post, {'body': html_md})
+    _params.update(recipes) if recipes else None
+    return pystache.render(template, _params)
+
+
+def _textstache(config, post, template, recipes=None):
+    """Converts Markdown/Mustache/YAML to HTML."""
+    txt = post['body'].decode("utf-8")
+    _params = __newdict(post, {'body': txt})
     _params.update(recipes) if recipes else None
     return pystache.render(template, _params)
 
