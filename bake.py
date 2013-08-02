@@ -114,13 +114,10 @@ def load_recipes(config):
     return templates, styles, scripts, lambdas
 
 
-def bake(config, templates, posts, styles, scripts, lambdas, serve=False):
+def bake(config, templates, posts, styles, scripts, lambdas, minify=False):
     """Parse everything. Wrap results in a final page in Html5, CSS, JS, POSTS
        NOTE: This function modifies 'posts' dictionary by adding a new posts['html'] element"""
-    content_processor_dict = {".txt": _textstache,
-                              ".md": _markstache
-                              }
-
+    content_processor_dict = {".txt": _textstache, ".md": _markstache }
     for post in posts:
         for key in content_processor_dict.keys():
             if post['name'].endswith(key):
@@ -133,7 +130,7 @@ def bake(config, templates, posts, styles, scripts, lambdas, serve=False):
                "posts": posts
                }
 
-    if serve:
+    if minify:
         print "Minifying CSS/JS"
         _params.update({"style_sheet": cssmin.cssmin("".join(styles.values())),
                         "script": jsmin.jsmin("".join(scripts.values()))
@@ -152,7 +149,7 @@ def bake(config, templates, posts, styles, scripts, lambdas, serve=False):
     return pystache.render(templates['index.mustache.html'], _params)
 
 
-def serve_github(config, version=None):
+def serve(config, version=None):
     """
     TODO: Refactor this from brute force to git api
     Algo:
@@ -169,12 +166,8 @@ def serve_github(config, version=None):
         print 'You need a config.github.yaml for serve.'
         exit(1)
         
-    proc = Popen(['git','config', "--get","remote.origin.url"],stdout=PIPE)
-    url = proc.stdout.readline().rstrip("\n")
-    os.system("rm -rf build")
-    os.system("git clone -b gh-pages " + url + " build")
-    os.system("cp deploy/index.html build/")
-    os.system("cd build; git add index.html; git commit -m 'new deploy " + datetime.now() + "'; git push --force origin gh-pages")
+    # Currently supports github
+    _serve_github(config)
 
 
 ### SPI ###
@@ -202,6 +195,14 @@ def _read_yaml(subdir, fname):
         else:
             return yaml.load(yaml_and_raw[0]), yaml_and_raw[1]
 
+def _serve_github(config):
+    proc = Popen(['git','config', "--get","remote.origin.url"],stdout=PIPE)
+    url = proc.stdout.readline().rstrip("\n")
+    os.system("rm -rf build")
+    os.system("git clone -b gh-pages " + url + " build")
+    os.system("cp deploy/index.html build/")
+    os.system("cd build; git add index.html; git commit -m 'new deploy " + datetime.now() + "'; git push --force origin gh-pages")
+    
 
 def _markstache(config, post, template, lambdas=None):
     """Converts Markdown/Mustache/YAML to HTML."""
@@ -253,18 +254,18 @@ def __newdict(*dicts):
 
 ### MAIN ###
 
-def main(config_path, serve=False):
+def main(config_path, to_serve=False):
     """Let's cook an Apple Pie"""
     config = load_config(config_path)
     contents = load_contents(config)
     templates, styles, scripts, lambdas = load_recipes(config)
     
-    output = bake(config, templates, contents, styles, scripts, lambdas, serve=serve)
-    open('deploy/index.html', 'w').write(output)
+    pie = bake(config, templates, contents, styles, scripts, lambdas, minify=to_serve)
+    open('deploy/index.html', 'w').write(pie)
     print 'Generated index.html'
     
-    if serve:
-        serve_github(config)
+    if to_serve:
+        serve(config)
 
 
 if __name__ == '__main__':
@@ -274,8 +275,8 @@ if __name__ == '__main__':
     parser.add_argument("--config", nargs=1, default=["config.yaml"])
     args = parser.parse_args(sys.argv[1:])
     __config_path = args.config[0]
-    serve = False
+    to_serve = False
     if "serve" in args.string_options:
-        serve = True        
+        to_serve = True        
     print "Using config from " + __config_path
-    main(__config_path, serve=serve)
+    main(__config_path, to_serve=to_serve)
