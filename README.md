@@ -11,7 +11,7 @@ Seriously.
 
 These toolkits are built for developers. For different abstractions. 
 
-It requires a lot of work for an average, yet smart user to perform simple tasks, like moving content from one site to another, changing design on the fly, modifying templates that are user-friendly, adding basic logic to analyze, filter, and distribute content to any device.
+It requires a lot of work for an average, yet smart user to perform simple tasks, like moving content from one site to another, changing design on the fly, modifying templates that are user-friendly, adding basic logic to analyze, filter, and distribute content to other apps.
 
 Things shouldn’t be this way. Not in 2013.
 
@@ -20,8 +20,8 @@ Things shouldn’t be this way. Not in 2013.
 Frozen Pie is built on _three principles_:
 
 1. Content is King
-2. Design once, View anywhere (Responsive Web Design)
-3. Logic should be declarative, composed of single tasks (Lambdas)
+2. Design once, View anywhere
+3. Logic should be declarative, composed of single tasks
 
 Here's a sample workflow:
 
@@ -40,11 +40,11 @@ bake_in_oven
 serve
 > Content creator runs the script to push index.html onto his/her github :gh-pages
 
-As easy as Frozen Pie.
+As easy as Pie.
 
 ## Technical Overview
 
-Frozen-Pie is built on popular specs that promote simplicity: Markdown, Mustache, and HAML. It's written in Python (soon, in Clojure) with pure functional programming techniques. There is no state, no framework, just a single workflow that lets content creators, designers, and developers work in parallel. Lambdas are used to analyze content, realtime, with data stored elsewhere. 
+Frozen-Pie is built on popular specs that promote simplicity: Markdown, Mustache, and HAML. It's written in Python with pure functional programming techniques. There is no state, no framework, just a single workflow that lets content creators, designers, and developers work in parallel. Lambdas are used to analyze inline content, realtime, with data stored elsewhere. 
 
 Content authors will learn how to run a script, basics of git, Markdown, and that's okay. 
 
