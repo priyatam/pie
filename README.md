@@ -44,7 +44,8 @@ As easy as Pie.
 
 ## Technical Overview
 
-Frozen-Pie is built on popular specs that promote simplicity: Markdown, Mustache, and HAML. It's written in Python with pure functional programming techniques. There is no state, no framework, just a single workflow that lets content creators, designers, and developers work in parallel. Lambdas are used to analyze inline content, realtime, with data stored elsewhere. 
+Frozen-Pie is built on popular specs that promote simplicity: Markdown, Mustache, HAML, and embraces full HTML 5 and CSS3. 
+It's written in Python with pure functional programming techniques. There is no state, no framework, just a single workflow that lets content creators, designers, and developers work in parallel. Lambdas are used to analyze inline content, realtime, with data stored elsewhere. 
 
 Content authors will learn how to run a script, basics of git, Markdown, and that's okay. 
 
