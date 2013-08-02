@@ -51,10 +51,10 @@ def load_recipes(config):
 def load_posts(config):
     """Creates a dictionary of Post meta data, including body as 'raw content'"""
     posts = []
-    for fname in os.listdir("posts"):
+    for fname in os.listdir(config['content']):
         if re.match(r'[A-Za-z\.0-9-_~]+', fname):
-            yaml_data, content = _read_yaml('posts', fname)
-            fname = 'posts' + os.sep + fname
+            yaml_data, content = _read_yaml(config['content'], fname)
+            fname = config['content'] + os.sep + fname
             post = {
                 "name": fname,
                 "body": content, # raw, unprocessed content
@@ -75,7 +75,7 @@ def compile_assets(config, asset_type):
 
     def _compile(__compile, _from, _to, ):
         outputs = []
-        for fname in os.listdir(asset_type):
+        for fname in os.listdir(config[asset_type]):
             if fname.endswith(_from):
                 raw_data = __compile(asset_type,  fname)
                 # Avoid including the output twice. Hint bake, by adding a _ filename convention
@@ -133,16 +133,19 @@ def bake(config, templates, posts, styles, scripts, recipes, serve=False):
     if serve:
         print "Minifying CSS/JS"
         _params.update({"style_sheet": cssmin.cssmin("".join(styles.values())),
-                        "script": jsmin.jsmin("".join(scripts.values())),
-                        "json_data": json.dumps(posts),
+                        "script": jsmin.jsmin("".join(scripts.values()))
                         })
     else:
         _params.update({"style_sheet": "".join(styles.values()),
-                        "script": "".join(scripts.values()),
-                        "json_data": json.dumps(posts),
+                        "script": "".join(scripts.values())                        
                         })
 
     _params.update(recipes)
+    
+    # Json Data
+    _params.update({"config": config})
+    _params.update({"json_data": json.dumps(posts)})
+    
     return pystache.render(templates['index.mustache.html'], _params)
 
 
