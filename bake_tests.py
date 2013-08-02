@@ -28,12 +28,12 @@ class BakeTests(unittest.TestCase):
         self.assertIsNotNone(templates['post.mustache.haml'])
 
     def test_load_posts(self):
-        posts = bake.load_posts(self.config)
+        posts = bake.load_contents(self.config)
         self.assertEqual(2, len(posts))
         self.assertIsNotNone(posts[0]['body'])
 
     def test_load_content(self):
-        templates, styles, scripts, posts = bake.load_content(self.config)
+        templates, styles, scripts, posts = bake.load_recipes(self.config)
         self.assertEqual(types.DictType, type(templates))
         self.assertEqual(types.DictType, type(styles))
         self.assertEqual(types.DictType, type(scripts))
