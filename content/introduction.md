@@ -1,7 +1,7 @@
 ---
 title: Have your Pie and Eat it
 type: page
-template: post.mustache.html
+template: post.mustache
 category: tech
 author: Sreeharsha Mudivarti
 post_date: 07-23-13

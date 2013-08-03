@@ -61,7 +61,7 @@ def load_contents(config):
 
 def load_assets(config):
     """Loads assets as raw content into a dictionary, looked up by its fname.
-    Closure accepts an asset ('templates', 'styles', 'posts', 'scripts') and a filter that filters based on file ext"""
+    Closure accepts an asset and a filter that filters based on file ext"""
     return lambda asset, filter: {fname: _read(fname, asset) for fname in os.listdir(asset) if fname.endswith(filter)}
 
 
@@ -85,9 +85,6 @@ def compile_asset(config, asset_type, fname):
 def load_recipes(config):
     """Pre-process and load each asset type into a dict and return as a single recipe package: a tuple of dicts"""
 
-    # Compile HTML Templates
-    templates = load_assets(config)('templates', 'html')
-
     # Compile CSS
     style = None
     scss_file_name = config["styles"] + "/style.scss"
@@ -107,10 +104,10 @@ def load_recipes(config):
     # Load 3rd party logic
     lambdas = load_lambdas(config)
 
-    return templates, style, script, lambdas
+    return style, script, lambdas
 
 
-def bake(config, templates, contents, style, script, lambdas, minify=False):
+def bake(config, contents, style, script, lambdas, minify=False):
     """Parse everything. Wrap results in a single page of html, css, js
        NOTE: This function modifies 'contents' by adding a new contents['html'] element"""
 
@@ -121,7 +118,7 @@ def bake(config, templates, contents, style, script, lambdas, minify=False):
             for ext in processor.keys():
                 if content['name'].endswith(ext):
                     _tmpl = content.get('template', config['default_template']) # set default if no template assigned
-                    content['html'] = processor[ext](config, content, _get_template(_tmpl, templates), lambdas)
+                    content['html'] = processor[ext](config, content, _tmpl, lambdas)
         except RuntimeError as e:
             print "Error baking content: %s %s" % content, e
 
@@ -144,7 +141,8 @@ def bake(config, templates, contents, style, script, lambdas, minify=False):
     _params.update({"config": config})
     _params.update({"json_data": json.dumps(contents)})
 
-    return pystache.render(templates['index.mustache.html'], _params)
+    renderer = pystache.Renderer(search_dirs=[config["templates"]])
+    return renderer.render_path(_get_template_path(config, "index.mustache"), _params)
 
 
 def serve(config, version=None):
@@ -167,9 +165,8 @@ def serve(config, version=None):
 
 ### SPI ###
 
-def _get_template(template, templates):
-    """Gets compiled html templates"""
-    return templates[template]
+def _get_template_path(config, name):
+    return config["templates"] + os.sep + name
 
 
 def _read(fname, subdir):
@@ -198,20 +195,22 @@ def _serve_github(config):
     os.system("cd build; git add index.html; git commit -m 'new deploy " + datetime.now() + "'; git push --force origin gh-pages")
 
 
-def _markstache(config, post, template, lambdas=None):
+def _markstache(config, post, template_name, lambdas=None):
     """Converts Markdown/Mustache/YAML to HTML."""
     html_md = md.markdown(post['body'].decode("utf-8"))
     _params = __newdict(post, {'body': html_md})
     _params.update(lambdas) if lambdas else None
-    return pystache.render(template, _params)
+    renderer = pystache.Renderer(search_dirs=[config["templates"]])
+    return renderer.render_path(_get_template_path(config, template_name), _params)
 
 
-def _textstache(config, content, template, lambdas=None):
+def _textstache(config, content, template_name, lambdas=None):
     """Converts Markdown/Mustache/YAML to HTML."""
     txt = content['body'].decode("utf-8")
     _params = __newdict(content, {'body': txt})
     _params.update(lambdas) if lambdas else None
-    return pystache.render(template, _params)
+    renderer = pystache.Renderer(search_dirs=[config["templates"]])
+    return renderer.render_path(_get_template_path(config, template_name), _params)
 
 
 def _compile_scss(config):
@@ -249,9 +248,9 @@ def main(config_path, to_serve=False):
     """Let's cook an Apple Pie"""
     config = load_config(config_path)
     contents = load_contents(config)
-    templates, style, script, lambdas = load_recipes(config)
+    style, script, lambdas = load_recipes(config)
 
-    pie = bake(config, templates, contents, style, script, lambdas, minify=to_serve)
+    pie = bake(config, contents, style, script, lambdas, minify=to_serve)
     open('deploy/index.html', 'w').write(pie)
     print 'Generated index.html'
 

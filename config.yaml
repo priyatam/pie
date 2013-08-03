@@ -6,7 +6,7 @@ scripts: scripts
 lambdas: lambdas
 
 ## System overrides
-default_template: post.mustache.haml
+default_template: post.mustache
 
 # Deploy
 title: Frozen Pie

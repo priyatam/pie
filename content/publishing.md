@@ -2,7 +2,7 @@
 title: Why is it hard to create a website?
 type: blog
 category: tech
-template: post.mustache.html
+template: post.mustache
 author: Priyatam Mudivarti
 post_date: 08-01-13
 ---

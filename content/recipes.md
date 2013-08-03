@@ -2,7 +2,7 @@
 title: Recipes
 type: blog
 category: features
-template: recipes.mustache.html
+template: recipes.mustache
 author: Sreeharsha Mudivarti
 post_date: 07-25-13
 ---

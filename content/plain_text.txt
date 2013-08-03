@@ -2,7 +2,7 @@
 title: Plain Text
 type: blog
 category: tech
-template: post_plain.mustache.html
+template: post_plain.mustache
 author: Sreeharsha Mudivarti
 post_date: 07-31-13
 ---
