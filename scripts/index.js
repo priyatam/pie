@@ -8,7 +8,7 @@ $( function () {
             }
             context.app.swap(index_page_cache)
         });
-        this.get(rel_path + '#/'+config('content')+'/(.*)', function (context) {
+        this.get(rel_path + '#/'+config['content']+'/(.*)', function (context) {
             var dhash = document.location.hash;
             post_name = dhash.substring(2);
             for (var i =0; i < data.length; i++) {

@@ -68,14 +68,12 @@ def load_assets(config):
 
 def load_lambdas(config):
     """Loads all pure functions from each module under 'lambdas' as a dictionary lookup by funcion name"""
-    modules = [import_module(config['lambdas'] + "." + recipe) for recipe in _lambdas(config)]
+    modules = [import_module(config['lambdas'] + "." + recipe) for recipe in _get_lambdas(config)]
     return {funcname: getattr(mod, funcname) for mod in modules for funcname in dir(mod) if not funcname.startswith("__")}
 
 
 def compile_assets(config, asset_type):
-    """Closure: Compiles asset types: css, js, html using pre-processors.
-       Currently supports haml, scss, coffeescript."""
-
+    """Closure: Compiles asset types: css, js, html using pre-processors"""
     def _compile(__compile, _from, _to, ):
         outputs = []
         for fname in os.listdir(config[asset_type]):
@@ -86,7 +84,6 @@ def compile_assets(config, asset_type):
                 open(asset_type + os.sep + new_filename, 'w').write(raw_data)
                 outputs.append((raw_data, new_filename))
         return outputs
-
     return _compile
 
 
@@ -114,50 +111,45 @@ def load_recipes(config):
     return templates, styles, scripts, lambdas
 
 
-def bake(config, templates, posts, styles, scripts, lambdas, minify=False):
-    """Parse everything. Wrap results in a final page in Html5, CSS, JS, POSTS
-       NOTE: This function modifies 'posts' dictionary by adding a new posts['html'] element"""
-    content_processor_dict = {".txt": _textstache, ".md": _markstache }
-    for post in posts:
-        for key in content_processor_dict.keys():
-            if post['name'].endswith(key):
-                # each post can have its own template
-                html = content_processor_dict[key](config, post, _get_template_path(templates, post['template']), lambdas=lambdas)  
-        post['html'] = html
+def bake(config, templates, contents, styles, scripts, lambdas, minify=False):
+    """Parse everything. Wrap results in a single page of html, css, js
+       NOTE: This function modifies 'contents' by adding a new contents['html'] element"""
 
+    # Content
+    processor = {".txt": _textstache, ".md": _markstache }
+    for content in contents:
+        for ext in processor.keys():
+            if content['name'].endswith(ext):
+                content['html'] = processor[ext](config, content, _get_template(content['template'], templates), lambdas)
+ 
     _params = {"relative_path": config['relative_path'],
                "title": config['title'],
-               "posts": posts
-               }
+               "posts": contents }
 
+    # Scripts & Styles
     if minify:
-        print "Minifying CSS/JS"
         _params.update({"style_sheet": cssmin.cssmin("".join(styles.values())),
-                        "script": jsmin.jsmin("".join(scripts.values()))
-                        })
+                        "script": jsmin.jsmin("".join(scripts.values())) })
     else:
         _params.update({"style_sheet": "".join(styles.values()),
-                        "script": "".join(scripts.values())                        
-                        })
-
+                        "script": "".join(scripts.values()) })
+        
+    #Lambdas        
     _params.update(lambdas)
     
     # Json Data
     _params.update({"config": config})
-    _params.update({"json_data": json.dumps(posts)})
+    _params.update({"json_data": json.dumps(contents)})
     
     return pystache.render(templates['index.mustache.html'], _params)
 
 
 def serve(config, version=None):
-    """
-    TODO: Refactor this from brute force to git api
-    Algo:
+    """ Algo:
         create or replace deploy
         clone gh-pages into deploy
         git commit index.html -m "hash" (deploy/index.html can always be recreated from src hash)
-        git push gh-pages
-    """
+        git push gh-pages """
     # Validate
     __config_path = "config.github.yaml"
     try:
@@ -172,12 +164,9 @@ def serve(config, version=None):
 
 ### SPI ###
 
-def _get_template_path(templates, post_template_name):
-    if post_template_name.endswith(".haml"):
-        key = "_" + post_template_name.replace(".haml", ".html")
-        return templates[key]
-    else:
-        return templates[post_template_name]
+def _get_template(template, templates):
+    """Gets compiled html templates"""
+    return templates[template] if template.endswith(".html") else templates["_" + template.replace(".haml", ".html")] 
 
 
 def _read(fname, subdir):
@@ -196,6 +185,7 @@ def _read_yaml(subdir, fname):
             return yaml.load(yaml_and_raw[0]), yaml_and_raw[1]
 
 def _serve_github(config):
+    """TODO: Refactor this from brute force to git api"""
     proc = Popen(['git','config', "--get","remote.origin.url"],stdout=PIPE)
     url = proc.stdout.readline().rstrip("\n")
     os.system("rm -rf build")
@@ -212,14 +202,14 @@ def _markstache(config, post, template, lambdas=None):
     return pystache.render(template, _params)
 
 
-def _textstache(config, post, template, lambdas=None):
+def _textstache(config, content, template, lambdas=None):
     """Converts Markdown/Mustache/YAML to HTML."""
-    txt = post['body'].decode("utf-8")
-    _params = __newdict(post, {'body': txt})
+    txt = content['body'].decode("utf-8")
+    _params = __newdict(content, {'body': txt})
     _params.update(lambdas) if lambdas else None
     return pystache.render(template, _params)
 
-
+    
 def _compile_haml(asset_type, fname):
     return hamlpy.Compiler().process(_read(fname, asset_type))
 
@@ -236,7 +226,7 @@ def _format_date(fname):
     return datetime.strptime(time.ctime(os.path.getmtime(fname)), "%a %b %d %H:%M:%S %Y").strftime("%m-%d-%y")
 
 
-def _lambdas(config):
+def _get_lambdas(config):
     return [f.strip('.py') for f in os.listdir(config['lambdas']) if f.endswith('py') and not f.startswith("__")]
 
 
