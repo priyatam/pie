@@ -3,25 +3,23 @@
 > You know you have reached perfection in design, not when there is nothing more to add, but when there is nothing more to be taken away -- Antoine de Saint-Exupery
 
 ## Abstract
-Have you ever asked someone to show their content on the web?
+How do you create semantic content and design a website around it? Wordpress? Tumblr? Weebly? Jekyll? Middleman? Custom CMS or handcrafted Sinatra app?
 
-Reality check: evaluate a CMS, understand templating, filter programming languages, pick a framework, read the docs to customize a workflow, create or tweak existing css, check browser compatibility and mobile-readiness and responsiveness, add plugins for simple logic, and finally, evaluate hosting and pricing options, and so on.
+They all break a simple rule: Coupling.
 
-Seriously.
+These solutions couple at least two of the following: authors, designers, developers, hosting. Their styles and templates are not compatible with each other, non-portable across frameworks. You can't even move content from one platform to another. 
 
-These toolkits are built for developers. For different abstractions. It requires a lot of work for an average user to perform simple tasks, like moving content from one site to another, changing design, modifying templates that are user-friendly, adding simple logic to analyze, filter, and distribute content to apps and devices.
+Things shouldn’t be coupled this way. 
 
-Things shouldn’t be this way. Not in 2013.
-
-## How it works
-
-Frozen Pie is built on _three principles_:
+## Three principles
 
 1. Content is King
 2. Design once, View anywhere
 3. Logic should be declarative, composed of single tasks
 
 Here's a sample workflow:
+
+## How it works
 
 create_crust
 > Content creator creates Posts and Pages in Markdown, with optional YAML meta-data
@@ -30,22 +28,20 @@ put_in_pan and add filling
 > Designers create generic Templates with HAML and Mustache, and optionally, 3rd-party logic (Mustache lambdas), and package them as 'Recipes'.
 
 add_recipes
-> Content creator selects Recipes, modifies templates if needed.
+> Content creator selects Recipes
 
 bake_in_oven
-> Content creator runs a script to compile everything into a single index.html, _everything_ included
+> Content creator runs a script to compile everything into a single index.html
 
 serve
-> Content creator runs the script to push index.html onto his/her github :gh-pages
+> Content creator runs the script see his/her page live on github pages
 
-As easy as Pie.
+## Behind the scenes
+Markdown, Mustache, HAML, embracing HTML 5 and CSS3. 
 
-## Technical Overview
+Python with pure functions. There is no state, no framework, just a single workflow that lets content creators, designers, and developers work in parallel. Lambdas can be added to analyze inline content with data stored elsewhere. 
 
-Frozen-Pie is built on popular specs that promote simplicity: Markdown, Mustache, HAML, and embraces HTML 5 and CSS3. 
-It's written in Python with pure functional programming techniques. There is no state, no framework, just a single workflow that lets content creators, designers, and developers work in parallel. Lambdas are used to analyze inline content, realtime, with data stored elsewhere. 
-
-Content authors will learn how to run a script, basics of git, Markdown, and that's okay. 
+Content authors can learn how to run a script, basics of git, Markdown, and that's okay. 
 
 It's time we give them power.
 
