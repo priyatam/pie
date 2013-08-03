@@ -1,9 +1,12 @@
 # Develop
-content: content
+content: /Users/priyatam/Dev/projects/poems
 templates: templates
 styles: styles
 scripts: scripts
 lambdas: lambdas
+
+## System overrides
+default_template: post.mustache.haml
 
 # Deploy
 title: Frozen Pie

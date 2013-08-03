@@ -42,22 +42,23 @@ def load_contents(config):
     """Creates a dictionary of Post meta data, including body as 'raw content'"""
     contents = []
     for fname in os.listdir(config['content']):
-        if re.match(r'[A-Za-z\.0-9-_~]+', fname):
-            yaml_data, raw_data = _read_yaml(config['content'], fname)
-            fname = config['content'] + os.sep + fname
-            content = {
-                "name": fname,
-                "body": raw_data, # unprocessed
-                "modified_date": _format_date(fname)
-            }
-            content.update(yaml_data)  # Merge Yaml data for future lookup
-            contents.append(content)
+        if fname.endswith('.md') or fname.endswith('.txt'):
+            try:
+                yaml_data, raw_data = _read_yaml(config['content'], fname)
+                fname = config['content'] + os.sep + fname
+                content = {
+                    "name": fname,
+                    "body": raw_data, # unprocessed
+                    "modified_date": _format_date(fname)
+                }           
+                content.update(yaml_data)  # Merge Yaml data for future lookup
+                contents.append(content)
+            except:
+                print "Error occured reading file: %s, " % fname               
         else:
-            print """Filename format: ['a/A', 2.5, '_', '.', '-', '~']"""
-            exit(1)
-
+            print "Warning: Filename %s not in format: ['a/A', 2.5, '_', '.', '-', '~']" % fname
+ 
     return contents
-
 
 
 def load_assets(config):
@@ -116,12 +117,16 @@ def bake(config, templates, contents, styles, scripts, lambdas, minify=False):
        NOTE: This function modifies 'contents' by adding a new contents['html'] element"""
 
     # Content
-    processor = {".txt": _textstache, ".md": _markstache }
+    processor = {".txt": _textstache, ".md": _markstache }        
     for content in contents:
-        for ext in processor.keys():
-            if content['name'].endswith(ext):
-                content['html'] = processor[ext](config, content, _get_template(content['template'], templates), lambdas)
- 
+        try:
+            for ext in processor.keys():
+                if content['name'].endswith(ext):
+                    _tmpl = content.get('template', config['default_template']) # set default if no template assigned
+                    content['html'] = processor[ext](config, content, _get_template(_tmpl, templates), lambdas)
+        except RuntimeError as e:
+            print "Error baking content: %s %s" % content, e
+            
     _params = {"relative_path": config['relative_path'],
                "title": config['title'],
                "posts": contents }
