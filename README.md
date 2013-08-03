@@ -19,7 +19,7 @@ create_crust
 > Content creator creates Posts and Pages in Markdown/Plain Text, with optional YAML meta-data
 
 put_in_pan and add filling
-> Designers create generic Templates with HAML and Mustache, and optionally, 3rd-party logic (Mustache lambdas), and package them as 'Recipes'.
+> Designers create generic Templates with HTML and Mustache, and optionally, 3rd-party logic (Mustache lambdas), and package them as 'Recipes'.
 
 add_recipes
 > Content creator selects Recipes
@@ -31,7 +31,7 @@ serve
 > Content creator runs the script see his/her page live on github pages
 
 ## Behind the scenes
-Markdown, Mustache, HAML, embracing HTML 5 and CSS3.
+Markdown, Mustache, HTML 5 and CSS3 (SCSS/Bourbon).
 
 Python with pure functions. No state, no framework, just a single workflow that lets content creators, designers, and developers work in parallel. Lambdas analyze inline content with data stored elsewhere.
 
