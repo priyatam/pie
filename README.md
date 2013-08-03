@@ -3,15 +3,13 @@
 > You know you have reached perfection in design, not when there is nothing more to add, but when there is nothing more to be taken away -- Antoine de Saint-Exupery
 
 ## Abstract
-Have you ever asked someone to put their content—text and images, on a custom designed website?
+Have you ever asked someone to show their content on the web?
 
-Reality check: evaluate a CMS, understand templating concepts, filter programming languages, pick a framework, read docs on internals to customize a workflow, create or tweak existing css, check browser compatibility and mobile-readiness and responsiveness, add plugins for simple logic, and finally, evaluate hosting and pricing options, and so on.
+Reality check: evaluate a CMS, understand templating, filter programming languages, pick a framework, read the docs to customize a workflow, create or tweak existing css, check browser compatibility and mobile-readiness and responsiveness, add plugins for simple logic, and finally, evaluate hosting and pricing options, and so on.
 
 Seriously.
 
-These toolkits are built for developers. For different abstractions. 
-
-It requires a lot of work for an average, yet smart user to perform simple tasks, like moving content from one site to another, changing design on the fly, modifying templates that are user-friendly, adding basic logic to analyze, filter, and distribute content to other apps.
+These toolkits are built for developers. For different abstractions. It requires a lot of work for an average user to perform simple tasks, like moving content from one site to another, changing design, modifying templates that are user-friendly, adding simple logic to analyze, filter, and distribute content to apps and devices.
 
 Things shouldn’t be this way. Not in 2013.
 
@@ -44,7 +42,7 @@ As easy as Pie.
 
 ## Technical Overview
 
-Frozen-Pie is built on popular specs that promote simplicity: Markdown, Mustache, HAML, and embraces full HTML 5 and CSS3. 
+Frozen-Pie is built on popular specs that promote simplicity: Markdown, Mustache, HAML, and embraces HTML 5 and CSS3. 
 It's written in Python with pure functional programming techniques. There is no state, no framework, just a single workflow that lets content creators, designers, and developers work in parallel. Lambdas are used to analyze inline content, realtime, with data stored elsewhere. 
 
 Content authors will learn how to run a script, basics of git, Markdown, and that's okay. 
