@@ -31,11 +31,15 @@ serve
 > Content creator runs the script see his/her page live on github pages
 
 ## Behind the scenes
-Markdown, Mustache, HTML 5 and CSS3 (SCSS/Bourbon).
+Markdown, Mustache, HTML 5, CSS3 (SCSS/Bourbon), SammyJs.
 
-Python with pure functions. No state, no framework, just a single workflow that lets content creators, designers, and developers work in parallel. Lambdas analyze inline content with data stored elsewhere.
+SammyJs will be a part of the toolkit and not required by Users.
 
-Content authors can learn how to run a script, basics of git, Markdown, and that's okay.
+Python with pure functions. No state, no framework, just a single workflow that lets content creators, designers, and developers work in parallel. 
+
+Lambdas analyze inline content with data stored elsewhere. Lambdas can be written in Python, Javascript, Coffeescript, and Clojuresript.
+
+Content authors can learn how to run basics of command line, git, Markdown, and that's okay.
 
 It's time we give them power.
 
