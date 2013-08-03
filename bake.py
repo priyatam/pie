@@ -7,7 +7,7 @@ To serve in gh-pages
 ./bake.py serve
 
 Algo:
-Read config.yaml. For each post.md, process YAML, and apply its Mustache-HAML Template, and generate final HTML.
+Read config.yaml. For each post.md, process YAML, and apply its Mustache Templates, and generate final HTML.
 Lastly, combine everything into a single index.html with a minified CSS, JS.
 """
 
@@ -17,12 +17,10 @@ from datetime import datetime
 from importlib import import_module
 import json
 import os
-import re
 import yaml
 import markdown as md
 import pystache
-from hamlpy import hamlpy
-from scss import Scss
+import scss
 import coffeescript
 import cssmin
 import jsmin
@@ -50,14 +48,14 @@ def load_contents(config):
                     "name": fname,
                     "body": raw_data, # unprocessed
                     "modified_date": _format_date(fname)
-                }           
+                }
                 content.update(yaml_data)  # Merge Yaml data for future lookup
                 contents.append(content)
             except:
-                print "Error occured reading file: %s, " % fname               
+                print "Error occured reading file: %s, " % fname
         else:
             print "Warning: Filename %s not in format: ['a/A', 2.5, '_', '.', '-', '~']" % fname
- 
+
     return contents
 
 
@@ -73,46 +71,46 @@ def load_lambdas(config):
     return {funcname: getattr(mod, funcname) for mod in modules for funcname in dir(mod) if not funcname.startswith("__")}
 
 
-def compile_assets(config, asset_type):
+def compile_asset(config, asset_type, fname):
     """Closure: Compiles asset types: css, js, html using pre-processors"""
     def _compile(__compile, _from, _to, ):
-        outputs = []
-        for fname in os.listdir(config[asset_type]):
-            if fname.endswith(_from):
-                raw_data = __compile(asset_type,  fname)
-                # Avoid including the output twice. Hint bake, by adding a _ filename convention
-                new_filename = "_" + fname.replace(_from, _to)
-                open(asset_type + os.sep + new_filename, 'w').write(raw_data)
-                outputs.append((raw_data, new_filename))
-        return outputs
+        raw_data = __compile(config)
+        # Avoid including the output twice. Hint bake, by adding a _ filename convention
+        new_filename = "_" + fname.replace(_from, _to)
+        open(config[asset_type] + os.sep + new_filename, 'w').write(raw_data)
+        return raw_data
     return _compile
 
 
 def load_recipes(config):
     """Pre-process and load each asset type into a dict and return as a single recipe package: a tuple of dicts"""
 
-    # Compile HAML
-    _haml = {fname: compiled_out for compiled_out, fname in compile_assets(config, 'templates')(_compile_haml, 'haml', 'html')}
-    _html = load_assets(config)('templates', 'html')
-    templates = __newdict(_html, _haml)
+    # Compile HTML Templates
+    templates = load_assets(config)('templates', 'html')
 
-    # Compile SCSS
-    _scss = {fname: compiled_out for compiled_out, fname in compile_assets(config, 'styles')(_compile_scss, 'scss', 'css')}
-    _css = load_assets(config)('styles', 'css')
-    styles = __newdict(_css, _scss)
+    # Compile CSS
+    style = None
+    scss_file_name = config["styles"] + "/style.scss"
+    if os.path.isfile(scss_file_name):
+        style = compile_asset(config, "styles", "style.scss")(_compile_scss, 'scss', 'css')
+    else:
+        style = _read("style.css",config["styles"])
 
     # Compile Coffeescript
-    _cs = {fname: compiled_out for compiled_out, fname in compile_assets(config, 'scripts')(_compile_coffee, 'coffee', 'js')}
-    _js = load_assets(config)('scripts', 'js')
-    scripts = __newdict(_js, _cs)
+    script = None
+    cs_file_name = config["scripts"] + "/script.coffee"
+    if os.path.isfile(cs_file_name):
+        script = compile_asset(config, "scripts", "script.coffee")(_compile_scss, 'coffee', 'js')
+    else:
+        script = _read("script.js", config["scripts"])
 
     # Load 3rd party logic
     lambdas = load_lambdas(config)
-    
-    return templates, styles, scripts, lambdas
+
+    return templates, style, script, lambdas
 
 
-def bake(config, templates, contents, styles, scripts, lambdas, minify=False):
+def bake(config, templates, contents, style, script, lambdas, minify=False):
     """Parse everything. Wrap results in a single page of html, css, js
        NOTE: This function modifies 'contents' by adding a new contents['html'] element"""
 
@@ -126,26 +124,26 @@ def bake(config, templates, contents, styles, scripts, lambdas, minify=False):
                     content['html'] = processor[ext](config, content, _get_template(_tmpl, templates), lambdas)
         except RuntimeError as e:
             print "Error baking content: %s %s" % content, e
-            
+
     _params = {"relative_path": config['relative_path'],
                "title": config['title'],
                "posts": contents }
 
-    # Scripts & Styles
+    # Script & Style
     if minify:
-        _params.update({"style_sheet": cssmin.cssmin("".join(styles.values())),
-                        "script": jsmin.jsmin("".join(scripts.values())) })
+        _params.update({"style_sheet": cssmin.cssmin(style),
+                        "script": jsmin.jsmin(script) })
     else:
-        _params.update({"style_sheet": "".join(styles.values()),
-                        "script": "".join(scripts.values()) })
-        
-    #Lambdas        
+        _params.update({"style_sheet": style,
+                        "script": script })
+
+    #Lambdas
     _params.update(lambdas)
-    
+
     # Json Data
     _params.update({"config": config})
     _params.update({"json_data": json.dumps(contents)})
-    
+
     return pystache.render(templates['index.mustache.html'], _params)
 
 
@@ -162,7 +160,7 @@ def serve(config, version=None):
     except IOError:
         print 'You need a config.github.yaml for serve.'
         exit(1)
-        
+
     # Currently supports github
     _serve_github(config)
 
@@ -171,7 +169,7 @@ def serve(config, version=None):
 
 def _get_template(template, templates):
     """Gets compiled html templates"""
-    return templates[template] if template.endswith(".html") else templates["_" + template.replace(".haml", ".html")] 
+    return templates[template]
 
 
 def _read(fname, subdir):
@@ -189,6 +187,7 @@ def _read_yaml(subdir, fname):
         else:
             return yaml.load(yaml_and_raw[0]), yaml_and_raw[1]
 
+
 def _serve_github(config):
     """TODO: Refactor this from brute force to git api"""
     proc = Popen(['git','config', "--get","remote.origin.url"],stdout=PIPE)
@@ -197,7 +196,7 @@ def _serve_github(config):
     os.system("git clone -b gh-pages " + url + " build")
     os.system("cp deploy/index.html build/")
     os.system("cd build; git add index.html; git commit -m 'new deploy " + datetime.now() + "'; git push --force origin gh-pages")
-    
+
 
 def _markstache(config, post, template, lambdas=None):
     """Converts Markdown/Mustache/YAML to HTML."""
@@ -214,13 +213,10 @@ def _textstache(config, content, template, lambdas=None):
     _params.update(lambdas) if lambdas else None
     return pystache.render(template, _params)
 
-    
-def _compile_haml(asset_type, fname):
-    return hamlpy.Compiler().process(_read(fname, asset_type))
 
-
-def _compile_scss(asset_type, fname):
-    return Scss().compile(_read(fname, asset_type))
+def _compile_scss(config):
+    _scss = scss.Scss(scss_opts={"compress": False, "load_paths": [ config["styles"]]})
+    return _scss.compile(_read("style.scss", config["styles"]))
 
 
 def _compile_coffee(asset_type, fname):
@@ -253,12 +249,12 @@ def main(config_path, to_serve=False):
     """Let's cook an Apple Pie"""
     config = load_config(config_path)
     contents = load_contents(config)
-    templates, styles, scripts, lambdas = load_recipes(config)
-    
-    pie = bake(config, templates, contents, styles, scripts, lambdas, minify=to_serve)
+    templates, style, script, lambdas = load_recipes(config)
+
+    pie = bake(config, templates, contents, style, script, lambdas, minify=to_serve)
     open('deploy/index.html', 'w').write(pie)
     print 'Generated index.html'
-    
+
     if to_serve:
         serve(config)
 
@@ -272,6 +268,6 @@ if __name__ == '__main__':
     __config_path = args.config[0]
     to_serve = False
     if "serve" in args.string_options:
-        to_serve = True        
+        to_serve = True
     print "Using config from " + __config_path
     main(__config_path, to_serve=to_serve)
