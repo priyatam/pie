@@ -19,7 +19,7 @@ create_crust
 > Content creator creates Posts and Pages in Markdown/Plain Text, with optional YAML meta-data
 
 put_in_pan and add filling
-> Designers create generic Templates with HTML and Mustache, and optionally, 3rd-party logic (Mustache lambdas), and package them as 'Recipes'.
+> Designers create generic Templates with semantic HTML5 and Mustache, and package them as 'Recipes'.
 
 add_recipes
 > Content creator selects Recipes
@@ -28,16 +28,14 @@ bake_in_oven
 > Content creator runs a script to compile everything into a single index.html
 
 serve
-> Content creator runs the script see his/her page live on github pages
+> Content creator runs the script see his/her page live on github pages or S3.
 
 ## Behind the scenes
-Markdown, Mustache, HTML 5, CSS3 (SCSS/Bourbon), SammyJs.
+Markdown, Mustache, HTML 5, CSS3 (SCSS/Bourbon), SammyJs. SammyJs will be a part of the toolkit and not required by Users.
 
-SammyJs will be a part of the toolkit and not required by Users.
+Toolkit built in Python with pure functions. No state, no framework, just a single workflow that lets content creators, designers, and developers work in parallel. 
 
-Python with pure functions. No state, no framework, just a single workflow that lets content creators, designers, and developers work in parallel. 
-
-Lambdas analyze inline content with data stored elsewhere. Lambdas can be written in Python, Javascript, Coffeescript, and Clojuresript.
+Lambdas analyze inline content with data stored elsewhere. Lambdas can be written in Python, Javascript, Coffeescript, and Clojuresript, and packed together to import into recipes.
 
 Content authors can learn how to run basics of command line, git, Markdown, and that's okay.
 
