@@ -26,13 +26,14 @@ import cssmin
 import jsmin
 import argparse
 from subprocess import Popen, PIPE
+from codecs import open
 
 
 ### API ###
 
 def load_config(config_path):
     """Loads configuration from config.yaml"""
-    with open(config_path, "r") as fin:
+    with open(config_path, "r", "utf-8") as fin:
         return yaml.load(fin.read())
 
 
@@ -54,7 +55,7 @@ def load_contents(config):
             except:
                 print "Error occured reading file: %s, " % fname
         else:
-            print "Warning: Filename %s not in format: ['a/A', 2.5, '_', '.', '-', '~']" % fname
+            print "Warning: Incorrect Extension"
 
     return contents
 
@@ -77,7 +78,7 @@ def compile_asset(config, asset_type, fname):
         raw_data = __compile(config)
         # Avoid including the output twice. Hint bake, by adding a _ filename convention
         new_filename = "_" + fname.replace(_from, _to)
-        open(config[asset_type] + os.sep + new_filename, 'w').write(raw_data)
+        open(config[asset_type] + os.sep + new_filename, 'w', "utf-8").write(raw_data)
         return raw_data
     return _compile
 
@@ -141,7 +142,7 @@ def bake(config, contents, style, script, lambdas, minify=False):
     _params.update({"config": config})
     _params.update({"json_data": json.dumps(contents)})
 
-    renderer = pystache.Renderer(search_dirs=[config["templates"]])
+    renderer = pystache.Renderer(search_dirs=[config["templates"]], file_encoding="utf-8", string_encoding="utf-8")
     return renderer.render_path(_get_template_path(config, "index.mustache"), _params)
 
 
@@ -154,7 +155,7 @@ def serve(config, version=None):
     # Validate
     __config_path = "config.github.yaml"
     try:
-        with open(__config_path): pass
+        with open(__config_path, "r", "utf-8"): pass
     except IOError:
         print 'You need a config.github.yaml for serve.'
         exit(1)
@@ -171,13 +172,13 @@ def _get_template_path(config, name):
 
 def _read(fname, subdir):
     """Reads subdir/fname as raw content"""
-    with open(subdir + os.sep + fname, "r") as fin:
+    with open(subdir + os.sep + fname, "r", "utf-8") as fin:
         return fin.read()
 
 
 def _read_yaml(subdir, fname):
     """Splits subdir/fname into a tuple of YAML and raw content"""
-    with open(subdir + os.sep + fname, "r") as fin:
+    with open(subdir + os.sep + fname, "r", "utf-8") as fin:
         yaml_and_raw = fin.read().split('\n---\n')
         if len(yaml_and_raw) == 1:
             return {}, yaml_and_raw[0]
@@ -197,19 +198,19 @@ def _serve_github(config):
 
 def _markstache(config, post, template_name, lambdas=None):
     """Converts Markdown/Mustache/YAML to HTML."""
-    html_md = md.markdown(post['body'].decode("utf-8"))
+    html_md = md.markdown(post['body'])
     _params = __newdict(post, {'body': html_md})
     _params.update(lambdas) if lambdas else None
-    renderer = pystache.Renderer(search_dirs=[config["templates"]])
+    renderer = pystache.Renderer(search_dirs=[config["templates"]], file_encoding="utf-8", string_encoding="utf-8")
     return renderer.render_path(_get_template_path(config, template_name), _params)
 
 
 def _textstache(config, content, template_name, lambdas=None):
     """Converts Markdown/Mustache/YAML to HTML."""
-    txt = content['body'].decode("utf-8")
+    txt = content['body']
     _params = __newdict(content, {'body': txt})
     _params.update(lambdas) if lambdas else None
-    renderer = pystache.Renderer(search_dirs=[config["templates"]])
+    renderer = pystache.Renderer(search_dirs=[config["templates"]], file_encoding="utf-8", string_encoding="utf-8")
     return renderer.render_path(_get_template_path(config, template_name), _params)
 
 
@@ -251,7 +252,7 @@ def main(config_path, to_serve=False):
     style, script, lambdas = load_recipes(config)
 
     pie = bake(config, contents, style, script, lambdas, minify=to_serve)
-    open('deploy/index.html', 'w').write(pie)
+    open('deploy/index.html', 'w', "utf-8").write(pie)
     print 'Generated index.html'
 
     if to_serve:
