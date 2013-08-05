@@ -46,7 +46,7 @@ def load_contents(config):
                 yaml_data, raw_data = _read_yaml(config['content'], fname)
                 fname = config['content'] + os.sep + fname
                 content = {
-                    "name": fname,
+                    "name": os.path.basename(fname),
                     "body": raw_data, # unprocessed
                     "modified_date": _format_date(fname)
                 }
@@ -123,26 +123,24 @@ def bake(config, contents, style, script, lambdas, minify=False):
         except RuntimeError as e:
             print "Error baking content: %s %s" % content, e
 
-    _params = {"relative_path": config['relative_path'],
-               "title": config['title'],
-               "posts": contents }
+    _params = { "title": config['title'] }
 
     # Script & Style
     if minify:
         _params.update({"style_sheet": cssmin.cssmin(style),
-                        "script": jsmin.jsmin(script) })
+                        "script": jsmin.jsmin(script)})
     else:
         _params.update({"style_sheet": style,
-                        "script": script })
+                        "script": script})
 
     #Lambdas
     _params.update(lambdas)
 
     # Json Data
-    _params.update({"config": config})
-    _params.update({"json_data": json.dumps(contents)})
+    _params.update({"config": json.dumps(config)})
+    _params.update({"json_data": json.dumps(contents, indent=4, separators=(',', ': '))})
 
-    renderer = pystache.Renderer(search_dirs=[config["templates"]], file_encoding="utf-8", string_encoding="utf-8")
+    renderer = pystache.Renderer(search_dirs=[config["templates"]], file_encoding="utf-8", string_encoding="utf-8", escape=lambda u: u)
     return renderer.render_path(_get_template_path(config, "index.mustache"), _params)
 
 
@@ -201,7 +199,7 @@ def _markstache(config, post, template_name, lambdas=None):
     html_md = md.markdown(post['body'])
     _params = __newdict(post, {'body': html_md})
     _params.update(lambdas) if lambdas else None
-    renderer = pystache.Renderer(search_dirs=[config["templates"]], file_encoding="utf-8", string_encoding="utf-8")
+    renderer = pystache.Renderer(search_dirs=[config["templates"]], file_encoding="utf-8", string_encoding="utf-8", escape= lambda u: u)
     return renderer.render_path(_get_template_path(config, template_name), _params)
 
 
@@ -210,7 +208,7 @@ def _textstache(config, content, template_name, lambdas=None):
     txt = content['body']
     _params = __newdict(content, {'body': txt})
     _params.update(lambdas) if lambdas else None
-    renderer = pystache.Renderer(search_dirs=[config["templates"]], file_encoding="utf-8", string_encoding="utf-8")
+    renderer = pystache.Renderer(search_dirs=[config["templates"]], file_encoding="utf-8", string_encoding="utf-8", escape=lambda u: u)
     return renderer.render_path(_get_template_path(config, template_name), _params)
 
 
