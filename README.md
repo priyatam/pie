@@ -8,8 +8,8 @@ If I can see what I write
 I should build  
 what I see, If I can build what  
 I SEE  
-I can build what I think
-therefore I build.
+I can build what  
+I think therefore I build.
 
 A minimalist website builder for semantic content with an emphasis on Plain text, Markdown, HTML5, CSS3, Responsive Web Design, and injectable Lamdas.
 
