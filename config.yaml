@@ -1,12 +1,12 @@
 # Develop
-content: content
+content: done
 templates: recipe/templates
 styles: recipe/styles
 lambdas: recipe/lambdas
 scripts: lib
 
 ## System overrides
-default_template: post.mustache
+default_template: post_plain.mustache
 
 # Deploy
 first_page : about.md

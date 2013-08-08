@@ -139,7 +139,8 @@ def bake(config, contents, style, script, lambdas, minify=False):
 
     # Json Data
     _params.update({"config": config})
-    _params.update({"json_data": json.dumps(contents, indent=4, separators=(',', ': '))})
+#    _params.update({"json_data": json.dumps(contents, indent=4, separators=(',', ': '))})
+    _params.update({"json_data": json.dumps(contents)})
 
     renderer = pystache.Renderer(search_dirs=[config["templates"]], file_encoding="utf-8", string_encoding="utf-8", escape=lambda u: u)
     return renderer.render_path(_get_template_path(config, "index.mustache"), _params)
