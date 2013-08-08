@@ -1,6 +1,8 @@
 _*
 *.py[cod]
 
+recipe.old
+
 .sass-cache
 
 .DS_Store
@@ -27,8 +29,6 @@ var
 sdist
 develop-eggs
 .installed.cfg
-lib
-lib64
 __pycache__
 
 # Installer logs

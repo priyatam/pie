@@ -171,7 +171,7 @@ footer {
 var data = [
     {
         "body": "\n## What are recipes ?\n\nFunctions in recipes/*, rendered in your mustache template.\n> Here's the hello_world from recipes/default.py recipe saying something,\n\n\n",
-        "modified_date": "08-05-13",
+        "modified_date": "08-08-13",
         "name": "recipes.md",
         "author": "Sreeharsha Mudivarti",
         "title": "Recipes",
@@ -183,7 +183,7 @@ var data = [
     },
     {
         "body": "\nToday's static site generators require css, markup, templating and programming skills. Their compatibility is broken. A template in one framework doesn't work in the other. You can't mix and match languages, and add custom features in a decoupled way. You can't take a Designer's template and pipe data structures and lambdas. You can't let them both work in total independence.\n\nAnd then you check for hosting, browser compatibility, plugins that blow on your face.\n\nThese toolkits are built for a different mindset. For different abstractions. It requires a lot of work to perform simple tasks, like changing design on the fly, add behavior on the fly with a single lambda, cook a frozen pie from recipe.\n\nThings shouldn\u2019t be this way.\n",
-        "modified_date": "08-04-13",
+        "modified_date": "08-08-13",
         "name": "simplicity.md",
         "author": "Priyatam Mudivarti",
         "title": "Simplicity",
@@ -195,7 +195,7 @@ var data = [
     },
     {
         "body": "\nThe majority of digital publishing today uses a PHP based CMS. A large number of them use an off-the-shelf Wordpress or Tumblr blog. Nothing wrong with them. Except: they have no control over the framework.\n\nSome content authors even email Microsoft Word docs to each other. Their massive cms platforms don't have REST. They don't support Markdown. They don't version control their content and distribute them to an asset pipeline.\n\nThese things are foreign to most publishers. Even those who know spend an awful lot of money to do little things.\n\nYet, we, as developers, are obsessed with static site generators, mvc frameworks, frontend toolkits in javascript, this and that. Have you ever asked your non-programmer friend to create a custom website?\n\nReality Check: pick a framework, filter on language, understand its templating syntax, understand the framework to customize a workflow, modify non-portable css styles, check browser compatibility, responsiveness, hosting requirements, pricing, plugins that blow on your face.\n\nThese toolkits are built for a different mindset. For different abstractions. It requires a lot of work to perform simple tasks, like changing content and design on the fly, adding simple logic to analyze data, build, and release your content.\n\nThings shouldn\u2019t be this way.\n",
-        "modified_date": "08-04-13",
+        "modified_date": "08-08-13",
         "name": "publishing.md",
         "author": "Priyatam Mudivarti",
         "title": "Why is it hard to create a website?",
@@ -207,7 +207,7 @@ var data = [
     },
     {
         "body": "\n### What's the point of another static generator ?  \n\n> It's a *single file* static generator with all the bells and whistles.  \nWrite all your md posts in posts/. Your file name becomes the url.  \n>\n> ./bake.py\n>\n> Copy the single file, you are done.  \n\n### How can a single file show multiple posts in an interactive manner ?  \n> Sammy.js  \n\n### Bookmarkable, Back button ?\n> Yes  \n\n### What about styles ?  \n> <https://github.com/jasonm23/markdown-css-themes/> and see the config.  \n\n### What about templates ?  \n> See the mustache templates in templates/  \n\n",
-        "modified_date": "08-05-13",
+        "modified_date": "08-08-13",
         "name": "introduction.md",
         "author": "Sreeharsha Mudivarti",
         "title": "Have your Pie and Eat it",
@@ -219,7 +219,7 @@ var data = [
     },
     {
         "body": "\n## What it is ...\nFrozen Pie is an attempt at simplifing html5 content management.\n\n## What it is not ...\nJust another static website generator.\n\n",
-        "modified_date": "08-05-13",
+        "modified_date": "08-08-13",
         "name": "about.md",
         "author": "Sreeharsha Mudivarti",
         "title": "About",
@@ -231,7 +231,7 @@ var data = [
     },
     {
         "body": "Plain text is a remarkable flat data structure.\n\n",
-        "modified_date": "08-04-13",
+        "modified_date": "08-08-13",
         "name": "plain_text.txt",
         "author": "Sreeharsha Mudivarti",
         "title": "Plain Text",
@@ -243,7 +243,7 @@ var data = [
     },
     {
         "body": "\nI started this project with my brother on July 10th 2013, hoping to learn functional programming and idiomatic Python. \n\nWhat happend in three weeks changed the way I think.\n\nSimplicity _is_ possible. \n\n",
-        "modified_date": "08-04-13",
+        "modified_date": "08-08-13",
         "name": "julython.md",
         "author": "Priyatam Mudivarti",
         "title": "Julython",
@@ -252,9 +252,21 @@ var data = [
         "template": "post.mustache",
         "category": "tech",
         "type": "blog"
+    },
+    {
+        "body": "\nHow do you create semantic content and design a website around it? Wordpress? Tumblr? Weebly? Jekyll? Middleman? Custom CMS or handcrafted Sinatra app?\n\nThey all break a simple rule: Coupling.\n\nThese solutions couple at least two of the following: authors, designers, developers, hosting. Their styles and templates are not compatible with each other, non-portable across frameworks. You can't even move content from one platform to another.\n\nThings shouldn\u2019t be coupled this way.\n",
+        "modified_date": "08-08-13",
+        "name": "coupling.md",
+        "author": "Priyatam Mudivarti",
+        "title": "What about coupling?",
+        "post_date": "07-31-13",
+        "html": "<header>\n    <h2>What about coupling? <em>by</em> Priyatam Mudivarti</h2>\n</header>\n<article class='post'>\n    <p>How do you create semantic content and design a website around it? Wordpress? Tumblr? Weebly? Jekyll? Middleman? Custom CMS or handcrafted Sinatra app?</p>\n<p>They all break a simple rule: Coupling.</p>\n<p>These solutions couple at least two of the following: authors, designers, developers, hosting. Their styles and templates are not compatible with each other, non-portable across frameworks. You can't even move content from one platform to another.</p>\n<p>Things shouldn\u2019t be coupled this way.</p>\n</article>\n",
+        "template": "post.mustache",
+        "category": "tech",
+        "type": "blog"
     }
 ];
-var config = {"templates": "templates", "styles": "styles", "title": "Frozen Pie", "github_repo": "https://github.com/Facjure/frozen-pie", "content": "content", "first_page": "about.md", "scripts": "scripts", "default_template": "post.mustache", "relative_path": "/index.html", "lambdas": "lambdas"};
+var config = {"templates": "recipe/templates", "styles": "recipe/styles", "title": "Frozen Pie", "github_repo": "https://github.com/Facjure/frozen-pie", "content": "content", "first_page": "about.md", "recipes_repo": "https://github.com/Facjure/frozen-pie-recipes.git", "scripts": "lib", "default_template": "post.mustache", "relative_path": "/index.html", "lambdas": "recipe/lambdas"};
 
 $( function () {
     var titles_template = '\

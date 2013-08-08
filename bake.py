@@ -13,6 +13,7 @@ Lastly, combine everything into a single index.html with a minified CSS, JS.
 
 import sys
 import time
+import re
 from datetime import datetime
 from importlib import import_module
 import json
@@ -68,7 +69,7 @@ def load_assets(config):
 
 def load_lambdas(config):
     """Loads all pure functions from each module under 'lambdas' as a dictionary lookup by funcion name"""
-    modules = [import_module(config['lambdas'] + "." + recipe) for recipe in _get_lambdas(config)]
+    modules = [ import_module(re.sub("/", ".", config['lambdas'] + "." + recipe)) for recipe in _get_lambdas(config)]
     return {funcname: getattr(mod, funcname) for mod in modules for funcname in dir(mod) if not funcname.startswith("__")}
 
 
@@ -96,7 +97,7 @@ def load_recipes(config):
 
     # Compile Coffeescript
     script = None
-    cs_file_name = config["scripts"] + "/script.coffee"
+    cs_file_name = config["scripts"] + os.sep + "/script.coffee"
     if os.path.isfile(cs_file_name):
         script = compile_asset(config, "scripts", "script.coffee")(_compile_scss, 'coffee', 'js')
     else:
@@ -137,7 +138,7 @@ def bake(config, contents, style, script, lambdas, minify=False):
     _params.update(lambdas)
 
     # Json Data
-    _params.update({"config": json.dumps(config)})
+    _params.update({"config": config})
     _params.update({"json_data": json.dumps(contents, indent=4, separators=(',', ': '))})
 
     renderer = pystache.Renderer(search_dirs=[config["templates"]], file_encoding="utf-8", string_encoding="utf-8", escape=lambda u: u)
@@ -145,12 +146,6 @@ def bake(config, contents, style, script, lambdas, minify=False):
 
 
 def serve(config, version=None):
-    """ Algo:
-        create or replace deploy
-        clone gh-pages into deploy
-        git commit index.html -m "hash" (deploy/index.html can always be recreated from src hash)
-        git push gh-pages """
-    # Validate
     __config_path = "config.github.yaml"
     try:
         with open(__config_path, "r", "utf-8"): pass
@@ -192,6 +187,15 @@ def _serve_github(config):
     os.system("git clone -b gh-pages " + url + " build")
     os.system("cp deploy/index.html build/")
     os.system("cd build; git add index.html; git commit -m 'new deploy " + datetime.now() + "'; git push --force origin gh-pages")
+
+
+def _download_recipe(config, name):
+    """TODO: Refactor this from brute force to git api"""
+    os.system("rm -rf build")
+    os.system("rm -rf recipe.old")
+    os.system("git clone " + config["recipes_repo"] + " build")
+    os.system("mv recipe recipe.old")
+    os.system("cp -R build/" + name + " recipe")
 
 
 def _markstache(config, post, template_name, lambdas=None):
@@ -243,9 +247,8 @@ def __newdict(*dicts):
 
 ### MAIN ###
 
-def main(config_path, to_serve=False):
+def main(config, to_serve=False):
     """Let's cook an Apple Pie"""
-    config = load_config(config_path)
     contents = load_contents(config)
     style, script, lambdas = load_recipes(config)
 
@@ -262,10 +265,17 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Some options.')
     parser.add_argument('string_options', type=str, nargs="*", default=[])
     parser.add_argument("--config", nargs=1, default=["config.yaml"])
+    parser.add_argument("--recipe", nargs=1, default=["default"])
     args = parser.parse_args(sys.argv[1:])
-    __config_path = args.config[0]
+    config_path = args.config[0]
+    print "Using config from " + config_path
+    config = load_config(config_path)
+
+    if args.recipe[0] != "default":
+        _download_recipe(config, args.recipe[0])
+
     to_serve = False
     if "serve" in args.string_options:
         to_serve = True
-    print "Using config from " + __config_path
-    main(__config_path, to_serve=to_serve)
+
+    main(config, to_serve=to_serve)
