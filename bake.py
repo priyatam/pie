@@ -266,13 +266,13 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Some options.')
     parser.add_argument('string_options', type=str, nargs="*", default=[])
     parser.add_argument("--config", nargs=1, default=["config.yaml"])
-    parser.add_argument("--recipe", nargs=1, default=["default"])
+    parser.add_argument("--recipe", nargs=1, default=["recipe"])
     args = parser.parse_args(sys.argv[1:])
     config_path = args.config[0]
     print "Using config from " + config_path
     config = load_config(config_path)
 
-    if args.recipe[0] != "default":
+    if args.recipe[0] != "recipe":
         _download_recipe(config, args.recipe[0])
 
     to_serve = False
