@@ -6,9 +6,10 @@ scripts: scripts
 lambdas: lambdas
 
 ## System overrides
-default_template: post.mustache.haml
+default_template: post.mustache
 
 # Deploy
+first_page : about.md
 title: Frozen Pie
 github_repo: https://github.com/Facjure/frozen-pie
 relative_path: /index.html
