@@ -1,7 +1,6 @@
 markdown
 PyYaml
 pystache
-hamlpy
 Coffeescript
 pyScss
 cssmin
