@@ -275,7 +275,7 @@ if __name__ == '__main__':
 
     # This way, the user can do --recipe=default and expect it to work
     if args.recipe[0] != "recipe":
-        _download_recipe(config, args.recipe[0])
+        _download_recipe(_config, args.recipe[0])
 
     to_serve = False
     if "serve" in args.string_options:
