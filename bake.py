@@ -13,9 +13,8 @@ Lastly, combine everything into a single index.html with a minified CSS, JS.
 
 import sys
 import time
-import re
 from datetime import datetime
-from importlib import import_module
+import imp
 import json
 import os
 import yaml
@@ -70,7 +69,7 @@ def load_assets(config):
 def load_lambdas(config):
     """Loads all pure functions from each module under 'lambdas' as a dictionary lookup by funcion name"""
     # recipe should be foo.bar.baz, not .foo.bar.baz or ..foo.bar.baz or foo/bar/baz, hence the regex
-    modules = [import_module(re.sub("/", ".", config['lambdas'] + "." + recipe).lstrip(".")) for recipe in _get_lambdas(config)]
+    modules = [imp.load_source("lambda" + recipe, config['lambdas'] + os.sep + recipe + ".py") for recipe in _get_lambdas(config)]
     return {funcname: getattr(mod, funcname) for mod in modules for funcname in dir(mod) if not funcname.startswith("__")}
 
 
@@ -233,11 +232,6 @@ def _format_date(fname):
 
 def _get_lambdas(config):
     return [f.strip('.py') for f in os.listdir(config['lambdas']) if f.endswith('py') and not f.startswith("__")]
-
-
-def _funcname(name):
-    """To avoud namespace collisions, filename is a prefix to all functions defined in it. Ex: default_hello_world """
-    return str.__name__.strip("lambdas.") + "_" + name
 
 
 def __newdict(*dicts):

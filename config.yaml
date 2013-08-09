@@ -1,8 +1,9 @@
 # Develop
+# no trailing /
 content: content
 templates: recipe/templates
 styles: recipe/styles
-lambdas: recipe/lambdas
+lambdas: lambdas
 scripts: lib
 
 ## System overrides
