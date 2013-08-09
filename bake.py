@@ -60,12 +60,6 @@ def load_contents(config):
     return contents
 
 
-def load_assets(config):
-    """Loads assets as raw content into a dictionary, looked up by its fname.
-    Closure accepts an asset and a filter that filters based on file ext"""
-    return lambda asset, filter: {fname: _read(fname, asset) for fname in os.listdir(asset) if fname.endswith(filter)}
-
-
 def load_lambdas(config):
     """Loads all pure functions from each module under 'lambdas' as a dictionary lookup by funcion name"""
     # recipe should be foo.bar.baz, not .foo.bar.baz or ..foo.bar.baz or foo/bar/baz, hence the regex
