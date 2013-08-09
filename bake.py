@@ -69,7 +69,8 @@ def load_assets(config):
 
 def load_lambdas(config):
     """Loads all pure functions from each module under 'lambdas' as a dictionary lookup by funcion name"""
-    modules = [ import_module(re.sub("/", ".", config['lambdas'] + "." + recipe)) for recipe in _get_lambdas(config)]
+    # recipe should be foo.bar.baz, not .foo.bar.baz or ..foo.bar.baz or foo/bar/baz, hence the regex
+    modules = [import_module(re.sub("/", ".", config['lambdas'] + "." + recipe).lstrip(".")) for recipe in _get_lambdas(config)]
     return {funcname: getattr(mod, funcname) for mod in modules for funcname in dir(mod) if not funcname.startswith("__")}
 
 
@@ -93,7 +94,7 @@ def load_recipes(config):
     if os.path.isfile(scss_file_name):
         style = compile_asset(config, "styles", "style.scss")(_compile_scss, 'scss', 'css')
     else:
-        style = _read("style.css",config["styles"])
+        style = _read("style.css", config["styles"])
 
     # Compile Coffeescript
     script = None
@@ -114,17 +115,17 @@ def bake(config, contents, style, script, lambdas, minify=False):
        NOTE: This function modifies 'contents' by adding a new contents['html'] element"""
 
     # Content
-    processor = {".txt": _textstache, ".md": _markstache }        
+    processor = {".txt": _textstache, ".md": _markstache}
     for content in contents:
         try:
             for ext in processor.keys():
                 if content['name'].endswith(ext):
-                    _tmpl = content.get('template', config['default_template']) # set default if no template assigned
+                    _tmpl = content.get('template', config['default_template'])  # set default if no template assigned
                     content['html'] = processor[ext](config, content, _tmpl, lambdas)
         except RuntimeError as e:
             print "Error baking content: %s %s" % content, e
 
-    _params = { "title": config['title'] }
+    _params = {"title": config['title']}
 
     # Script & Style
     if minify:
@@ -182,7 +183,7 @@ def _read_yaml(subdir, fname):
 
 def _serve_github(config):
     """TODO: Refactor this from brute force to git api"""
-    proc = Popen(['git','config', "--get","remote.origin.url"],stdout=PIPE)
+    proc = Popen(['git', 'config', "--get", "remote.origin.url"], stdout=PIPE)
     url = proc.stdout.readline().rstrip("\n")
     os.system("rm -rf build")
     os.system("git clone -b gh-pages " + url + " build")
@@ -218,7 +219,7 @@ def _textstache(config, content, template_name, lambdas=None):
 
 
 def _compile_scss(config):
-    _scss = scss.Scss(scss_opts={"compress": False, "load_paths": [ config["styles"]]})
+    _scss = scss.Scss(scss_opts={"compress": False, "load_paths": [config["styles"]]})
     return _scss.compile(_read("style.scss", config["styles"]))
 
 
