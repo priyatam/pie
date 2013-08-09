@@ -5,4 +5,4 @@ install: "pip install -r requirements.txt --use-mirrors"
 script: ./bake_tests.py
 notifications:
   email: false
-  campfire: [facjure]:[0d5b2bad79367517767c07c102b2f177a617e157]@[565244]
+  campfire: facjure:0d5b2bad79367517767c07c102b2f177a617e157@565244
