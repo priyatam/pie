@@ -185,19 +185,19 @@ def _serve_github(config):
     """TODO: Refactor this from brute force to git api"""
     proc = Popen(['git', 'config', "--get", "remote.origin.url"], stdout=PIPE)
     url = proc.stdout.readline().rstrip("\n")
-    os.system("rm -rf build")
-    os.system("git clone -b gh-pages " + url + " build")
-    os.system("cp deploy/index.html build/")
-    os.system("cd build; git add index.html; git commit -m 'new deploy " + datetime.now() + "'; git push --force origin gh-pages")
+    os.system("rm -rf .build")
+    os.system("git clone -b gh-pages " + url + " .build")
+    os.system("cp deploy/index.html .build/")
+    os.system("cd .build; git add index.html; git commit -m 'new deploy " + datetime.now() + "'; git push --force origin gh-pages")
 
 
 def _download_recipe(config, name):
     """TODO: Refactor this from brute force to git api"""
-    os.system("rm -rf build")
+    os.system("rm -rf .build")
     os.system("rm -rf recipe.old")
-    os.system("git clone " + config["recipes_repo"] + " build")
+    os.system("git clone " + config["recipes_repo"] + " .build")
     os.system("mv recipe recipe.old")
-    os.system("cp -R build/" + name + " recipe")
+    os.system("cp -R .build/" + name + " recipe")
 
 
 def _markstache(config, post, template_name, lambdas=None):
@@ -235,9 +235,9 @@ def _get_lambdas(config):
     return [f.strip('.py') for f in os.listdir(config['lambdas']) if f.endswith('py') and not f.startswith("__")]
 
 
-def _funcname(str):
+def _funcname(name):
     """To avoud namespace collisions, filename is a prefix to all functions defined in it. Ex: default_hello_world """
-    return str.__name__.strip("lambdas.") + "_" + str
+    return str.__name__.strip("lambdas.") + "_" + name
 
 
 def __newdict(*dicts):
@@ -271,8 +271,9 @@ if __name__ == '__main__':
     args = parser.parse_args(sys.argv[1:])
     config_path = args.config[0]
     print "Using config from " + config_path
-    config = load_config(config_path)
+    _config = load_config(config_path)
 
+    # This way, the user can do --recipe=default and expect it to work
     if args.recipe[0] != "recipe":
         _download_recipe(config, args.recipe[0])
 
@@ -280,4 +281,4 @@ if __name__ == '__main__':
     if "serve" in args.string_options:
         to_serve = True
 
-    main(config, to_serve=to_serve)
+    main(_config, to_serve=to_serve)
