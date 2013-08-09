@@ -1,6 +1,6 @@
 # Frozen Pie
 
-<img src="https://secure.travis-ci.org/facjure/frozen-pie.png?branch=master" ndymccurdy/redis-py.png?branch=master" style="max-width:100%;">
+<img src="https://secure.travis-ci.org/Facjure/frozen-pie.png?branch=master" style="max-width:100%;">
 
 > You know you have reached perfection in design, not when there is nothing more to add, but when there is nothing more to be taken away -- Antoine de Saint-Exupery
 
