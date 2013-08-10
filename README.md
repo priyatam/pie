@@ -9,6 +9,7 @@ Use or Buy any Design.
 Logic should be declarative.   
 Deployment? Simpler than gmail.  
 
+A minimalist website builder for semantic content with an emphasis on Plain Text, Markdown, Mustache Templates, Mustache Lambdas,  HTML 5, and Responsive Web Design.
 For more info, read [Wiki](https://github.com/Facjure/frozen-pie/wiki).   
 
 _Currently under active development_. 
