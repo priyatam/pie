@@ -6,7 +6,7 @@
 
 ## Overview
 
-A minimalist website builder for semantic content with an emphasis on Plain text, Markdown, HTML5, CSS3, Responsive Web Design, and injectable Lamdas.
+A minimalist website builder for semantic content with an emphasis on Plain text/Markdown, injectable Logic,  HTML 5 and Responsive Web Design.
 
 ## Three principles
 
