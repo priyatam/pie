@@ -1,16 +1,16 @@
 # Develop
 # no trailing /
-content: content
-templates: recipe/templates
-styles: recipe/styles
-lambdas: recipe/lambdas
+content: /Users/priyatam/Dev/github/facjure/resumaker/content
+templates: /Users/priyatam/Dev/github/facjure/resumaker/templates
+styles: /Users/priyatam/Dev/github/facjure/resumaker/styles
+lambdas: /Users/priyatam/Dev/github/facjure/resumaker/lambdas
 scripts: lib
 
 ## System overrides
 default_template: post.mustache
 
 # Deploy
-first_page : about.md
+first_page: main.md
 title: Frozen Pie
 github_repo: https://github.com/Facjure/frozen-pie
 recipes_repo: https://github.com/Facjure/frozen-pie-recipes.git
