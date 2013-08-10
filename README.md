@@ -6,21 +6,22 @@
 
 ## Overview
 
-How do you design a website for semantic HTML 5 content? 
+A minimalist website builder for semantic content with an emphasis on Plain Text, Markdown, Mustache Templates, Mustache Lambdas,  HTML 5, and Responsive Web Design. 
 
-Current platforms are Blog and CMS centric: Drupal, Wordpress, Tumblr, Weebly, Jekyll, Middleman, etc. They are great for developers or users who want to click and push, however, these solutions break a simple rule: _Coupling_.
+## Abstract
+How do you design a responsive website around semantic content? 
 
-They couple at least two of the following: authors, designers, developers, hosting. Their styles are not compatible across platforms, across frameworks. When you upgrade some plugins break, blow on your face. Designs, though in CSS, seem coupled to classes and ids tied to the toolkit beneath; you can't port designs--you can't even move **Content** from one thing to another.
+Current platforms are Blog and CMS centric like Drupal, Wordpress, Tumblr, Weebly or Static site generators like Jekyll, Middleman, DocPad etc., The former platforms are good for users who want to click and forget, and the latter for developers who like to hack. However, both these approaches break a simple rule: _Coupling_.
+
+They couple at least two of the following: authors, designers, developers, hosting providers. Their styles are not compatible across frameworks. When you upgrade some plugins break, blow on your face. Designs, though written in CSS, seem coupled to classes and ids tied to the underlying toolkits; you can't port designs; you can't even move **Content** from one thing to another. Everything is locked to one framework, one language, coupling code and design.
 
 Things shouldn’t be this way.
 
-## Three principles
+## How it works
 
 1. Content is King
 2. Design once, View anywhere
 3. Logic should be declarative, composed of single tasks
-
-## How it works
 
 Author = Cook
 
@@ -42,7 +43,7 @@ serve
 It's time we give them power.
 
 ## Documentation
-A minimalist website builder for semantic content with an emphasis on Plain Text, Markdown, Mustache Templates, Mustache Lambdas,  HTML 5, and Responsive Web Design. For more info, see the [Wiki](https://github.com/Facjure/frozen-pie/wiki).
+See the [WIKI](https://github.com/Facjure/frozen-pie/wiki).
 
 ## Status
 Unstable, under active development.
