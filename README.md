@@ -1,10 +1,8 @@
 <img src="https://secure.travis-ci.org/Facjure/frozen-pie.png?branch=master" style="max-width:100%;">
 
-## Frozen &#123;&#955;&#125;
+## Frozen &#123;&#955;&#125; - Create Websites Together
 
 > You know you have reached perfection in design, not when there is nothing more to add, but when there is nothing more to be taken away -- Antoine de Saint-Exupery
-
-**Create Websites Together.**
 
 Principles:
 
@@ -15,13 +13,6 @@ Principles:
 5. Decouple everything
 6. Go back in time
 
-A minimalist website builder for publishers with an emphasis on Markdown, Responsive Web Design, and Single Page Architecture.
+A minimalist website builder for publishers with an emphasis on Responsive Web Design. Key specs include Bootstrap, Markdown, Mustache, and Pure Functional Programming. Read more on the github [WIKI](https://github.com/Facjure/frozen-pie/wiki).
 
-More on [WIKI](https://github.com/Facjure/frozen-pie/wiki).
-
-_Under active development_.
-
----
-Copyright 2013 Facjure LLC, under the Apache 2.0 License.
-
-
+**!Under active development?** / Ver 0.2 / Copyright 2013 Fac.jure LL&#955; / **Apache 2.0 License**
