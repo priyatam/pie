@@ -8,13 +8,11 @@
 
 How do you design a website for semantic HTML 5 content? 
 
-Current frameworks and platforms areCMS and Blog centric, including Wordpress, Drupal, Tumblr, Weebly, Jekyll, Middleman, and  handcrafted Bourbon mixins with Sinatra.
+Current platforms are Blog and CMS centric: Drupal, Wordpress, Tumblr, Weebly, Jekyll, Middleman, etc. They are great for developers or users who want to click and push, however, these solutions break a simple rule: _Coupling_.
 
-They are great for developer, however, they all break a simple rule: _Coupling_.
+They couple at least two of the following: authors, designers, developers, hosting. Their styles are not compatible across platforms, across frameworks. When you upgrade some plugins break, blow on your face. Designs, though in CSS, seem coupled to classes and ids tied to the toolkit beneath; you can't port designs--you can't even move **Content** from one thing to another.
 
-They couple at least two of the following: authors, designers, developers, hosting. Their styles and templates are not compatible with each other, non-portable across frameworks. Plugins break when you upgrade the framework; you can't move plugins between frameworks, you can't port designs--you can't even move **Content** from one platform to another.
-
-Things shouldn’t be coupled this way.
+Things shouldn’t be this way.
 
 ## Three principles
 
@@ -44,7 +42,7 @@ serve
 It's time we give them power.
 
 ## Documentation
-A minimalist website builder for semantic content with an emphasis on Plain text/Markdown, injectable Logic,  HTML 5 and Responsive Web Design. For more info, see the [Wiki](https://github.com/Facjure/frozen-pie/wiki).
+A minimalist website builder for semantic content with an emphasis on Plain Text, Markdown, Mustache Templates, Mustache Lambdas,  HTML 5, and Responsive Web Design. For more info, see the [Wiki](https://github.com/Facjure/frozen-pie/wiki).
 
 ## Status
 Unstable, under active development.
