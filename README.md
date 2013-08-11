@@ -4,7 +4,7 @@
 
 > You know you have reached perfection in design, not when there is nothing more to add, but when there is nothing more to be taken away -- Antoine de Saint-Exupery
 
-A minimalist website builder for publishers with an emphasis on &#955; architectures, responsive web design, and content freedom. Key specs include Mustache, Bootstrap, Markdown and Semantic HTML 5. Read more on the github [WIKI](https://github.com/Facjure/frozen-pie/wiki).
+A minimalist website builder for publishers with an emphasis on &#955; architectures, responsive web design, and content freedom. Key specs include [Mustache](http://mustache.github.io), [Markdown](http://daringfireball.net/projects/markdown/) and [Semantic HTML 5](http://diveintohtml5.info/semantics.html). Supporting libraries include [Bootstrap](http://getbootstrap.com) and [SammyJS](http://sammyjs.org), and [JQuery](http://jquery.com). Read more on the github [WIKI](https://github.com/Facjure/frozen-pie/wiki).
 
 Principles:
 
