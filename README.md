@@ -4,7 +4,7 @@
 
 > You know you have reached perfection in design, not when there is nothing more to add, but when there is nothing more to be taken away -- Antoine de Saint-Exupery
 
-A minimalist website builder for publishers with an emphasis on Responsive Web Design. Key specs include Bootstrap, Markdown, Mustache, and Pure Functional Programming. Read more on the github [WIKI](https://github.com/Facjure/frozen-pie/wiki).
+A minimalist website builder for publishers with an emphasis on &#955; architectures, responsive web design, and content freedom. Key specs include Mustache, Bootstrap, Markdown and Semantic HTML 5. Read more on the github [WIKI](https://github.com/Facjure/frozen-pie/wiki).
 
 Principles:
 
