@@ -12,12 +12,10 @@ Lastly, combine everything into a single index.html with a minified CSS, JS.
 """
 
 import sys
-import time
 from datetime import datetime
 import imp
 import json
 import os
-import yaml
 import markdown as md
 import pystache
 import scss
@@ -28,13 +26,10 @@ import argparse
 from subprocess import Popen, PIPE
 from codecs import open
 
+from pieutils import *
+
 
 ### API ###
-
-def load_config(config_path):
-    """Loads configuration from config.yaml"""
-    with open(config_path, "r", "utf-8") as fin:
-        return yaml.load(fin.read())
 
 
 def load_contents(config):
@@ -43,12 +38,12 @@ def load_contents(config):
     for fname in os.listdir(config['content']):
         if fname.endswith('.md') or fname.endswith('.txt'):
             try:
-                yaml_data, raw_data = _read_yaml(config['content'], fname)
+                yaml_data, raw_data = read_yaml(config['content'], fname)
                 fname = config['content'] + os.sep + fname
                 content = {
                     "name": os.path.basename(fname),
                     "body": raw_data, # unprocessed
-                    "modified_date": _format_date(fname)
+                    "modified_date": format_date(fname)
                 }
                 content.update(yaml_data)  # Merge Yaml data for future lookup
                 contents.append(content)
@@ -87,7 +82,7 @@ def load_recipes(config):
     if os.path.isfile(scss_file_name):
         style = compile_asset(config, "styles", "style.scss")(_compile_scss, 'scss', 'css')
     else:
-        style = _read("style.css", config["styles"])
+        style = read("style.css", config["styles"])
 
     # Compile Coffeescript
     script = None
@@ -95,7 +90,7 @@ def load_recipes(config):
     if os.path.isfile(cs_file_name):
         script = compile_asset(config, "scripts", "script.coffee")(_compile_scss, 'coffee', 'js')
     else:
-        script = _read("script.js", config["scripts"])
+        script = read("script.js", config["scripts"])
 
     # Load 3rd party logic
     lambdas = load_lambdas(config)
@@ -154,25 +149,6 @@ def serve(config, version=None):
 
 ### SPI ###
 
-def _get_template_path(config, name):
-    return config["templates"] + os.sep + name
-
-
-def _read(fname, subdir):
-    """Reads subdir/fname as raw content"""
-    with open(subdir + os.sep + fname, "r", "utf-8") as fin:
-        return fin.read()
-
-
-def _read_yaml(subdir, fname):
-    """Splits subdir/fname into a tuple of YAML and raw content"""
-    with open(subdir + os.sep + fname, "r", "utf-8") as fin:
-        yaml_and_raw = fin.read().split('\n---\n')
-        if len(yaml_and_raw) == 1:
-            return {}, yaml_and_raw[0]
-        else:
-            return yaml.load(yaml_and_raw[0]), yaml_and_raw[1]
-
 
 def _serve_github(config):
     """TODO: Refactor this from brute force to git api"""
@@ -196,7 +172,7 @@ def _download_recipe(config, name):
 def _markstache(config, post, template_name, lambdas=None):
     """Converts Markdown/Mustache/YAML to HTML."""
     html_md = md.markdown(post['body'])
-    _params = __newdict(post, {'body': html_md})
+    _params = newdict(post, {'body': html_md})
     _params.update(lambdas) if lambdas else None
     renderer = pystache.Renderer(search_dirs=[config["templates"]], file_encoding="utf-8", string_encoding="utf-8", escape= lambda u: u)
     return renderer.render_path(_get_template_path(config, template_name), _params)
@@ -205,7 +181,7 @@ def _markstache(config, post, template_name, lambdas=None):
 def _textstache(config, content, template_name, lambdas=None):
     """Converts Markdown/Mustache/YAML to HTML."""
     txt = content['body']
-    _params = __newdict(content, {'body': txt})
+    _params = newdict(content, {'body': txt})
     _params.update(lambdas) if lambdas else None
     renderer = pystache.Renderer(search_dirs=[config["templates"]], file_encoding="utf-8", string_encoding="utf-8", escape=lambda u: u)
     return renderer.render_path(_get_template_path(config, template_name), _params)
@@ -213,26 +189,20 @@ def _textstache(config, content, template_name, lambdas=None):
 
 def _compile_scss(config):
     _scss = scss.Scss(scss_opts={"compress": False, "load_paths": [config["styles"]]})
-    return _scss.compile(_read("style.scss", config["styles"]))
+    return _scss.compile(read("style.scss", config["styles"]))
 
 
 def _compile_coffee(asset_type, fname):
-    return coffeescript.compile(_read(fname, asset_type))
-
-
-def _format_date(fname):
-    return datetime.strptime(time.ctime(os.path.getmtime(fname)), "%a %b %d %H:%M:%S %Y").strftime("%m-%d-%y")
+    return coffeescript.compile(read(fname, asset_type))
 
 
 def _get_lambdas(config):
     return [f.strip('.py') for f in os.listdir(config['lambdas']) if f.endswith('py') and not f.startswith("__")]
 
 
-def __newdict(*dicts):
-    _dict = {}
-    for d in dicts:
-        _dict.update(d)
-    return _dict
+def _get_template_path(config, name):
+    return config["templates"] + os.sep + name
+
 
 
 ### MAIN ###

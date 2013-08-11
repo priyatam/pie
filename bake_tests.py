@@ -1,18 +1,19 @@
 #!/usr/bin/env python
 
 '''
-$ env TEST=yes python bake_tests.py
+./bake_tests.py
 '''
 
 import unittest
 import types
 import bake
+from pieutils import *
 
 
 class BakeTests(unittest.TestCase):
     def setUp(self):
         self.config_path = "./config.test.yaml"
-        self.config = bake.load_config(self.config_path)
+        self.config = load_config(self.config_path)
 
     def test_load_config(self):
         self.assertEqual(types.DictType, type(self.config))
@@ -38,13 +39,12 @@ class BakeTests(unittest.TestCase):
         for k, v in lambdas.items():
             self.assertIsNotNone(v)
 
-
-    def test_read(self):
-        fin = bake._read('bake_tests.py', '.')
+    def testread(self):
+        fin = read('bake_tests.py', '.')
         self.assertTrue('import unittest' in fin)
 
     def test_read_posts(self):
-        yaml, post = bake._read_yaml('content', 'introduction.md')
+        yaml, post = read_yaml('content', 'introduction.md')
         self.assertEqual(6, len(yaml))
         self.assertIsNotNone(post)
 
@@ -70,8 +70,8 @@ class BakeTests(unittest.TestCase):
         stache = bake._textstache(self.config, post, template_name)
         self.assertIsNotNone(stache)
 
-    def test__format_date(self):
-        dt = bake._format_date('bake_tests.py')
+    def test_format_date(self):
+        dt = bake.format_date('bake_tests.py')
         self.assertIsNotNone(dt)
 
 
