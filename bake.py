@@ -154,10 +154,11 @@ def _serve_github(config):
     """TODO: Refactor this from brute force to git api"""
     proc = Popen(['git', 'config', "--get", "remote.origin.url"], stdout=PIPE)
     url = proc.stdout.readline().rstrip("\n")
+    os.system("mv .build/index.html deploy/")
     os.system("rm -rf .build")
     os.system("git clone -b gh-pages " + url + " .build")
     os.system("cp deploy/index.html .build/")
-    os.system("cd .build; git add index.html; git commit -m 'new deploy " + datetime.now() + "'; git push --force origin gh-pages")
+    os.system("cd .build; git add index.html; git commit -m 'new deploy " + str(datetime.now()) + "'; git push --force origin gh-pages")
 
 
 def _download_recipe(config, name):
@@ -204,8 +205,8 @@ def _get_template_path(config, name):
     return config["templates"] + os.sep + name
 
 
-
 ### MAIN ###
+
 
 def main(config, to_serve=False):
     """Let's cook an Apple Pie"""
@@ -213,8 +214,10 @@ def main(config, to_serve=False):
     style, script, lambdas = load_recipes(config)
 
     pie = bake(config, contents, style, script, lambdas, minify=to_serve)
-    open('deploy/index.html', 'w', "utf-8").write(pie)
-    print 'Generated index.html'
+    if not os.path.isdir(".build"):
+        os.system('mkdir .build')
+    open('.build/index.html', 'w', "utf-8").write(pie)
+    print 'Generated .build/index.html'
 
     if to_serve:
         serve(config)
