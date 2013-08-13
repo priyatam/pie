@@ -1,10 +1,5 @@
 # Develop
-# no trailing /
-content: content
-templates: recipe/templates
-styles: recipe/styles
-lambdas: recipe/lambdas
-scripts: lib
+recipe_root: recipe/
 
 ## System overrides
 default_template: post.mustache

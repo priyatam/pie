@@ -17,9 +17,7 @@ class BakeTests(unittest.TestCase):
 
     def test_load_config(self):
         self.assertEqual(types.DictType, type(self.config))
-
         self.assertEqual("https://github.com/Facjure/frozen-pie", self.config['github_repo'])
-        self.assertEqual("content", self.config['content'])
 
     def test_load_contents(self):
         posts = bake.load_contents(self.config)

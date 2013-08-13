@@ -35,14 +35,15 @@ from pieutils import *
 def load_contents(config):
     """Creates a dictionary of Post meta data, including body as 'raw content'"""
     contents = []
-    for fname in os.listdir(config['content']):
+    content_path = "content"
+    for fname in os.listdir(content_path):
         if fname.endswith('.md') or fname.endswith('.txt'):
             try:
-                yaml_data, raw_data = read_yaml(config['content'], fname)
-                fname = config['content'] + os.sep + fname
+                yaml_data, raw_data = read_yaml(content_path, fname)
+                fname = content_path + os.sep + fname
                 content = {
                     "name": os.path.basename(fname),
-                    "body": raw_data, # unprocessed
+                    "body": raw_data,  # unprocessed
                     "modified_date": format_date(fname)
                 }
                 content.update(yaml_data)  # Merge Yaml data for future lookup
@@ -58,17 +59,18 @@ def load_contents(config):
 def load_lambdas(config):
     """Loads all pure functions from each module under 'lambdas' as a dictionary lookup by funcion name"""
     # recipe should be foo.bar.baz, not .foo.bar.baz or ..foo.bar.baz or foo/bar/baz, hence the regex
-    modules = [imp.load_source("lambda" + recipe, config['lambdas'] + os.sep + recipe + ".py") for recipe in _get_lambdas(config)]
+    lambdas_path = config['recipe_root'] + os.sep + "lambdas"
+    modules = [imp.load_source("lambda" + recipe, lambdas_path + os.sep + recipe + ".py") for recipe in _get_lambdas(config)]
     return {funcname: getattr(mod, funcname) for mod in modules for funcname in dir(mod) if not funcname.startswith("__")}
 
 
-def compile_asset(config, asset_type, fname):
+def compile_asset(config, subdir, fname):
     """Closure: Compiles asset types: css, js, html using pre-processors"""
     def _compile(__compile, _from, _to, ):
         raw_data = __compile(config)
         # Avoid including the output twice. Hint bake, by adding a _ filename convention
         new_filename = "_" + fname.replace(_from, _to)
-        open(config[asset_type] + os.sep + new_filename, 'w', "utf-8").write(raw_data)
+        open(subdir + os.sep + new_filename, 'w', "utf-8").write(raw_data)
         return raw_data
     return _compile
 
@@ -78,19 +80,19 @@ def load_recipes(config):
 
     # Compile CSS
     style = None
-    scss_file_name = config["styles"] + "/style.scss"
+    scss_file_name = config["recipe_root"] + os.sep + "styles" + os.sep + "style.scss"
     if os.path.isfile(scss_file_name):
-        style = compile_asset(config, "styles", "style.scss")(_compile_scss, 'scss', 'css')
+        style = compile_asset(config, config["recipe_root"] + os.sep + "styles", "style.scss")(_compile_scss, 'scss', 'css')
     else:
         style = read("style.css", config["styles"])
 
     # Compile Coffeescript
     script = None
-    cs_file_name = config["scripts"] + os.sep + "/script.coffee"
+    cs_file_name = config["recipe_root"] + os.sep + "scripts" + os.sep + "script.coffee"
     if os.path.isfile(cs_file_name):
-        script = compile_asset(config, "scripts", "script.coffee")(_compile_scss, 'coffee', 'js')
+        script = compile_asset(config, config["recipe_root"] + os.sep + "styles", "script.coffee")(_compile_coffee, 'coffee', 'js')
     else:
-        script = read("script.js", config["scripts"])
+        script = read("script.js", config["recipe_root"] + os.sep + "scripts")
 
     # Load 3rd party logic
     lambdas = load_lambdas(config)
@@ -131,7 +133,7 @@ def bake(config, contents, style, script, lambdas, minify=False):
 #    _params.update({"json_data": json.dumps(contents, indent=4, separators=(',', ': '))})
     _params.update({"json_data": json.dumps(contents)})
 
-    renderer = pystache.Renderer(search_dirs=[config["templates"]], file_encoding="utf-8", string_encoding="utf-8", escape=lambda u: u)
+    renderer = pystache.Renderer(search_dirs=[config["recipe_root"] + os.sep + "templates"], file_encoding="utf-8", string_encoding="utf-8")
     return renderer.render_path(_get_template_path(config, "index.mustache"), _params)
 
 
@@ -175,7 +177,7 @@ def _markstache(config, post, template_name, lambdas=None):
     html_md = md.markdown(post['body'])
     _params = newdict(post, {'body': html_md})
     _params.update(lambdas) if lambdas else None
-    renderer = pystache.Renderer(search_dirs=[config["templates"]], file_encoding="utf-8", string_encoding="utf-8", escape= lambda u: u)
+    renderer = pystache.Renderer(search_dirs=[config["recipe_root"] + os.sep + "templates"], file_encoding="utf-8", string_encoding="utf-8")
     return renderer.render_path(_get_template_path(config, template_name), _params)
 
 
@@ -184,25 +186,26 @@ def _textstache(config, content, template_name, lambdas=None):
     txt = content['body']
     _params = newdict(content, {'body': txt})
     _params.update(lambdas) if lambdas else None
-    renderer = pystache.Renderer(search_dirs=[config["templates"]], file_encoding="utf-8", string_encoding="utf-8", escape=lambda u: u)
+    renderer = pystache.Renderer(search_dirs=[config["recipe_root"] + os.sep + "templates"], file_encoding="utf-8", string_encoding="utf-8", escape=lambda u: u)
     return renderer.render_path(_get_template_path(config, template_name), _params)
 
 
 def _compile_scss(config):
-    _scss = scss.Scss(scss_opts={"compress": False, "load_paths": [config["styles"]]})
-    return _scss.compile(read("style.scss", config["styles"]))
+    _scss = scss.Scss(scss_opts={"compress": False, "load_paths": [config["recipe_root"] + os.sep + "styles"]})
+    return _scss.compile(read("style.scss", config["recipe_root"] + os.sep + "styles"))
 
 
-def _compile_coffee(asset_type, fname):
-    return coffeescript.compile(read(fname, asset_type))
+def _compile_coffee(config):
+    return coffeescript.compile(read("script.coffee", config['recipe_root'] + os.sep + "scripts"))
 
 
 def _get_lambdas(config):
-    return [f.strip('.py') for f in os.listdir(config['lambdas']) if f.endswith('py') and not f.startswith("__")]
+    lambdas_path = config['recipe_root'] + os.sep + "lambdas"
+    return [f.strip('.py') for f in os.listdir(lambdas_path) if f.endswith('py') and not f.startswith("__")]
 
 
 def _get_template_path(config, name):
-    return config["templates"] + os.sep + name
+    return config["recipe_root"] + os.sep + "templates" + os.sep + name
 
 
 ### MAIN ###
