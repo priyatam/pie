@@ -232,7 +232,12 @@ if __name__ == '__main__':
     args = parser.parse_args(sys.argv[1:])
     config_path = args.config[0]
     print "Using config from " + config_path
-    _config = load_config(config_path)
+    _config = load_config("config.yaml")
+
+    # One level config inheritance
+    if config_path != "config.yaml":
+        _config_from_recipe = load_config(config_path)
+        _config = newdict(_config, _config_from_recipe)
 
     # This way, the user can do --recipe=default and expect it to work
     if args.recipe[0] != "recipe":

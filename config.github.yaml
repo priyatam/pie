@@ -9,8 +9,7 @@ scripts: lib
 default_template: post.mustache
 
 # Deploy
-first_page : about.md
-title: Frozen Pie
+first_page : main.md
+title: Frozen Pie On Github Pages
 github_repo: https://github.com/Facjure/frozen-pie
 recipes_repo: https://github.com/Facjure/frozen-pie-recipes.git
-relative_path: /frozen-pie/

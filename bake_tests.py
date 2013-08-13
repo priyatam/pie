@@ -20,7 +20,6 @@ class BakeTests(unittest.TestCase):
 
         self.assertEqual("https://github.com/Facjure/frozen-pie", self.config['github_repo'])
         self.assertEqual("content", self.config['content'])
-        self.assertEqual('/index.html', self.config['relative_path'])
 
     def test_load_contents(self):
         posts = bake.load_contents(self.config)
