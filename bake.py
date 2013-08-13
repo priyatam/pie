@@ -87,12 +87,7 @@ def load_recipes(config):
         style = read("style.css", config["styles"])
 
     # Compile Coffeescript
-    script = None
-    cs_file_name = config["recipe_root"] + os.sep + "scripts" + os.sep + "script.coffee"
-    if os.path.isfile(cs_file_name):
-        script = compile_asset(config, config["recipe_root"] + os.sep + "styles", "script.coffee")(_compile_coffee, 'coffee', 'js')
-    else:
-        script = read("script.js", config["recipe_root"] + os.sep + "scripts")
+    script = read("script.js", "lib")
 
     # Load 3rd party logic
     lambdas = load_lambdas(config)
