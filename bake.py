@@ -50,7 +50,6 @@ def load_contents(config):
                 print "Error occured reading file: %s, " % fname
         else:
             print "Warning: Incorrect Extension"
-
     return contents
 
 
@@ -76,21 +75,13 @@ def compile_asset(config, subdir, fname):
 def load_recipes(config):
     """Pre-process and load each asset type into a dict and return as a single recipe package: a tuple of dicts"""
     _styles_path = config["recipe_root"] + os.sep + "styles"
-
-    # Compile CSS
-    style = None
     scss_file_name = _styles_path + os.sep + "style.scss"
     if os.path.isfile(scss_file_name):
         style = compile_asset(config, _styles_path, "style.scss")(_compile_scss, 'scss', 'css')
     else:
         style = read("style.css", _styles_path)
-
-    # Compile Coffeescript
     script = read("script.js", "lib")
-
-    # Load 3rd party logic
     lambdas = load_lambdas(config)
-
     return style, script, lambdas
 
 
@@ -221,18 +212,15 @@ def main(config, to_serve=False):
     os.system('mkdir .build') if not os.path.isdir(".build") else None
     open('.build/index.html', 'w', "utf-8").write(pie)
     print 'Generated .build/index.html'
+    
     serve(config) if to_serve else 'Use bake serve to deploy the site to github'
 
 
 if __name__ == '__main__':
-    args = _parse_cmd_args(sys.argv[1:])
+    args = _parse_cmd_args(sys.argv)
     sys_config = load_config("config.yaml")
-    user_config = args.config[0]
-    # Merge user config with system config, if necessary
-    _config = dict(sys_config, **user_config) if not user_config else sys_config
-    # Support bake --recipe=default
-    if args.recipe[0] != "recipe":
-        _download_recipe(_config, args.recipe[0])
-
+    user_config = load_config(args.config[0])
+    _config = sys_config if not user_config else dict(sys_config, **user_config) # Merge    
+    _download_recipe(_config, args.recipe[0]) if args.recipe[0] != "recipe" else 'Using default recipe'
     to_serve = True if "serve" in args.string_options else False
     main(_config, to_serve=to_serve)
