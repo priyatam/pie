@@ -33,11 +33,12 @@ from pieutils import *
 def load_contents(config):
     """Creates a dictionary of Post meta data, including body as 'raw content'"""
     contents = []
-    content_path = config['recipe_root'] + os.sep + "content"
+    content_path = config['content']
     for fname in os.listdir(content_path):
         if fname.endswith('.md') or fname.endswith('.txt'):
             try:
                 yaml_data, raw_data = read_yaml(content_path, fname)
+                fname = config['content'] + os.sep + fname
                 fname = content_path + os.sep + fname
                 content = {
                     "name": os.path.basename(fname),
@@ -76,7 +77,7 @@ def compile_asset(config, subdir, fname):
 def load_recipes(config):
     """Pre-process and load each asset type into a dict and return as a single recipe package: a tuple of dicts"""
     _styles_path = config["recipe_root"] + os.sep + "styles"
-    
+
     # Compile CSS
     style = None
     scss_file_name = _styles_path + os.sep + "style.scss"

@@ -1,5 +1,6 @@
 # Develop
 recipe_root: recipe
+contents: content
 
 ## System overrides
 default_template: post.mustache
