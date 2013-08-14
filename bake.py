@@ -38,7 +38,6 @@ def load_contents(config):
         if fname.endswith('.md') or fname.endswith('.txt'):
             try:
                 yaml_data, raw_data = read_yaml(content_path, fname)
-                fname = config['content'] + os.sep + fname
                 fname = content_path + os.sep + fname
                 content = {
                     "name": os.path.basename(fname),
@@ -146,7 +145,6 @@ def serve(config, version=None):
 
 ### SPI ###
 
-
 def _serve_github(config):
     """TODO: Refactor this from brute force to git api"""
     proc = Popen(['git', 'config', "--get", "remote.origin.url"], stdout=PIPE)
@@ -203,46 +201,38 @@ def _get_template_path(config, name):
     return config["recipe_root"] + os.sep + "templates" + os.sep + name
 
 
-### MAIN ###
+def _parse_cmd_args(args):
+    """Parses Cmd line args"""
+    parser = argparse.ArgumentParser(description='Some options.')
+    parser.add_argument('string_options', type=str, nargs="*", default=[])
+    parser.add_argument("--config", nargs=1, default=["config.yaml"])
+    parser.add_argument("--recipe", nargs=1, default=["recipe"])
+    return parser.parse_args(args[1:])
 
+
+### MAIN ###
 
 def main(config, to_serve=False):
     """Let's cook an Apple Pie"""
     contents = load_contents(config)
     style, script, lambdas = load_recipes(config)
-
     pie = bake(config, contents, style, script, lambdas, minify=to_serve)
-    if not os.path.isdir(".build"):
-        os.system('mkdir .build')
+
+    os.system('mkdir .build') if not os.path.isdir(".build") else None
     open('.build/index.html', 'w', "utf-8").write(pie)
     print 'Generated .build/index.html'
-
-    if to_serve:
-        serve(config)
+    serve(config) if to_serve else 'Use bake serve to deploy the site to github'
 
 
 if __name__ == '__main__':
-    # Parse commmand line options
-    parser = argparse.ArgumentParser(description='Some options.')
-    parser.add_argument('string_options', type=str, nargs="*", default=[])
-    parser.add_argument("--config", nargs=1, default=["config.yaml"])
-    parser.add_argument("--recipe", nargs=1, default=["recipe"])
-    args = parser.parse_args(sys.argv[1:])
-    config_path = args.config[0]
-    print "Using config from " + config_path
-    _config = load_config("config.yaml")
-
-    # One level config inheritance
-    if config_path != "config.yaml":
-        _config_from_recipe = load_config(config_path)
-        _config = dict(_config, **_config_from_recipe)
-
-    # This way, the user can do --recipe=default and expect it to work
+    args = _parse_cmd_args(sys.argv[1:])
+    sys_config = load_config("config.yaml")
+    user_config = args.config[0]
+    # Merge user config with system config, if necessary
+    _config = dict(sys_config, **user_config) if not user_config else sys_config
+    # Support bake --recipe=default
     if args.recipe[0] != "recipe":
         _download_recipe(_config, args.recipe[0])
 
-    to_serve = False
-    if "serve" in args.string_options:
-        to_serve = True
-
+    to_serve = True if "serve" in args.string_options else False
     main(_config, to_serve=to_serve)
