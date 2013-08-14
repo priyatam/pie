@@ -25,17 +25,15 @@ import jsmin
 import argparse
 from subprocess import Popen, PIPE
 from codecs import open
-
 from pieutils import *
 
 
 ### API ###
 
-
 def load_contents(config):
     """Creates a dictionary of Post meta data, including body as 'raw content'"""
     contents = []
-    content_path = "content"
+    content_path = config['recipe_root'] + os.sep + "content"
     for fname in os.listdir(content_path):
         if fname.endswith('.md') or fname.endswith('.txt'):
             try:
@@ -77,14 +75,15 @@ def compile_asset(config, subdir, fname):
 
 def load_recipes(config):
     """Pre-process and load each asset type into a dict and return as a single recipe package: a tuple of dicts"""
-
+    _styles_path = config["recipe_root"] + os.sep + "styles"
+    
     # Compile CSS
     style = None
-    scss_file_name = config["recipe_root"] + os.sep + "styles" + os.sep + "style.scss"
+    scss_file_name = _styles_path + os.sep + "style.scss"
     if os.path.isfile(scss_file_name):
-        style = compile_asset(config, config["recipe_root"] + os.sep + "styles", "style.scss")(_compile_scss, 'scss', 'css')
+        style = compile_asset(config, _styles_path, "style.scss")(_compile_scss, 'scss', 'css')
     else:
-        style = read("style.css", config["styles"])
+        style = read("style.css", _styles_path)
 
     # Compile Coffeescript
     script = read("script.js", "lib")
@@ -235,7 +234,7 @@ if __name__ == '__main__':
     # One level config inheritance
     if config_path != "config.yaml":
         _config_from_recipe = load_config(config_path)
-        _config = newdict(_config, _config_from_recipe)
+        _config = dict(_config, **_config_from_recipe)
 
     # This way, the user can do --recipe=default and expect it to work
     if args.recipe[0] != "recipe":
