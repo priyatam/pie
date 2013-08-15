@@ -7,7 +7,8 @@ To serve in gh-pages
 ./bake.py serve
 
 Algo:
-Read config.yaml. For each post.md, process YAML, and apply its Mustache Templates, and generate final HTML.
+Read config.yaml.
+For each post.md, process YAML, and apply its Mustache Templates, and generate final HTML.
 Lastly, combine everything into a single index.html with a minified CSS, JS.
 """
 
@@ -31,7 +32,7 @@ from pieutils import *
 ### API ###
 
 def load_contents(config):
-    """Creates a dictionary of Post meta data, including body as 'raw content'"""
+    """Creates a dictionary of content meta data, including a 'raw' content body"""
     contents = []
     content_path = config['content']
     for fname in os.listdir(content_path):
@@ -44,7 +45,7 @@ def load_contents(config):
                     "body": raw_data,  # unprocessed
                     "modified_date": format_date(fname)
                 }
-                content.update(yaml_data)  # Merge Yaml data for future lookup
+                content.update(yaml_data) # Merge yaml
                 contents.append(content)
             except:
                 print "Error occured reading file: %s, " % fname
@@ -86,40 +87,39 @@ def load_recipes(config):
 
 
 def bake(config, contents, style, script, lambdas, minify=False):
-    """Parse everything. Wrap results in a single page of html, css, js
-       NOTE: This function modifies 'contents' by adding a new contents['html'] element"""
-
-    # Content
+    """Bake contents into a template and combine all templates into a single, compiled html page with embedded styles and scripts and all content as json data"""
     processor = {".txt": _textstache, ".md": _markstache}
+    # Convert txt/md contents into html
     for content in contents:
         try:
             for ext in processor.keys():
                 if content['name'].endswith(ext):
-                    _tmpl = content.get('template', config['default_template'])  # set default if no template assigned
+                    # Using assigned/default templates
+                    _tmpl = content.get('template', config['default_template'])
                     content['html'] = processor[ext](config, content, _tmpl, lambdas)
         except RuntimeError as e:
             print "Error baking content: %s %s" % content, e
 
     _params = {"title": config['title']}
 
-    # Script & Style
+    # Scripts & Styles
     if minify:
-        _params.update({"style_sheet": cssmin.cssmin(style),
-                        "script": jsmin.jsmin(script)})
+        _params.update({"style_sheet": cssmin.cssmin(style), "script": jsmin.jsmin(script)})
     else:
-        _params.update({"style_sheet": style,
-                        "script": script})
+        _params.update({"style_sheet": style, "script": script})
 
-    #Lambdas
+    # Lambdas
     _params.update(lambdas)
 
-    # Json Data
+    # Pack content into Json Data
     _params.update({"config": config})
-#    _params.update({"json_data": json.dumps(contents, indent=4, separators=(',', ': '))})
+    # _params.update({"json_data": json.dumps(contents, indent=4, separators=(',', ': '))})
     _params.update({"json_data": json.dumps(contents)})
 
-    renderer = pystache.Renderer(search_dirs=[config["recipe_root"] + os.sep + "templates"], file_encoding="utf-8", string_encoding="utf-8")
-    return renderer.render_path(_get_template_path(config, "index.mustache"), _params)
+    # Render everything into the root, index page
+    _index_page = _get_template_path(config, "index.mustache")
+    renderer = pystache.Renderer(file_encoding="utf-8", string_encoding="utf-8")
+    return renderer.render_path(_index_page, _params)
 
 
 def serve(config, version=None):
@@ -157,16 +157,16 @@ def _download_recipe(config, name):
 
 
 def _markstache(config, post, template_name, lambdas=None):
-    """Converts Markdown/Mustache/YAML to HTML."""
-    html_md = md.markdown(post['body'])
-    _params = newdict(post, {'body': html_md})
+    """Converts Markdown/Mustache/YAML to HTML"""
+    _html = md.markdown(post['body'])
+    _params = newdict(post, {'body': _html})
     _params.update(lambdas) if lambdas else None
     renderer = pystache.Renderer(search_dirs=[config["recipe_root"] + os.sep + "templates"], file_encoding="utf-8", string_encoding="utf-8")
     return renderer.render_path(_get_template_path(config, template_name), _params)
 
 
 def _textstache(config, content, template_name, lambdas=None):
-    """Converts Markdown/Mustache/YAML to HTML."""
+    """Converts Markdown/Mustache/YAML to HTML"""
     txt = content['body']
     _params = newdict(content, {'body': txt})
     _params.update(lambdas) if lambdas else None
@@ -212,7 +212,7 @@ def main(config, to_serve=False):
     os.system('mkdir .build') if not os.path.isdir(".build") else None
     open('.build/index.html', 'w', "utf-8").write(pie)
     print 'Generated .build/index.html'
-    
+
     serve(config) if to_serve else 'Use bake serve to deploy the site to github'
 
 
@@ -220,7 +220,7 @@ if __name__ == '__main__':
     args = _parse_cmd_args(sys.argv)
     sys_config = load_config("config.yaml")
     user_config = load_config(args.config[0])
-    _config = sys_config if not user_config else dict(sys_config, **user_config) # Merge    
+    _config = sys_config if not user_config else dict(sys_config, **user_config) # Merge
     _download_recipe(_config, args.recipe[0]) if args.recipe[0] != "recipe" else 'Using default recipe'
     to_serve = True if "serve" in args.string_options else False
     main(_config, to_serve=to_serve)
