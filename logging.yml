@@ -8,10 +8,15 @@ handlers:
     level: DEBUG
     formatter: simple
     stream: ext://sys.stdout
+  file:
+    class : logging.handlers.RotatingFileHandler
+    formatter: simple
+    filename: pie.log
+    maxBytes: 1024
 loggers:
   pielogger:
     level: DEBUG
-    handlers: [console]
+    handlers: [console, file]
     propagate: no
 root:
   level: INFO
