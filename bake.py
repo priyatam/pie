@@ -94,34 +94,33 @@ def load_recipes(config):
 def bake(config, contents, style, script, lambdas, minify=False):
     """Bake everything into a single index.html containing styles and scripts and a json of config, metadata, and compiled html"""
     processor = {".txt": _textstache, ".md": _markstache}
-    # Convert txt/md contents into html
+    logger.info('Baking Text and Markdown contents into HTML')
     for content in contents:
         try:
             for ext in processor.keys():
                 if content['name'].endswith(ext):
-                    # Using assigned/default templates
                     _tmpl = content.get('template', config['default_template'])
+                    logger.info('Found Template: %s for content: %s', _tmpl, content['name'])
                     content['html'] = processor[ext](config, content, _tmpl, lambdas)
         except RuntimeError as e:
             logger.error("Error baking content: %s %s" % content, e)
 
     _params = {"title": config['title']}
 
-    # Scripts & Styles
+    logger.info('Baking Styles and Scripts')
     if minify:
         _params.update({"style_sheet": cssmin.cssmin(style), "script": jsmin.jsmin(script)})
     else:
         _params.update({"style_sheet": style, "script": script})
 
-    # Lambdas
+    logger.info('Baking Lambdas')
     _params.update(lambdas)
 
-    # Pack content into Json Data
+    logger.info('Baking Config')
     _params.update({"config": config})
-    # _params.update({"json_data": json.dumps(contents, indent=4, separators=(',', ': '))})
+    logger.info('Baking contents into json_data')
     _params.update({"json_data": json.dumps(contents)})
-
-    # Render everything into the root, index page
+    logger.info('Generating root index.html using index.mustache')
     _index_page = _get_template_path(config, "index.mustache")
     renderer = pystache.Renderer(file_encoding="utf-8", string_encoding="utf-8")
     return renderer.render_path(_index_page, _params)
@@ -134,10 +133,10 @@ def serve(config, version=None):
     try:
         with open(__config_path, "r", "utf-8"): pass
     except IOError:
-        logger.error('You need a config.github.yaml for serve.')
+        logger.error('You need a config.github.yaml to serve.')
         exit(1)
 
-    # Currently supports github
+    logger.info('Currently supports only gh-pages')
     _serve_github(config)
 
 
@@ -220,19 +219,18 @@ def _parse_cmd_args(args):
 @analyze
 def main():
     """Let's cook an Apple Pie:"""
-    # Prepare
-    logger = get_logger()
-    logger.info('Started ...')
+    logger.info('Understanding config')
     args = _parse_cmd_args(sys.argv)
     sys_config = load_config("config.yml")
     user_config = load_config(args.config[0])
     config = sys_config if not user_config else dict(sys_config, **user_config) # Merge
 
-    # Search for Ingredients
+    logger.info('Checking if Recipes are required')
     _download_recipe(_config, args.recipe[0]) if args.recipe[0] != "recipe" else logger.info('Using default recipe')
+
     to_serve = True if "serve" in args.string_options else False
 
-    # Cook
+    logger.info('Cooking now')
     contents = load_contents(config)
     style, script, lambdas = load_recipes(config)
     pie = bake(config, contents, style, script, lambdas, minify=to_serve)
@@ -240,10 +238,12 @@ def main():
     open('.build/index.html', 'w', "utf-8").write(pie)
     logger.info('Generated .build/index.html')
 
-    # Serve
-    serve(config) if to_serve else 'Use bake serve to deploy the site to github'
-    logger.info('Finished')
+    logger.info('Ready to serve, I hope?')
+    serve(config) if to_serve else logger.info('Run bake serve to deploy the site to github')
 
 
 if __name__ == '__main__':
+    logger = get_logger()
+    logger.info('Starting ...')
     main()
+    logger.info('Finished')
