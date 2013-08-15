@@ -12,7 +12,7 @@ from pieutils import *
 
 class BakeTests(unittest.TestCase):
     def setUp(self):
-        self.config_path = "./config.test.yaml"
+        self.config_path = "./config.test.yml"
         self.config = load_config(self.config_path)
 
     def test_load_config(self):
