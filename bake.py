@@ -26,13 +26,15 @@ import jsmin
 import argparse
 from subprocess import Popen, PIPE
 from codecs import open
+import logging, logging.config
 from pieutils import *
 
 
 ### API ###
 
+@analyze
 def load_contents(config):
-    """Creates a dictionary of content meta data, including a 'raw' content body"""
+    """Create a dictionary for retrieving content's raw body, meta data, and compiled html"""
     contents = []
     content_path = config['content']
     for fname in os.listdir(content_path):
@@ -48,22 +50,24 @@ def load_contents(config):
                 content.update(yaml_data) # Merge yaml
                 contents.append(content)
             except:
-                print "Error occured reading file: %s, " % fname
+                logger.error("Error occured reading file: %s, " % fname)
         else:
-            print "Warning: Incorrect Extension"
+            logger.warning("Incorrect Extension!")
     return contents
 
 
+@analyze
 def load_lambdas(config):
-    """Loads all pure functions from each module under 'lambdas' as a dictionary lookup by funcion name"""
+    """Load all pure functions from each module under 'lambdas' as a dictionary by funcion name"""
     # recipe should be foo.bar.baz, not .foo.bar.baz or ..foo.bar.baz or foo/bar/baz, hence the regex
     lambdas_path = config['recipe_root'] + os.sep + "lambdas"
     modules = [imp.load_source("lambda" + recipe, lambdas_path + os.sep + recipe + ".py") for recipe in _get_lambdas(config)]
     return {funcname: getattr(mod, funcname) for mod in modules for funcname in dir(mod) if not funcname.startswith("__")}
 
 
+@analyze
 def compile_asset(config, subdir, fname):
-    """Closure: Compiles asset types: css, js, html using pre-processors"""
+    """Compile asset types: css, js, html using pre-processors"""
     def _compile(__compile, _from, _to, ):
         raw_data = __compile(config)
         # Avoid including the output twice. Hint bake, by adding a _ filename convention
@@ -73,8 +77,9 @@ def compile_asset(config, subdir, fname):
     return _compile
 
 
+@analyze
 def load_recipes(config):
-    """Pre-process and load each asset type into a dict and return as a single recipe package: a tuple of dicts"""
+    """Create a tuple of dictionaries, each providing  access to compiled sytles, scripts, and raw lambdas (with dictionary data)"""
     _styles_path = config["recipe_root"] + os.sep + "styles"
     scss_file_name = _styles_path + os.sep + "style.scss"
     if os.path.isfile(scss_file_name):
@@ -85,9 +90,9 @@ def load_recipes(config):
     lambdas = load_lambdas(config)
     return style, script, lambdas
 
-
+@analyze
 def bake(config, contents, style, script, lambdas, minify=False):
-    """Bake contents into a template and combine all templates into a single, compiled html page with embedded styles and scripts and all content as json data"""
+    """Bake everything into a single index.html containing styles and scripts and a json of config, metadata, and compiled html"""
     processor = {".txt": _textstache, ".md": _markstache}
     # Convert txt/md contents into html
     for content in contents:
@@ -98,7 +103,7 @@ def bake(config, contents, style, script, lambdas, minify=False):
                     _tmpl = content.get('template', config['default_template'])
                     content['html'] = processor[ext](config, content, _tmpl, lambdas)
         except RuntimeError as e:
-            print "Error baking content: %s %s" % content, e
+            logger.error("Error baking content: %s %s" % content, e)
 
     _params = {"title": config['title']}
 
@@ -122,12 +127,14 @@ def bake(config, contents, style, script, lambdas, minify=False):
     return renderer.render_path(_index_page, _params)
 
 
+@analyze
 def serve(config, version=None):
+    """Preparing to serve index.html to a hosting provider"""
     __config_path = "config.github.yaml"
     try:
         with open(__config_path, "r", "utf-8"): pass
     except IOError:
-        print 'You need a config.github.yaml for serve.'
+        logger.error('You need a config.github.yaml for serve.')
         exit(1)
 
     # Currently supports github
@@ -136,8 +143,10 @@ def serve(config, version=None):
 
 ### SPI ###
 
+@analyze
 def _serve_github(config):
-    """TODO: Refactor this from brute force to git api"""
+    """Serve baked index.html into gh-pages"""
+    # TODO: Refactor this from brute force to git api
     proc = Popen(['git', 'config', "--get", "remote.origin.url"], stdout=PIPE)
     url = proc.stdout.readline().rstrip("\n")
     os.system("mv .build/index.html deploy/")
@@ -148,7 +157,8 @@ def _serve_github(config):
 
 
 def _download_recipe(config, name):
-    """TODO: Refactor this from brute force to git api"""
+    """Download recipes from github repo"""
+    # TODO: Refactor this from brute force to git api
     os.system("rm -rf .build")
     os.system("rm -rf recipe.old")
     os.system("git clone " + config["recipes_repo"] + " .build")
@@ -156,8 +166,9 @@ def _download_recipe(config, name):
     os.system("cp -R .build/" + name + " recipe")
 
 
+@analyze
 def _markstache(config, post, template_name, lambdas=None):
-    """Converts Markdown/Mustache/YAML to HTML"""
+    """Convert Markdown-YAML from its Mustache Template into HTML"""
     _html = md.markdown(post['body'])
     _params = newdict(post, {'body': _html})
     _params.update(lambdas) if lambdas else None
@@ -165,8 +176,9 @@ def _markstache(config, post, template_name, lambdas=None):
     return renderer.render_path(_get_template_path(config, template_name), _params)
 
 
+@analyze
 def _textstache(config, content, template_name, lambdas=None):
-    """Converts Markdown/Mustache/YAML to HTML"""
+    """Convert PlainText-YAML from its Mustache Template into HTML"""
     txt = content['body']
     _params = newdict(content, {'body': txt})
     _params.update(lambdas) if lambdas else None
@@ -192,35 +204,46 @@ def _get_template_path(config, name):
     return config["recipe_root"] + os.sep + "templates" + os.sep + name
 
 
+@analyze
 def _parse_cmd_args(args):
-    """Parses Cmd line args"""
+    """Parse command line args"""
     parser = argparse.ArgumentParser(description='Some options.')
     parser.add_argument('string_options', type=str, nargs="*", default=[])
     parser.add_argument("--config", nargs=1, default=["config.yaml"])
     parser.add_argument("--recipe", nargs=1, default=["recipe"])
+    #parser.add_argument("--log", nargs=1, default=["INFO"])
     return parser.parse_args(args[1:])
 
 
 ### MAIN ###
 
-def main(config, to_serve=False):
-    """Let's cook an Apple Pie"""
-    contents = load_contents(config)
-    style, script, lambdas = load_recipes(config)
-    pie = bake(config, contents, style, script, lambdas, minify=to_serve)
-
-    os.system('mkdir .build') if not os.path.isdir(".build") else None
-    open('.build/index.html', 'w', "utf-8").write(pie)
-    print 'Generated .build/index.html'
-
-    serve(config) if to_serve else 'Use bake serve to deploy the site to github'
-
-
-if __name__ == '__main__':
+@analyze
+def main():
+    """Let's cook an Apple Pie:"""
+    # Prepare
+    logger = get_logger()
+    logger.info('Started ...')
     args = _parse_cmd_args(sys.argv)
     sys_config = load_config("config.yaml")
     user_config = load_config(args.config[0])
-    _config = sys_config if not user_config else dict(sys_config, **user_config) # Merge
-    _download_recipe(_config, args.recipe[0]) if args.recipe[0] != "recipe" else 'Using default recipe'
+    config = sys_config if not user_config else dict(sys_config, **user_config) # Merge
+
+    # Search for Ingredients
+    _download_recipe(_config, args.recipe[0]) if args.recipe[0] != "recipe" else logger.info('Using default recipe')
     to_serve = True if "serve" in args.string_options else False
-    main(_config, to_serve=to_serve)
+
+    # Cook
+    contents = load_contents(config)
+    style, script, lambdas = load_recipes(config)
+    pie = bake(config, contents, style, script, lambdas, minify=to_serve)
+    os.system('mkdir .build') if not os.path.isdir(".build") else None
+    open('.build/index.html', 'w', "utf-8").write(pie)
+    logger.info('Generated .build/index.html')
+
+    # Serve
+    serve(config) if to_serve else 'Use bake serve to deploy the site to github'
+    logger.info('Finished')
+
+
+if __name__ == '__main__':
+    main()

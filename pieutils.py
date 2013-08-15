@@ -3,6 +3,33 @@ import time
 from datetime import datetime
 import os
 from codecs import open
+from functools import wraps
+import logging
+
+logger = logging.getLogger('pielogger')
+
+def get_logger():
+    """Loads logging.yml and returns appropriate logger"""
+    loggingConf = open('logging.yml', 'r')
+    logging.config.dictConfig(yaml.load(loggingConf))
+    loggingConf.close()
+    return logging.getLogger('pielogger')
+
+
+def analyze(func):
+    """A debugger that dumps a docstring along with func args passed in"""
+    argnames = func.func_code.co_varnames[:func.func_code.co_argcount]
+    fname = func.func_name
+
+    @wraps(func)
+    def wrapper(*args, **kwds):
+        logger.debug("<--->")
+        for i in (a for a in zip(argnames, args) + kwds.items()):
+            logger.debug("%s: %s", fname, func.__doc__)
+            logger.debug(i)
+        logger.debug("<--->")
+        return func(*args, **kwds)
+    return wrapper
 
 
 def load_config(config_path):

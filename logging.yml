@@ -1,0 +1,18 @@
+version: 1
+formatters:
+  simple:
+    format: '%(name)s - %(levelname)s - %(message)s'
+handlers:
+  console:
+    class: logging.StreamHandler
+    level: DEBUG
+    formatter: simple
+    stream: ext://sys.stdout
+loggers:
+  pielogger:
+    level: DEBUG
+    handlers: [console]
+    propagate: no
+root:
+  level: INFO
+  handlers: [console]
