@@ -33,7 +33,7 @@ def analyze(func):
 
 
 def load_config(config_path):
-    """Loads configuration from config.yaml"""
+    """Loads configuration from config.yml"""
     with open(config_path, "r", "utf-8") as fin:
         return yaml.load(fin.read())
 

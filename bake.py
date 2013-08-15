@@ -7,7 +7,7 @@ To serve in gh-pages
 ./bake.py serve
 
 Algo:
-Read config.yaml.
+Read config.yml.
 For each post.md, process YAML, and apply its Mustache Templates, and generate final HTML.
 Lastly, combine everything into a single index.html with a minified CSS, JS.
 """
@@ -209,7 +209,7 @@ def _parse_cmd_args(args):
     """Parse command line args"""
     parser = argparse.ArgumentParser(description='Some options.')
     parser.add_argument('string_options', type=str, nargs="*", default=[])
-    parser.add_argument("--config", nargs=1, default=["config.yaml"])
+    parser.add_argument("--config", nargs=1, default=["config.yml"])
     parser.add_argument("--recipe", nargs=1, default=["recipe"])
     #parser.add_argument("--log", nargs=1, default=["INFO"])
     return parser.parse_args(args[1:])
@@ -224,7 +224,7 @@ def main():
     logger = get_logger()
     logger.info('Started ...')
     args = _parse_cmd_args(sys.argv)
-    sys_config = load_config("config.yaml")
+    sys_config = load_config("config.yml")
     user_config = load_config(args.config[0])
     config = sys_config if not user_config else dict(sys_config, **user_config) # Merge
 
