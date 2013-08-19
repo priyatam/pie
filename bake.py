@@ -52,7 +52,7 @@ def load_contents(config):
             except:
                 logger.error("Error occured reading file: %s, " % fname)
         else:
-            logger.warning("Incorrect Extension!")
+            logger.warning("Incorrect Extension: %s" % fname)
     return contents
 
 
@@ -100,7 +100,7 @@ def bake(config, contents, style, script, lambdas, minify=False):
             for ext in processor.keys():
                 if content['name'].endswith(ext):
                     _tmpl = content.get('template', config['default_template'])
-                    logger.info('Found Template: %s for content: %s', _tmpl, content['name'])
+                    logger.debug('Found Template: %s for content: %s', _tmpl, content['name'])
                     content['html'] = processor[ext](config, content, _tmpl, lambdas)
         except RuntimeError as e:
             logger.error("Error baking content: %s %s" % content, e)
@@ -239,12 +239,12 @@ def main():
     open('.build/index.html', 'w', "utf-8").write(pie)
     logger.info('Generated .build/index.html')
 
-    logger.info('Ready to serve, I hope?')
-    serve(config) if to_serve else logger.info('Run bake serve to deploy the site to github')
+    logger.info('Ready to serve')
+    serve(config) if to_serve else logger.info('(Run bake serve to deploy the site to github)')
 
 
 if __name__ == '__main__':
     logger = get_logger()
     logger.info('Starting ...')
     main()
-    logger.info('Finished')
+    logger.info('Finished!')
