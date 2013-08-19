@@ -12,8 +12,8 @@ For each post.md, process YAML, and apply its Mustache Templates, and generate f
 Lastly, combine everything into a single index.html with a minified CSS, JS.
 """
 
+import logging, logging.config
 import sys
-from datetime import datetime
 import imp
 import json
 import os
@@ -26,7 +26,7 @@ import jsmin
 import argparse
 from subprocess import Popen, PIPE
 from codecs import open
-import logging, logging.config
+from datetime import datetime
 from pieutils import *
 
 
@@ -89,6 +89,7 @@ def load_recipes(config):
     script = read("script.js", "lib")
     lambdas = load_lambdas(config)
     return style, script, lambdas
+
 
 @analyze
 def bake(config, contents, style, script, lambdas, minify=False):
@@ -212,7 +213,6 @@ def _parse_cmd_args(args):
     parser.add_argument('string_options', type=str, nargs="*", default=[])
     parser.add_argument("--config", nargs=1, default=["config.yml"])
     parser.add_argument("--recipe", nargs=1, default=["recipe"])
-    #parser.add_argument("--log", nargs=1, default=["INFO"])
     return parser.parse_args(args[1:])
 
 

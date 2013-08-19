@@ -1,10 +1,11 @@
+import logging
+import os
 import yaml
 import time
 from datetime import datetime
-import os
 from codecs import open
 from functools import wraps
-import logging
+
 
 logger = logging.getLogger('pielogger')
 
