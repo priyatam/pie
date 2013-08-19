@@ -122,7 +122,7 @@ def bake(config, contents, style, script, lambdas, minify=False):
     _params.update({"json_data": json.dumps(contents)})
     logger.info('Generating root index.html using index.mustache')
     _index_page = _get_template_path(config, "index.mustache")
-    renderer = pystache.Renderer(file_encoding="utf-8", string_encoding="utf-8")
+    renderer = pystache.Renderer(search_dirs=[config["recipe_root"] + os.sep + "templates"], file_encoding="utf-8", string_encoding="utf-8")
     return renderer.render_path(_index_page, _params)
 
 
@@ -181,13 +181,14 @@ def _textstache(config, content, template_name, lambdas=None):
     txt = content['body']
     _params = newdict(content, {'body': txt})
     _params.update(lambdas) if lambdas else None
-    renderer = pystache.Renderer(search_dirs=[config["recipe_root"] + os.sep + "templates"], file_encoding="utf-8", string_encoding="utf-8", escape=lambda u: u)
+    renderer = pystache.Renderer(search_dirs=[config["recipe_root"] + os.sep + "templates"], file_encoding="utf-8", string_encoding="utf-8")
     return renderer.render_path(_get_template_path(config, template_name), _params)
 
 
 def _compile_scss(config):
-    _scss = scss.Scss(scss_opts={"compress": False, "load_paths": [config["recipe_root"] + os.sep + "styles"]})
-    return _scss.compile(read("style.scss", config["recipe_root"] + os.sep + "styles"))
+    _styles_path = config["recipe_root"] + os.sep + "styles"
+    _scss = scss.Scss(scss_opts={"compress": False, "load_paths": [_styles_path]})
+    return _scss.compile(read("style.scss", _styles_path))
 
 
 def _compile_coffee(config):

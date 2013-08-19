@@ -15,7 +15,7 @@ handlers:
     maxBytes: 1024
 loggers:
   pielogger:
-    level: DEBUG
+    level: INFO
     handlers: [console, file]
     propagate: no
 root:
