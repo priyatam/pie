@@ -1,6 +1,34 @@
-{{> header }}
-{{> nav }}
-<div class="wrap">
-    <section id="main">{{{ body }}}</section>
-</div>
-{{> footer }}
+<!DOCTYPE html>
+ <html>
+    <head>
+       {{> header }}
+    </head>
+
+    <body>
+        <nav id="main-nav">
+            {{> nav }}
+            <br class="clear"/>
+        </nav>
+
+        <header id="main-header"/>
+
+        <div id="wrapper" class="wrap">
+            <article id="main" class="content">
+                <!-- Main Content -->
+                {{{ body }}}
+            </article>
+
+            <footer>
+                {{> footer }}
+            </footer>
+        </div>
+    </body>
+
+</html>
+
+
+
+
+
+
+

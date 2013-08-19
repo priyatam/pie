@@ -1,22 +1,21 @@
-<html lang="en">
-<head>
 <meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 <title>{{ title }}</title>
-<head>
+<meta name="description" content="A minimalist website builder for design and content freedom">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+
 <style type="text/css">
-{{{ style_sheet }}}
+    {{{ style_sheet }}}
 </style>
+
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/0.7.2/mustache.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sammy.js/0.7.4/sammy.min.js"></script>
-
 <script>
-var data = {{{ json_data }}};
-var config = {{{ config }}};
+    /* Frozen Pie */
+    var data = {{{ json_data }}};
+    var config = {{{ config }}};
 
-{{{ script }}}
+    {{{ script }}}
 
 </script>
-</head>
-<body>
-
