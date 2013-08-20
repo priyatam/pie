@@ -127,27 +127,28 @@ def bake(config, contents, style, script, lambdas, minify=False):
 
 
 @analyze
-def serve(config, version=None):
+def serve(config, directory_path, version=None):
     """Preparing to serve index.html to a hosting provider"""
-    __config_path = "config.github.yaml"
+    __config_path = "config.github.yml"
     try:
         with open(__config_path, "r", "utf-8"): pass
     except IOError:
-        logger.error('You need a config.github.yaml to serve.')
+        logger.error('You need a config.github.yml to serve.')
         exit(1)
 
     logger.info('Currently supports only gh-pages')
-    _serve_github(config)
+    _serve_github(config, directory_path)
 
 
 ### SPI ###
 
 @analyze
-def _serve_github(config):
+def _serve_github(config, directory_path):
     """Serve baked index.html into gh-pages"""
     # TODO: Refactor this from brute force to git api
     proc = Popen(['git', 'config', "--get", "remote.origin.url"], stdout=PIPE)
     url = proc.stdout.readline().rstrip("\n")
+    os.chdir(directory_path)
     os.system("mv .build/index.html deploy/")
     os.system("rm -rf .build")
     os.system("git clone -b gh-pages " + url + " .build")
@@ -223,7 +224,8 @@ def main():
     logger.info('Understanding config')
     args = _parse_cmd_args(sys.argv)
     sys_config = load_config("config.yml")
-    user_config = load_config(args.config[0])
+    config_path = args.config[0]
+    user_config = load_config(config_path)
     config = sys_config if not user_config else dict(sys_config, **user_config) # Merge
 
     logger.info('Checking if Recipes are required')
@@ -235,12 +237,15 @@ def main():
     contents = load_contents(config)
     style, script, lambdas = load_recipes(config)
     pie = bake(config, contents, style, script, lambdas, minify=to_serve)
+
+    directory_path = os.path.dirname(os.path.realpath(config_path))
+    os.chdir(directory_path)
     os.system('mkdir .build') if not os.path.isdir(".build") else None
     open('.build/index.html', 'w', "utf-8").write(pie)
-    logger.info('Generated .build/index.html')
+    logger.info('Generated ' + directory_path + '/.build/index.html')
 
     logger.info('Ready to serve')
-    serve(config) if to_serve else logger.info('(Run bake serve to deploy the site to github)')
+    serve(config, directory_path) if to_serve else logger.info('(Run bake serve to deploy the site to github)')
 
 
 if __name__ == '__main__':
