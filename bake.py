@@ -130,8 +130,8 @@ def bake(config, contents, dynamic_templates, style, script, lambdas,
     logger.info('Baking Contents and Dynamic Templates')
     bake_contents(config, contents, lambdas)
     bake_dynamic_templates(config, dynamic_templates, lambdas)
-    params.update({"json_data": json.dumps(contents + dynamic_templates, indent=5, separators=(',', ': '))})
-#    params.update({"json_data": json.dumps(contents + dynamic_templates)})
+#    params.update({"json_data": json.dumps(contents + dynamic_templates, indent=5, separators=(',', ': '))})
+    params.update({"json_data": json.dumps(contents + dynamic_templates)})
 
     logger.info('Baking Styles and Scripts')
     if minify:
