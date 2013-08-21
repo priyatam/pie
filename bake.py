@@ -44,7 +44,7 @@ def load_contents(config):
             try:
                 meta, raw = read_yaml(path, fname)
                 content = {
-                    "name": meta['type'] + fname,
+                    "name": meta['type'] + "/" + fname,
                     "body": raw,
                     "modified_date": format_date(path + os.sep + fname)
                 }
@@ -84,11 +84,14 @@ def load_dynamic_templates(config):
 
 
 @analyze
-def load_lambdas(config):
+def load_lambdas(config, contents, dynamic_templates):
     """Load all pure functions from each module under 'lambdas' as a dictionary by funcion name"""
     # recipe should be foo.bar.baz, not .foo.bar.baz or ..foo.bar.baz or foo/bar/baz
     lambdas_path = config['recipe_root'] + os.sep + "lambdas"
-    modules = [imp.load_source("lambda" + recipe, lambdas_path + os.sep + recipe + ".py") for recipe in _get_lambdas(config)]
+    modules = [imp.load_source(recipe, lambdas_path + os.sep + recipe + ".py") for recipe in _get_lambdas(config)]
+    for module in modules:
+        module.contents = contents
+        module.dynamic_templates = dynamic_templates
     return {funcname: getattr(mod, funcname) for mod in modules for funcname in dir(mod) if not funcname.startswith("__")}
 
 
@@ -105,7 +108,7 @@ def compile_asset(config, subdir, fname):
 
 
 @analyze
-def load_recipes(config):
+def load_recipes(config, contents, dynamic_templates):
     """Create a tuple of dictionaries, each providing  access to compiled sytle, script, and raw lambdas (along with their dictionary data)"""
     _styles_path = config["recipe_root"] + os.sep + "styles"
     scss_file_name = _styles_path + os.sep + "style.scss"
@@ -114,7 +117,7 @@ def load_recipes(config):
     else:
         style = read("style.css", _styles_path)
     script = read("script.js", "lib")
-    lambdas = load_lambdas(config)
+    lambdas = load_lambdas(config, contents, dynamic_templates)
     return style, script, lambdas
 
 
@@ -127,7 +130,8 @@ def bake(config, contents, dynamic_templates, style, script, lambdas,
     logger.info('Baking Contents and Dynamic Templates')
     bake_contents(config, contents, lambdas)
     bake_dynamic_templates(config, dynamic_templates, lambdas)
-    params.update({"json_data": json.dumps(contents + dynamic_templates)})
+    params.update({"json_data": json.dumps(contents + dynamic_templates, indent=5, separators=(',', ': '))})
+#    params.update({"json_data": json.dumps(contents + dynamic_templates)})
 
     logger.info('Baking Styles and Scripts')
     if minify:
@@ -180,14 +184,6 @@ def bake_dynamic_templates(config, templates, lambdas):
 
 @analyze
 def serve(config, directory_path, version=None):
-    """Preparing to serve index.html to a hosting provider"""
-    __config_path = "config.github.yml"
-    try:
-        with open(__config_path, "r", "utf-8"): pass
-    except IOError:
-        logger.error('You need a config.github.yml to serve.')
-        exit(1)
-
     logger.info('Currently supports only gh-pages')
     _serve_github(config, directory_path)
 
@@ -294,7 +290,7 @@ def main():
     logger.info('Cooking now')
     contents = load_contents(config)
     dynamic_templates = load_dynamic_templates(config)
-    style, script, lambdas = load_recipes(config)
+    style, script, lambdas = load_recipes(config, contents, dynamic_templates)
     pie = bake(config, contents, dynamic_templates, style, script, lambdas,
                minify=to_serve)
 

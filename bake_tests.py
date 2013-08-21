@@ -23,11 +23,11 @@ class BakeTests(unittest.TestCase):
         posts = bake.load_contents(self.config)
         for post in posts:
             self.assertEqual(types.DictType, type(post))
-        self.assertEqual(8, len(posts))
+        self.assertEqual(7, len(posts))
         self.assertIsNotNone(posts[0]['body'])
 
     def test_load_recipes(self):
-        style, script, lambdas = bake.load_recipes(self.config)
+        style, script, lambdas = bake.load_recipes(self.config, [], [])
 #        self.assertEqual(types.UnicodeType, type(style))
 #        self.assertEqual(types.UnicodeType, type(script))
         self.assertEqual(types.DictType, type(lambdas))
