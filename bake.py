@@ -1,15 +1,17 @@
 #!/usr/bin/env python
 """
-Usage:
-./bake.py
-
-To serve in gh-pages
-./bake.py serve
-
-Algo:
-Read config.yml.
-For each post.md, process YAML, and apply its Mustache Templates, and generate final HTML.
-Lastly, combine everything into a single index.html with a minified CSS, JS.
+    compile:
+        bake.py
+    compile-and-host-on-gh-pages:
+        bake.py serve
+    algo:
+        Read config.yml.
+        For each post.md, process YAML, and apply its Mustache Templates, and generate final HTML.
+        Combine everything into a single index.html with a minified CSS, JS.
+    copyright:
+        (c) 2013 by Facjure LLC
+    license:
+        Apache 2.0 License, see LICENSE for more details
 """
 
 import logging, logging.config
@@ -34,32 +36,57 @@ from pieutils import *
 
 @analyze
 def load_contents(config):
-    """Create a dictionary for retrieving content's raw body, meta data, and compiled html"""
+    """Create a dictionary for retrieving content's raw body, metadata, and future compiled html"""
     contents = []
-    content_path = config['content']
-    for fname in os.listdir(content_path):
+    path = config['content']
+    for fname in os.listdir(path):
         if fname.endswith('.md') or fname.endswith('.txt'):
             try:
-                yaml_data, raw_data = read_yaml(content_path, fname)
-                fname = content_path + os.sep + fname
+                meta, raw = read_yaml(path, fname)
                 content = {
-                    "name": os.path.basename(fname),
-                    "body": raw_data,  # unprocessed
-                    "modified_date": format_date(fname)
+                    "name": meta['type'] + fname,
+                    "body": raw,
+                    "modified_date": format_date(path + os.sep + fname)
                 }
-                content.update(yaml_data) # Merge yaml
+                content.update(meta)
                 contents.append(content)
-            except:
-                logger.error("Error occured reading file: %s, " % fname)
+            except RuntimeError as e:
+                logger.error("Error while reading content: %s:\n%s" % fname, e)
         else:
             logger.warning("Incorrect Extension: %s" % fname)
     return contents
 
 
+
+@analyze
+def load_dynamic_templates(config):
+    """Create a dictionary for retrieving template's raw body, metadata,
+    and compiled html"""
+    templates = []
+    path = config["recipe_root"] + os.sep + "templates"
+    for fname in os.listdir(path):
+        if fname.endswith('.mustache'):
+            try:
+                meta, raw = read_yaml(path, fname)
+                if meta.get('type', 'simple') == 'dynamic':
+                    template = {
+                        "name": os.path.splitext(fname)[0],
+                        "body": raw,
+                        "modified_date": format_date(path + os.sep + fname)
+                    }
+                    template.update(meta)
+                    templates.append(template)
+            except RuntimeError as e:
+                logger.error("Error while reading template: %s:\n%s" % fname, e)
+        else:
+            logger.warning("Incorrect Extension: %s" % fname)
+    return templates
+
+
 @analyze
 def load_lambdas(config):
     """Load all pure functions from each module under 'lambdas' as a dictionary by funcion name"""
-    # recipe should be foo.bar.baz, not .foo.bar.baz or ..foo.bar.baz or foo/bar/baz, hence the regex
+    # recipe should be foo.bar.baz, not .foo.bar.baz or ..foo.bar.baz or foo/bar/baz
     lambdas_path = config['recipe_root'] + os.sep + "lambdas"
     modules = [imp.load_source("lambda" + recipe, lambdas_path + os.sep + recipe + ".py") for recipe in _get_lambdas(config)]
     return {funcname: getattr(mod, funcname) for mod in modules for funcname in dir(mod) if not funcname.startswith("__")}
@@ -79,7 +106,7 @@ def compile_asset(config, subdir, fname):
 
 @analyze
 def load_recipes(config):
-    """Create a tuple of dictionaries, each providing  access to compiled sytles, scripts, and raw lambdas (with dictionary data)"""
+    """Create a tuple of dictionaries, each providing  access to compiled sytle, script, and raw lambdas (along with their dictionary data)"""
     _styles_path = config["recipe_root"] + os.sep + "styles"
     scss_file_name = _styles_path + os.sep + "style.scss"
     if os.path.isfile(scss_file_name):
@@ -92,39 +119,63 @@ def load_recipes(config):
 
 
 @analyze
-def bake(config, contents, style, script, lambdas, minify=False):
-    """Bake everything into a single index.html containing styles and scripts and a json of config, metadata, and compiled html"""
-    processor = {".txt": _textstache, ".md": _markstache}
-    logger.info('Baking Text and Markdown contents into HTML')
-    for content in contents:
-        try:
-            for ext in processor.keys():
-                if content['name'].endswith(ext):
-                    _tmpl = content.get('template', config['default_template'])
-                    logger.debug('Found Template: %s for content: %s', _tmpl, content['name'])
-                    content['html'] = processor[ext](config, content, _tmpl, lambdas)
-        except RuntimeError as e:
-            logger.error("Error baking content: %s %s" % content, e)
+def bake(config, contents, dynamic_templates, style, script, lambdas,
+         minify=False):
+    """Bake recipes with given style and script into a single index.html along with a json of style, script, and content"""
+    params = {"title": config['title']}
 
-    _params = {"title": config['title']}
+    logger.info('Baking Contents and Dynamic Templates')
+    bake_contents(config, contents, lambdas)
+    bake_dynamic_templates(config, dynamic_templates, lambdas)
+    params.update({"json_data": json.dumps(contents + dynamic_templates)})
 
     logger.info('Baking Styles and Scripts')
     if minify:
-        _params.update({"style_sheet": cssmin.cssmin(style), "script": jsmin.jsmin(script)})
+        params.update({"style_sheet": cssmin.cssmin(style), "script": jsmin.jsmin(script)})
     else:
-        _params.update({"style_sheet": style, "script": script})
+        params.update({"style_sheet": style, "script": script})
 
     logger.info('Baking Lambdas')
-    _params.update(lambdas)
+    params.update(lambdas)
 
     logger.info('Baking Config')
-    _params.update({"config": config})
-    logger.info('Baking contents into json_data')
-    _params.update({"json_data": json.dumps(contents)})
+    params.update({"config": config})
+
     logger.info('Generating root index.html using index.mustache')
     _index_page = _get_template_path(config, "index.mustache")
     renderer = pystache.Renderer(search_dirs=[config["recipe_root"] + os.sep + "templates"], file_encoding="utf-8", string_encoding="utf-8")
-    return renderer.render_path(_index_page, _params)
+
+    return renderer.render_path(_index_page, params)
+
+
+@analyze
+def bake_contents(config, contents, lambdas):
+    """Baking Contents into HTML using Mustache Templates"""
+    logger.info('Baking Contents into HTML')
+    for content in contents:
+        try:
+            if content['name'].endswith('.txt'):
+                template = content.get('template', config['default_template'])
+                logger.debug('Found Template: %s for content: %s', template, content['name'])
+                content['html'] = _textstache(config, content, template, lambdas)
+            elif content['name'].endswith('.md'):
+                template = content.get('template', config['default_template'])
+                logger.debug('Found Template: %s for content: %s', template, content['name'])
+                content['html'] = _markstache(config, content, template, lambdas)
+        except RuntimeError as e:
+           logger.error("Error Baking Contents: %s" % content, e)
+
+
+@analyze
+def bake_dynamic_templates(config, templates, lambdas):
+    """Bake Dynamic Templates into HTML using Mustache Templates"""
+    logger.info('Baking Dynamic Templates into HTML')
+    for template in templates:
+        try:
+            logger.debug('Found Template: %s', template['name'])
+            template['html'] = _htmlstache(config, template['body'], lambdas)
+        except RuntimeError as e:
+            logger.error("Error Baking Dynamic Templates: %s" % template, e)
 
 
 @analyze
@@ -170,19 +221,26 @@ def _download_recipe(config, name):
 @analyze
 def _markstache(config, post, template_name, lambdas=None):
     """Convert Markdown-YAML from its Mustache Template into HTML"""
-    _html = md.markdown(post['body'])
-    _params = newdict(post, {'body': _html})
-    _params.update(lambdas) if lambdas else None
+    _params = newdict(post, {'body': md.markdown(post['body'])})
+    _params.update(lambdas) if lambdas else logger.debug('No Lambdas provided')
     renderer = pystache.Renderer(search_dirs=[config["recipe_root"] + os.sep + "templates"], file_encoding="utf-8", string_encoding="utf-8")
     return renderer.render_path(_get_template_path(config, template_name), _params)
 
 
 @analyze
+def _htmlstache(config, template, lambdas=None):
+    """Convert Markdown-YAML from its Mustache Template into HTML"""
+    _params = {}
+    _params.update(lambdas) if lambdas else logger.debug('No Lambdas provided')
+    renderer = pystache.Renderer(search_dirs=[config["recipe_root"] + os.sep + "templates"], file_encoding="utf-8", string_encoding="utf-8")
+    return renderer.render(template, _params)
+
+
+@analyze
 def _textstache(config, content, template_name, lambdas=None):
     """Convert PlainText-YAML from its Mustache Template into HTML"""
-    txt = content['body']
-    _params = newdict(content, {'body': txt})
-    _params.update(lambdas) if lambdas else None
+    _params = newdict(content, {'body': content['body']})
+    _params.update(lambdas) if lambdas else logger.debug('No Lambdas provided')
     renderer = pystache.Renderer(search_dirs=[config["recipe_root"] + os.sep + "templates"], file_encoding="utf-8", string_encoding="utf-8")
     return renderer.render_path(_get_template_path(config, template_name), _params)
 
@@ -218,7 +276,6 @@ def _parse_cmd_args(args):
 
 ### MAIN ###
 
-@analyze
 def main():
     """Let's cook an Apple Pie:"""
     logger.info('Understanding config')
@@ -226,17 +283,20 @@ def main():
     sys_config = load_config("config.yml")
     config_path = args.config[0]
     user_config = load_config(config_path)
-    config = sys_config if not user_config else dict(sys_config, **user_config) # Merge
+    # Merge configs if necessary
+    config = sys_config if not user_config else dict(sys_config, **user_config)
 
     logger.info('Checking if Recipes are required')
-    _download_recipe(_config, args.recipe[0]) if args.recipe[0] != "recipe" else logger.info('Using default recipe')
+    _download_recipe(config, args.recipe[0]) if args.recipe[0] != "recipe" else logger.info('Using default recipe')
 
     to_serve = True if "serve" in args.string_options else False
 
     logger.info('Cooking now')
     contents = load_contents(config)
+    dynamic_templates = load_dynamic_templates(config)
     style, script, lambdas = load_recipes(config)
-    pie = bake(config, contents, style, script, lambdas, minify=to_serve)
+    pie = bake(config, contents, dynamic_templates, style, script, lambdas,
+               minify=to_serve)
 
     directory_path = os.path.dirname(os.path.realpath(config_path))
     os.chdir(directory_path)
