@@ -14,7 +14,6 @@
         Apache 2.0 License, see LICENSE for more details
 """
 
-import logging, logging.config
 import sys
 import imp
 import json
@@ -63,7 +62,7 @@ def load_dynamic_templates(config):
     """Create a dictionary for retrieving template's raw body, metadata,
     and compiled html"""
     templates = []
-    path = config["recipe_root"] + os.sep + "templates"
+    path = config["templates_path"]
     for fname in os.listdir(path):
         if fname.endswith('.mustache'):
             try:
@@ -87,7 +86,7 @@ def load_dynamic_templates(config):
 def load_lambdas(config, contents, dynamic_templates):
     """Load all pure functions from each module under 'lambdas' as a dictionary by funcion name"""
     # recipe should be foo.bar.baz, not .foo.bar.baz or ..foo.bar.baz or foo/bar/baz
-    lambdas_path = config['recipe_root'] + os.sep + "lambdas"
+    lambdas_path = config["lambdas_path"]
     modules = [imp.load_source(recipe, lambdas_path + os.sep + recipe + ".py") for recipe in _get_lambdas(config)]
     for module in modules:
         module.contents = contents
@@ -110,7 +109,7 @@ def compile_asset(config, subdir, fname):
 @analyze
 def load_recipes(config, contents, dynamic_templates):
     """Create a tuple of dictionaries, each providing  access to compiled sytle, script, and raw lambdas (along with their dictionary data)"""
-    _styles_path = config["recipe_root"] + os.sep + "styles"
+    _styles_path = config["styles_path"]
     scss_file_name = _styles_path + os.sep + "style.scss"
     if os.path.isfile(scss_file_name):
         style = compile_asset(config, _styles_path, "style.scss")(_compile_scss, 'scss', 'css')
@@ -147,7 +146,7 @@ def bake(config, contents, dynamic_templates, style, script, lambdas,
 
     logger.info('Generating root index.html using index.mustache')
     _index_page = _get_template_path(config, "index.mustache")
-    renderer = pystache.Renderer(search_dirs=[config["recipe_root"] + os.sep + "templates"], file_encoding="utf-8", string_encoding="utf-8")
+    renderer = pystache.Renderer(search_dirs=[config["templates_path"]], file_encoding="utf-8", string_encoding="utf-8")
 
     return renderer.render_path(_index_page, params)
 
@@ -197,6 +196,7 @@ def _serve_github(config, directory_path):
     proc = Popen(['git', 'config', "--get", "remote.origin.url"], stdout=PIPE)
     url = proc.stdout.readline().rstrip("\n")
     os.chdir(directory_path)
+    os.system("mkdir deploy")
     os.system("mv .build/index.html deploy/")
     os.system("rm -rf .build")
     os.system("git clone -b gh-pages " + url + " .build")
@@ -219,7 +219,7 @@ def _markstache(config, post, template_name, lambdas=None):
     """Convert Markdown-YAML from its Mustache Template into HTML"""
     _params = newdict(post, {'body': md.markdown(post['body'])})
     _params.update(lambdas) if lambdas else logger.debug('No Lambdas provided')
-    renderer = pystache.Renderer(search_dirs=[config["recipe_root"] + os.sep + "templates"], file_encoding="utf-8", string_encoding="utf-8")
+    renderer = pystache.Renderer(search_dirs=[config["templates_path"]], file_encoding="utf-8", string_encoding="utf-8")
     return renderer.render_path(_get_template_path(config, template_name), _params)
 
 
@@ -228,7 +228,7 @@ def _htmlstache(config, template, lambdas=None):
     """Convert Markdown-YAML from its Mustache Template into HTML"""
     _params = {}
     _params.update(lambdas) if lambdas else logger.debug('No Lambdas provided')
-    renderer = pystache.Renderer(search_dirs=[config["recipe_root"] + os.sep + "templates"], file_encoding="utf-8", string_encoding="utf-8")
+    renderer = pystache.Renderer(search_dirs=[config["templates_path"]], file_encoding="utf-8", string_encoding="utf-8")
     return renderer.render(template, _params)
 
 
@@ -237,27 +237,23 @@ def _textstache(config, content, template_name, lambdas=None):
     """Convert PlainText-YAML from its Mustache Template into HTML"""
     _params = newdict(content, {'body': content['body']})
     _params.update(lambdas) if lambdas else logger.debug('No Lambdas provided')
-    renderer = pystache.Renderer(search_dirs=[config["recipe_root"] + os.sep + "templates"], file_encoding="utf-8", string_encoding="utf-8")
+    renderer = pystache.Renderer(search_dirs=[config["templates_path"]], file_encoding="utf-8", string_encoding="utf-8")
     return renderer.render_path(_get_template_path(config, template_name), _params)
 
 
 def _compile_scss(config):
-    _styles_path = config["recipe_root"] + os.sep + "styles"
+    _styles_path = config["styles_path"]
     _scss = scss.Scss(scss_opts={"compress": False, "load_paths": [_styles_path]})
     return _scss.compile(read("style.scss", _styles_path))
 
 
-def _compile_coffee(config):
-    return coffeescript.compile(read("script.coffee", config['recipe_root'] + os.sep + "scripts"))
-
-
 def _get_lambdas(config):
-    lambdas_path = config['recipe_root'] + os.sep + "lambdas"
+    lambdas_path = config['lambdas_path']
     return [f.strip('.py') for f in os.listdir(lambdas_path) if f.endswith('py') and not f.startswith("__")]
 
 
 def _get_template_path(config, name):
-    return config["recipe_root"] + os.sep + "templates" + os.sep + name
+    return config["templates_path"] + os.sep + name
 
 
 @analyze
@@ -276,12 +272,8 @@ def main():
     """Let's cook an Apple Pie:"""
     logger.info('Understanding config')
     args = _parse_cmd_args(sys.argv)
-    sys_config = load_config("config.yml")
     config_path = args.config[0]
-    user_config = load_config(config_path)
-    # Merge configs if necessary
-    config = sys_config if not user_config else dict(sys_config, **user_config)
-
+    config = load_config(config_path)
     logger.info('Checking if Recipes are required')
     _download_recipe(config, args.recipe[0]) if args.recipe[0] != "recipe" else logger.info('Using default recipe')
 

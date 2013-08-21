@@ -1,4 +1,4 @@
-import logging
+import logging, logging.config
 import os
 import yaml
 import time
@@ -36,7 +36,14 @@ def analyze(func):
 def load_config(config_path):
     """Loads configuration from config.yml"""
     with open(config_path, "r", "utf-8") as fin:
-        return yaml.load(fin.read())
+        user_config = yaml.load(fin.read())
+    with open("config.yml", "r", "utf-8") as fin:
+        sys_config = yaml.load(fin.read())
+    config = dict(sys_config, **user_config)
+    config["templates_path"] = config["recipe_root"] + os.sep + "templates"
+    config["lambdas_path"] = config["recipe_root"] + os.sep + "lambdas"
+    config["styles_path"] = config["recipe_root"] + os.sep + "styles"
+    return config
 
 
 def format_date(fname):
