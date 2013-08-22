@@ -15,6 +15,6 @@ To understand what can be done, we must look at what _can't_ be done today. Most
 
 This is great, but they break an important rule: **Coupling**. They couple at least two of the following: _authors, designers, developers, hosting providers_.
 
-Logic is mixed in with Templates, Styles are tied to Templates, and Plugins—that extend your website's design or logic—are not portable across toolkits, not even the same language. When you add up developers and teams using these toolkits, you end up with millions of lines of code and content and design that aren't compatible with each other, become obsolete when the next best thing comes out.
+Logic is mixed in with Templates, Styles are tied to Templates, and Plugins—that extend your website's design or logic—are not portable across toolkits, not even the same language. When you add up developers and teams using these toolkits, you end up with millions of lines of code and content and design that aren't compatible with each other, become obsolete when the next best thing comes out. Things shouldn’t be this way, not in 2013. 
 
-Things shouldn’t be this way, not in 2013. Let's Build Websites Together.
+Let's Build Websites Together.
