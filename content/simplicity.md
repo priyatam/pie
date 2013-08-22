@@ -4,7 +4,7 @@ type: blog
 category: tech
 template: post.mustache
 author: Priyatam Mudivarti
-post_date: 07-20-13
+post_date: 07-11-13
 ---
 
 Today's static site generators require css, markup, templating and programming skills. Their compatibility is broken. A template in one framework doesn't work in the other. You can't mix and match languages, and add custom features in a decoupled way. You can't take a Designer's template and pipe data structures and lambdas. You can't let them both work in total independence.
