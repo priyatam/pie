@@ -23,7 +23,7 @@ class BakeTests(unittest.TestCase):
         posts = bake.load_contents(self.config)
         for post in posts:
             self.assertEqual(types.DictType, type(post))
-        self.assertEqual(7, len(posts))
+        self.assertEqual(8, len(posts))
         self.assertIsNotNone(posts[0]['body'])
 
     def test_load_recipes(self):
@@ -41,8 +41,8 @@ class BakeTests(unittest.TestCase):
         self.assertTrue('import unittest' in fin)
 
     def test_read_posts(self):
-        yaml, post = read_yaml('content', 'introduction.md')
-        self.assertEqual(6, len(yaml))
+        yaml, post = read_yaml('content', 'abstract.md')
+        self.assertEqual(5, len(yaml))
         self.assertIsNotNone(post)
 
     def test_markstache(self):
