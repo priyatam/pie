@@ -11,6 +11,6 @@ How do you create semantic content and design a website around it? Wordpress? Tu
 
 They all break a simple rule: Coupling.
 
-These solutions couple at least two of the following: authors, designers, developers, hosting. Their styles and templates are not compatible with each other, non-portable across frameworks. You can't even move content from one platform to another.
+These solutions couple at least two of the following: authors, designers, developers, hosting. Their styles and templates are not compatible with each other, non-portable across frameworks. You can't even move content from one platform to another. Things shouldn’t be coupled this way.
 
-Things shouldn’t be coupled this way.
+Not in Python.

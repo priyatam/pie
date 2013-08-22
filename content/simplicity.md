@@ -11,6 +11,6 @@ Today's static site generators require css, markup, templating and programming s
 
 And then you check for hosting, browser compatibility, plugins that blow on your face.
 
-These toolkits are built for a different mindset. For different abstractions. It requires a lot of work to perform simple tasks, like changing design on the fly, add behavior on the fly with a single lambda, cook a frozen pie from recipe.
+These toolkits are built for a different mindset. For different abstractions. It requires a lot of work to perform simple tasks, like changing design on the fly, adding behavior, hosting, and reusing your content across browsers and devices and platforms. Things shouldn’t be this way.
 
-Things shouldn’t be this way.
+Not in Python.
