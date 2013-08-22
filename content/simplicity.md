@@ -7,10 +7,13 @@ author: Priyatam Mudivarti
 post_date: 07-11-13
 ---
 
-Today's static site generators require css, markup, templating and programming skills. Their compatibility is broken. A template in one framework doesn't work in the other. You can't mix and match languages, and add custom features in a decoupled way. You can't take a Designer's template and pipe data structures and lambdas. You can't let them both work in total independence.
+Specifications like [Markdown](http://daringfireball.net/projects/markdown/), [Semantic HTML 5](http://diveintohtml5.info/semantics.html), and [Mustache](http://mustache.github.io) let us focus on what needs to be done, not how. When you build systems around specs, you have freedom from language, platform, logic, even hosting provider. You can embrace pure functional programming & &#955; architectures. You can focus on building content that evolves in its own pace.
 
-And then you check for hosting, browser compatibility, plugins that blow on your face.
+Simplicity _is_ possible.
 
-These toolkits are built for a different mindset. For different abstractions. It requires a lot of work to perform simple tasks, like changing design on the fly, adding behavior, hosting, and reusing your content across browsers and devices and platforms. Things shouldn’t be this way.
-
-Not in Python.
+1. Content is King
+1. Use any Design
+1. Logic is declarative
+1. Host anywhere
+1. Decouple everything
+1. Go back in time
