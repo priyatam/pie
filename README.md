@@ -6,4 +6,4 @@
 
 http://facjure.github.io/frozen-pie
 
-**!Under active development?** / Ver 0.2 / Copyright 2013 Fac.jure LL&#955; / **Apache 2.0 License**
+**!Under active development?** / Ver 0.3 / Copyright 2013 Fac.jure LL&#955; / **Apache 2.0 License**
