@@ -6,7 +6,6 @@ from datetime import datetime
 from codecs import open
 from functools import wraps
 
-
 logger = logging.getLogger('pielogger')
 
 def get_logger():

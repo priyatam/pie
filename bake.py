@@ -267,6 +267,15 @@ def _parse_cmd_args(args):
 
 ### MAIN ###
 
+def cook():
+    contents = load_contents(config)
+    dynamic_templates = load_dynamic_templates(config)
+    style, script, lambdas = load_recipes(config, contents, dynamic_templates)
+    pie = bake(config, contents, dynamic_templates, style, script, lambdas,
+               minify=to_serve)
+    return pie
+
+
 def main():
     """Let's cook an Apple Pie:"""
     logger.info('Understanding config')
@@ -279,11 +288,8 @@ def main():
     to_serve = True if "serve" in args.string_options else False
 
     logger.info('Cooking now')
-    contents = load_contents(config)
-    dynamic_templates = load_dynamic_templates(config)
-    style, script, lambdas = load_recipes(config, contents, dynamic_templates)
-    pie = bake(config, contents, dynamic_templates, style, script, lambdas,
-               minify=to_serve)
+
+    pie = cook()
 
     directory_path = os.path.dirname(os.path.realpath(config_path))
     os.chdir(directory_path)

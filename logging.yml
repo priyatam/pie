@@ -3,6 +3,8 @@ formatters:
   simple:
     format: '%(name)s - %(levelname)s - %(message)s'
 handlers:
+  nullh:
+    class: logging.NullHandler
   console:
     class: logging.StreamHandler
     level: DEBUG
@@ -14,10 +16,14 @@ handlers:
     filename: pie.log
     maxBytes: 1024
 loggers:
+  nologger:
+    level: INFO
+    handlers: [nullh]
+    propagate: no
   pielogger:
     level: INFO
     handlers: [console, file]
     propagate: no
-root:
-  level: INFO
-  handlers: [console]
+  root:
+    level: INFO
+    handlers: [console]

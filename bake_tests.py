@@ -9,15 +9,33 @@ import bake
 from pieutils import *
 
 
+class TestPieUtils:
+
+    def setup(self):
+        self.config_path = "./config.test.yml"
+
+    def test_load_config(self):
+        config = load_config(self.config_path)
+        assert types.DictType == type(config)
+        assert "https://github.com/Facjure/frozen-pie" == config['github_repo']
+
+    def test_read(self):
+        fin = read('bake_tests.py', '.')
+        assert 'import unittest' in fin
+
+    def test_read_yaml(self):
+        pass
+
+    def test_format_date(self):
+        dt = bake.format_date('bake_tests.py')
+        assert dt != None
+
+
 class TestBake:
 
     def setup(self):
         self.config_path = "./config.test.yml"
         self.config = load_config(self.config_path)
-
-    def test_load_config(self):
-        assert types.DictType == type(self.config)
-        assert "https://github.com/Facjure/frozen-pie" == self.config['github_repo']
 
     def test_load_contents(self):
         posts = bake.load_contents(self.config)
@@ -25,6 +43,13 @@ class TestBake:
             assert types.DictType == type(post)
         assert 8 == len(posts)
         assert posts[0]['body'] != None
+
+    def test_load_dynamic_templates(self):
+        pass
+
+    def test_load_lambdas(self):
+        pass
+
 
     def test_load_recipes(self):
         style, script, lambdas = bake.load_recipes(self.config, [], [])
@@ -36,14 +61,17 @@ class TestBake:
         for k, v in lambdas.items():
             assert v != None
 
-    def testread(self):
-        fin = read('bake_tests.py', '.')
-        assert 'import unittest' in fin
 
     def test_read_posts(self):
         yaml, post = read_yaml('content', 'abstract.md')
         assert 5 == len(yaml)
         assert post != None
+
+    def test_bake_contents(self):
+        pass
+
+    def test_bake_dynamic_templates(self):
+        pass
 
     def test_markstache(self):
         post = {'body': """#What's the point of another static generator ?
@@ -67,7 +95,13 @@ class TestBake:
         stache = bake._textstache(self.config, post, template_name)
         assert stache != None
 
-    def test_format_date(self):
-        dt = bake.format_date('bake_tests.py')
-        assert dt != None
+    def test_compile_scss(self):
+        pass
+
+    def test_get_lambdas(self):
+        pass
+
+    def test_cook(self):
+        pass
+
 
