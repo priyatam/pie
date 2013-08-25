@@ -21,7 +21,6 @@ import os
 import markdown as md
 import pystache
 import scss
-import coffeescript
 import cssmin
 import jsmin
 import argparse
@@ -244,7 +243,7 @@ def _textstache(config, content, template_name, lambdas=None):
 def _compile_scss(config):
     _styles_path = config["styles_path"]
     _scss = scss.Scss(scss_opts={"compress": False, "load_paths": [_styles_path]})
-    return _scss.compile(read("style.scss", _styles_path))
+    return unicode(_scss.compile(read("style.scss", _styles_path), "utf-8"))
 
 
 def _get_lambdas(config):

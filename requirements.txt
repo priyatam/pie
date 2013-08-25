@@ -1,8 +1,7 @@
 markdown
 PyYaml
 pystache
-Coffeescript
 pyScss
 cssmin
 jsmin
-
+pytest
