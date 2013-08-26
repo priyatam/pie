@@ -15,9 +15,10 @@
 """
 
 import sys
+import os
+import types
 import imp
 import json
-import os
 import markdown as md
 import pystache
 import scss
@@ -86,11 +87,11 @@ def load_lambdas(config, contents, dynamic_templates):
     """Load all pure functions from each module under 'lambdas' as a dictionary by funcion name"""
     # recipe should be foo.bar.baz, not .foo.bar.baz or ..foo.bar.baz or foo/bar/baz
     lambdas_path = config["lambdas_path"]
-    modules = [imp.load_source(recipe, lambdas_path + os.sep + recipe + ".py") for recipe in _get_lambdas(config)]
+    modules = [imp.load_source(module_name, lambdas_path + os.sep + module_name + ".py") for module_name in _get_lambda_module_names(config)]
     for module in modules:
         module.contents = contents
         module.dynamic_templates = dynamic_templates
-    return {funcname: getattr(mod, funcname) for mod in modules for funcname in dir(mod) if not funcname.startswith("__")}
+    return {name: getattr(mod, name) for mod in modules for name in dir(mod) if not name.startswith("__") and type(getattr(mod, name)) == types.FunctionType }
 
 
 @analyze
@@ -246,7 +247,7 @@ def _compile_scss(config):
     return unicode(_scss.compile(read("style.scss", _styles_path), "utf-8"))
 
 
-def _get_lambdas(config):
+def _get_lambda_module_names(config):
     lambdas_path = config['lambdas_path']
     return [f.strip('.py') for f in os.listdir(lambdas_path) if f.endswith('py') and not f.startswith("__")]
 
