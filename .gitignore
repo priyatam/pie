@@ -1,4 +1,4 @@
-_*
+recipe/styles/_*
 *.py[cod]
 
 .build
