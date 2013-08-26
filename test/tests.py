@@ -93,10 +93,22 @@ class TestBake:
 
 
     def test_bake_contents(self):
-        pass
+        contents = bake.load_contents(self.config)
+        dynamic_templates = bake.load_dynamic_templates(self.config)
+        lambdas = bake.load_lambdas(self.config, contents, dynamic_templates)
+        bake.bake_contents(self.config, contents, lambdas)
+        for content in contents:
+            assert "html" in content
+            assert content["html"] != None
 
     def test_bake_dynamic_templates(self):
-        pass
+        contents = bake.load_contents(self.config)
+        dynamic_templates = bake.load_dynamic_templates(self.config)
+        lambdas = bake.load_lambdas(self.config, contents, dynamic_templates)
+        bake.bake_dynamic_templates(self.config, dynamic_templates, lambdas)
+        for template in dynamic_templates:
+            assert "html" in template
+            assert template["html"] != None
 
     def test_markstache(self):
         post = {'body': """#What's the point of another static generator ?
@@ -131,6 +143,12 @@ class TestBake:
         assert stache != None
         assert "#What's the point of another static generator ?" in stache
 
+    def test_compile_asset(self):
+        _styles_path = self.config["recipe_root"] + os.sep + "styles"
+        compiled_sheet = bake.compile_asset(self.config, _styles_path, "styles.scss")(bake._compile_scss, 'scss', 'css')
+        assert compiled_sheet != None
+        assert "display" in compiled_sheet
+
     def test_compile_scss(self):
         compiled_css = bake._compile_scss(self.config)
         assert compiled_css != None
@@ -142,7 +160,13 @@ class TestBake:
         assert modules[0] == 'default'
 
     def test_cook(self):
-        pass
+        pie = bake.cook(self.config)
+        assert pie != None
+        assert "<style" in pie
+        assert "<script>" in pie
+        assert "<nav" in pie
+        assert self.config["title"] in pie
+        assert self.config["github_repo"] in pie
 
 def main():
     pytest.main("tests.py")

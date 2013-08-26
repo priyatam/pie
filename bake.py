@@ -268,7 +268,7 @@ def _parse_cmd_args(args):
 
 ### MAIN ###
 
-def cook():
+def cook(config, to_serve=False):
     contents = load_contents(config)
     dynamic_templates = load_dynamic_templates(config)
     style, script, lambdas = load_recipes(config, contents, dynamic_templates)
@@ -290,7 +290,7 @@ def main():
 
     logger.info('Cooking now')
 
-    pie = cook()
+    pie = cook(config, to_serve=to_serve)
 
     directory_path = os.path.dirname(os.path.realpath(config_path))
     os.chdir(directory_path)
