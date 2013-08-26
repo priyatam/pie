@@ -1,0 +1,12 @@
+# Develop
+recipe_root: ../recipe
+content: ../content
+
+## System overrides
+default_template: post.mustache
+
+# Deploy
+first_page : main.md
+title: Frozen Pie
+github_repo: https://github.com/Facjure/frozen-pie
+recipes_repo: https://github.com/Facjure/frozen-pie-recipes.git

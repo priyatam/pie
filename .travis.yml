@@ -2,7 +2,7 @@ language: python
 python:
   - "2.7"
 install: "pip install -r requirements.txt --use-mirrors"
-script: py.test bake_tests.py
+script: "python test_runner.py"
 notifications:
   email: false
   campfire: facjure:0d5b2bad79367517767c07c102b2f177a617e157@565244

@@ -42,6 +42,16 @@ def load_config(config_path):
     config["templates_path"] = config["recipe_root"] + os.sep + "templates"
     config["lambdas_path"] = config["recipe_root"] + os.sep + "lambdas"
     config["styles_path"] = config["recipe_root"] + os.sep + "styles"
+    if not os.path.exists(config["recipe_root"]):
+        logger.error("recipe folder folder does not exist. Exiting now")
+        exit(1)
+    if not os.path.exists(config["content"]):
+        logger.error("content folder folder does not exist. Exiting now")
+        exit(1)
+    for element in ["templates", "lambdas", "styles"]:
+        if not os.path.exists(config[element + "_path"]):
+            logger.error(element + " folder does not exist. Exiting now")
+            exit(1)
     return config
 
 

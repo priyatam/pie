@@ -1,40 +1,41 @@
 #!/usr/bin/env python
-'''
-./bake_tests.py
-'''
-
 import pytest
 import types
 import bake
+import pieutils
 from pieutils import *
+
+pieutils.logger = get_logger()
 
 
 class TestPieUtils:
 
     def setup(self):
-        self.config_path = "./config.test.yml"
+        self.config_path = "config.test.yml"
 
     def test_load_config(self):
         config = load_config(self.config_path)
         assert types.DictType == type(config)
         assert "https://github.com/Facjure/frozen-pie" == config['github_repo']
+        with pytest.raises(SystemExit):
+            load_config("./config.test.bad.yml")
 
     def test_read(self):
-        fin = read('bake_tests.py', '.')
+        fin = read('tests.py', '.')
         assert 'import unittest' in fin
 
     def test_read_yaml(self):
         pass
 
     def test_format_date(self):
-        dt = bake.format_date('bake_tests.py')
+        dt = bake.format_date('tests.py')
         assert dt != None
 
 
 class TestBake:
 
     def setup(self):
-        self.config_path = "./config.test.yml"
+        self.config_path = "config.test.yml"
         self.config = load_config(self.config_path)
 
     def test_load_contents(self):
@@ -63,7 +64,7 @@ class TestBake:
 
 
     def test_read_posts(self):
-        yaml, post = read_yaml('content', 'abstract.md')
+        yaml, post = read_yaml('../content', 'abstract.md')
         assert 5 == len(yaml)
         assert post != None
 
@@ -104,4 +105,5 @@ class TestBake:
     def test_cook(self):
         pass
 
-
+def main():
+    pytest.main("tests.py")
