@@ -58,7 +58,7 @@ class TestBake:
             assert types.DictType == type(post)
         assert 2 == len(posts)
         assert posts[0]['body'] != None
-        assert u"Antoine de Saint-Exupery" in posts[0]['body']
+
 
     def test_load_dynamic_templates(self):
         templates = bake.load_dynamic_templates(self.config)
