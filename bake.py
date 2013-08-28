@@ -115,7 +115,7 @@ def load_recipes(config, contents, dynamic_templates):
         style = compile_asset(config, _styles_path, "style.scss")(_compile_scss, 'scss', 'css')
     else:
         style = read("style.css", _styles_path)
-    script = read("script.js", "lib")
+    script = read("script.js", config["lib"])
     lambdas = load_lambdas(config, contents, dynamic_templates)
     return style, script, lambdas
 

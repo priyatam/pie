@@ -1,4 +1,13 @@
 #!/usr/bin/env python
+"""
+Can only be run from the parent directory as,
+> py.test test/tests.py
+"""
+import sys
+sys.path.append(".")
+import os
+os.chdir("test")
+
 import pytest
 import types
 import bake
@@ -168,5 +177,3 @@ class TestBake:
         assert self.config["title"] in pie
         assert self.config["github_repo"] in pie
 
-def main():
-    pytest.main("tests.py")
