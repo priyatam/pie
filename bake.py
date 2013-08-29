@@ -43,7 +43,7 @@ def load_contents(config):
             try:
                 meta, raw = read_yaml(path, fname)
                 content = {
-                    "name": meta['type'] + "/" + fname,
+                    "name": meta.get("type", "content") + "/" + fname,
                     "body": raw,
                     "modified_date": format_date(path + os.sep + fname)
                 }
