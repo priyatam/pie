@@ -11,13 +11,15 @@
         <header>
             <h1><a href="{{ config.github_repo }}">{{ title }}</a></h1>
         </header>
-        <nav id="main-nav">
-            {{> nav }}
-        </nav>
-
-        <header id="main-header"/>
 
         <div id="wrapper" class="wrap">
+
+          <nav id="main-nav">
+              {{> nav }}
+          </nav>
+
+          <header id="main-header"/>
+
             <article id="main" class="content">
                 <!-- Main Content -->
                 {{{ body }}}
