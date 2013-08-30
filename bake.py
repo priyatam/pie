@@ -39,7 +39,6 @@ def load_contents(config):
     contents = []
     path = config['content']
     for fname in os.listdir(path):
-        print fname
         if fname.endswith('.md') or fname.endswith('.txt'):
             try:
                 meta, raw = read_yaml(path, fname)
