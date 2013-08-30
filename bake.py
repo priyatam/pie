@@ -162,6 +162,7 @@ def bake_contents(config, contents, lambdas):
                 template = content.get('template', config['default_template'])
                 logger.debug('Found Template: %s for content: %s', template, content['name'])
                 content['html'] = _textstache(config, content, template, lambdas)
+                del content['body']
             elif content['name'].endswith('.md'):
                 template = content.get('template', config['default_template'])
                 logger.debug('Found Template: %s for content: %s', template, content['name'])
