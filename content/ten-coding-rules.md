@@ -1,6 +1,6 @@
 ---
 title: Ten Coding Rules
-type: blog
+_type: blog
 template: post.mustache
 author: Priyatam Mudivarti
 post_date: 07-18-13

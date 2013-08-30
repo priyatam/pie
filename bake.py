@@ -39,11 +39,12 @@ def load_contents(config):
     contents = []
     path = config['content']
     for fname in os.listdir(path):
+        print fname
         if fname.endswith('.md') or fname.endswith('.txt'):
             try:
                 meta, raw = read_yaml(path, fname)
                 content = {
-                    "name": meta.get("type", "content") + "/" + fname,
+                    "name": meta.get("_type", "content") + "/" + fname,
                     "body": raw,
                     "modified_date": format_date(path + os.sep + fname)
                 }
@@ -67,7 +68,7 @@ def load_dynamic_templates(config):
         if fname.endswith('.mustache'):
             try:
                 meta, raw = read_yaml(path, fname)
-                if meta.get('type', 'simple') == 'dynamic':
+                if meta.get('_type', 'simple') == 'dynamic':
                     template = {
                         "name": os.path.splitext(fname)[0],
                         "body": raw,

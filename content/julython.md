@@ -1,6 +1,6 @@
 ---
 title: Julython
-type: blog
+_type: blog
 category: tech
 template: post.mustache
 author: Priyatam Mudivarti
