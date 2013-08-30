@@ -1,6 +1,6 @@
 ---
 title: Tech
-type: page
+_type: page
 template: page.mustache
 author: Priyatam Mudivarti
 post_date: 07-21-13
