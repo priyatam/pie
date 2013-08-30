@@ -89,6 +89,7 @@ def load_lambdas(config, contents, dynamic_templates):
     lambdas_path = config["lambdas_path"]
     modules = [imp.load_source(module_name, lambdas_path + os.sep + module_name + ".py") for module_name in _get_lambda_module_names(config)]
     for module in modules:
+        module.config = config
         module.contents = contents
         module.dynamic_templates = dynamic_templates
     return {name: getattr(mod, name) for mod in modules for name in dir(mod) if not name.startswith("__") and type(getattr(mod, name)) == types.FunctionType }
