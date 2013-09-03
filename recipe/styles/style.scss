@@ -1,9 +1,9 @@
+/* Main Style */
+
 @import url(http://fonts.googleapis.com/css?family=Vollkorn:400,400italic,700,700italic&subset=latin);
 
 html, body {
-        padding:1em;
         margin:auto;
-        max-width:42em;
         background:#fefefe;
 	}
 body {
@@ -12,8 +12,8 @@ body {
 	line-height: 1.5;
 	text-align: justify;
 	}
-header, nav, article, footer {
-	width: 900px;
+header, nav, article {
+	width: 960px;
 	margin:0 auto;
 	}
 article {

@@ -94,7 +94,7 @@ class TestBake:
         assert types.DictType == type(lambdas)
         assert style != None
         assert script != None
-        assert "display" in style
+        assert "width" in style
         assert "sammy" in script
         for k,v in lambdas.items():
             assert types.FunctionType == type(v)
@@ -152,16 +152,10 @@ class TestBake:
         assert stache != None
         assert "#What's the point of another static generator ?" in stache
 
-    def test_compile_asset(self):
-        _styles_path = self.config["recipe_root"] + os.sep + "styles"
-        compiled_sheet = bake.compile_asset(self.config, _styles_path, "styles.scss")(bake._compile_scss, 'scss', 'css')
-        assert compiled_sheet != None
-        assert "display" in compiled_sheet
-
     def test_compile_scss(self):
         compiled_css = bake._compile_scss(self.config)
         assert compiled_css != None
-        assert "display" in compiled_css
+        assert "width" in compiled_css
 
     def test_get_lambda_module_namess(self):
         modules = bake._get_lambda_module_names(self.config)

@@ -1,5 +1,5 @@
 import logging, logging.config
-import os
+import os, sys
 import yaml
 import time
 from datetime import datetime
@@ -41,6 +41,7 @@ def load_config(config_path):
     config = dict(sys_config, **user_config)
     config["templates_path"] = config["recipe_root"] + os.sep + "templates"
     config["lambdas_path"] = config["recipe_root"] + os.sep + "lambdas"
+    sys.path.append(config['lambdas_path'])
     config["styles_path"] = config["recipe_root"] + os.sep + "styles"
     if not os.path.exists(config["recipe_root"]):
         logger.error("recipe folder folder does not exist. Exiting now")

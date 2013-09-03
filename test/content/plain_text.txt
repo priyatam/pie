@@ -1,6 +1,6 @@
 ---
 title: Plain Text
-type: blog
+_type: blog
 category: tech
 template: post_plain.mustache
 author: Sreeharsha Mudivarti

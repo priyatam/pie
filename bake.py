@@ -16,6 +16,7 @@
 
 import sys
 import os
+from glob import glob
 import types
 import imp
 import json
@@ -96,29 +97,26 @@ def load_lambdas(config, contents, dynamic_templates):
 
 
 @analyze
-def compile_asset(config, subdir, fname):
-    """Compile asset types: css, js, html using pre-processors"""
-    def _compile(__compile, _from, _to, ):
-        raw_data = __compile(config)
-        # Avoid including the output twice. Hint bake, by adding a _ filename convention
-        new_filename = "_" + fname.replace(_from, _to)
-        open(subdir + os.sep + new_filename, 'w', "utf-8").write(raw_data)
-        return raw_data
-    return _compile
-
-
-@analyze
 def load_recipes(config, contents, dynamic_templates):
     """Create a tuple of dictionaries, each providing  access to compiled sytle, script, and raw lambdas (along with their dictionary data)"""
     _styles_path = config["styles_path"]
+    styles = [ read(os.path.basename(fn), _styles_path) for fn in glob(_styles_path + os.sep + "*.css") if not fn.endswith("master.css") ]
+
     scss_file_name = _styles_path + os.sep + "style.scss"
     if os.path.isfile(scss_file_name):
-        style = compile_asset(config, _styles_path, "style.scss")(_compile_scss, 'scss', 'css')
-    else:
-        style = read("style.css", _styles_path)
+        style = _compile_scss(config)
+        styles.append(style)
+
+    mastercss_file_name = _styles_path + os.sep + "master.css"
+    if os.path.isfile(mastercss_file_name):
+        style = read("master.css", _styles_path)
+        styles.insert(0, style)
+
+    final_style = "".join(styles)
+
     script = read("script.js", config["lib"])
     lambdas = load_lambdas(config, contents, dynamic_templates)
-    return style, script, lambdas
+    return final_style, script, lambdas
 
 
 @analyze
@@ -245,7 +243,7 @@ def _textstache(config, content, template_name, lambdas=None):
 
 def _compile_scss(config):
     _styles_path = config["styles_path"]
-    _scss = scss.Scss(scss_opts={"compress": False, "load_paths": [_styles_path]})
+    _scss = scss.Scss(scss_opts={"verbosity": True, "compress": False, "load_paths": [_styles_path]})
     return unicode(_scss.compile(read("style.scss", _styles_path), "utf-8"))
 
 

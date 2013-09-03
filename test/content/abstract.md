@@ -1,6 +1,6 @@
 ---
 title: Abstract
-type: page
+_type: page
 template: page.mustache
 author: Priyatam Mudivarti
 post_date: 08-10-13
