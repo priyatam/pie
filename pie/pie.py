@@ -24,6 +24,25 @@ from utils import *
 
 
 @analyze
+def prepare():
+    """Let's cook an Apple Pie:"""
+    logger.info('Loading config')
+    args = parse_cmdline_args(sys.argv)
+    config_path = args.config[0]
+    config = load_config(config_path)
+
+    if "serve" in args.string_options:
+        to_serve = True
+    else:
+        to_serve = False
+
+    bake(config, to_serve=to_serve)
+
+    if to_serve:
+        serve(config, config_path)
+
+
+@analyze
 def add_recipes(config, args):
     """Add recipes, if any"""
     logger.info('Checking if Recipes are required')
@@ -50,24 +69,6 @@ def serve(config, config_path, version=None):
     logger.info("Serving ... currently supports only gh-pages")
     directory_path = os.path.dirname(os.path.realpath(config_path))
     serve_github(config, directory_path)
-
-
-def prepare():
-    """Let's cook an Apple Pie:"""
-    logger.info('Loading config')
-    args = parse_cmdline_args(sys.argv)
-    config_path = args.config[0]
-    config = load_config(config_path)
-
-    if "serve" in args.string_options:
-        to_serve = True
-    else:
-        to_serve = False
-
-    bake(config, to_serve=to_serve)
-
-    if to_serve:
-        serve(config, config_path)
 
 
 if __name__ == '__main__':
