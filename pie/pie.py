@@ -56,7 +56,7 @@ def bake(config, to_serve=False):
     contents_data = contents.load(config)
     dynamic_templates = templates.load_dynamic(config)
     style, script, lambdas_data = recipes.load(config, contents_data, dynamic_templates)
-    pie = recipes.bake(config, contents, dynamic_templates, style, script, lambdas_data, minify=to_serve)
+    pie = recipes.bake(config, contents_data, dynamic_templates, style, script, lambdas_data, minify=to_serve)
 
     build_index_html(pie)
 
