@@ -1,0 +1,4 @@
+recipe_root: recipe
+content: content
+first_page: page/about.md
+title: Frozen Pie Example

@@ -1,3 +1,11 @@
+---
+title: About
+_type: page
+template: page.mustache
+author: Priyatam Mudivarti
+post_date: 07-16-13
+---
+
 ## Frozen &#123;&pi; &#125; - Create Content Together
 
 > You know you have reached perfection in design, not when there is nothing more to add, but when there is nothing more to be taken away -- Antoine de Saint-Exupery
