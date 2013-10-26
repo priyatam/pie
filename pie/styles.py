@@ -17,4 +17,4 @@ from utils import *
 def compile(config):
     styles_path = config["styles_path"]
     compiler = scss.Scss(scss_opts={"verbosity": True, "compress": False, "load_paths": [styles_path]})
-    return unicode(compiler.compile(read("style.scss", _styles_path), "utf-8"))
+    return unicode(compiler.compile(read("style.scss", styles_path), "utf-8"))
