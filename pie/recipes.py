@@ -27,8 +27,7 @@ def load(config, contents_data, dynamic_templates):
     """Create a tuple of dictionaries, each providing  access to compiled style, script, and raw lambdas,
     along with their dictionary data"""
     styles_path = config["styles_path"]
-    raw_styles = [read(os.path.basename(fn), styles_path) for fn in glob(styles_path + os.sep + "*.css")
-                  if not fn.endswith("master.css")]
+    raw_styles = [read(os.path.basename(fn), styles_path) for fn in glob(styles_path + os.sep + "*.css") if not fn.endswith("master.css")]
 
     scss_fname = styles_path + os.sep + "style.scss"
     if os.path.isfile(scss_fname):
@@ -42,8 +41,7 @@ def load(config, contents_data, dynamic_templates):
 
     final_style = "".join(raw_styles)
 
-    for route in config["routes"]:
-        scripts = read(route)
+    scripts = [ read(route) for route in config["routes"] ]
 
     lambdas_data = lambdas.load(config, contents_data, dynamic_templates)
 
