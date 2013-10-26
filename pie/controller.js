@@ -2,7 +2,7 @@ $( function () {
 
     var relative_path = window.location.pathname;
 
-    var app = $.sammy(function() {
+    var pie = $.sammy(function() {
         this.element_selector = '#pie';
 
         this.get(relative_path, function (context) {
@@ -27,5 +27,6 @@ $( function () {
 
     });
 
-    app.run()
+    // Enable root controller
+    pie.run()
 });

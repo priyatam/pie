@@ -77,9 +77,13 @@ def format_date(fname):
     return datetime.strptime(time.ctime(os.path.getmtime(fname)), "%a %b %d %H:%M:%S %Y").strftime("%m-%d-%y")
 
 
-def read(fname, subdir):
+def read(fname, subdir=None):
     """Reads subdir/fname as raw content"""
-    with open(subdir + os.sep + fname, "r", "utf-8") as fin:
+    if subdir:
+        path = subdir + os.sep + fname
+    else:
+        path = fname
+    with open(path, "r", "utf-8") as fin:
         return fin.read()
 
 

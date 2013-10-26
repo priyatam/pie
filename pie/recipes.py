@@ -42,7 +42,7 @@ def load(config, contents_data, dynamic_templates):
 
     final_style = "".join(raw_styles)
 
-    script = read("script.js", config["lib"])
+    script = read(config["routes"])
 
     lambdas_data = lambdas.load(config, contents_data, dynamic_templates)
 
