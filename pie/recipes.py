@@ -42,19 +42,20 @@ def load(config, contents_data, dynamic_templates):
 
     final_style = "".join(raw_styles)
 
-    script = read(config["routes"])
+    for route in config["routes"]:
+        scripts = read(route)
 
     lambdas_data = lambdas.load(config, contents_data, dynamic_templates)
 
-    return final_style, script, lambdas_data
+    return final_style, scripts, lambdas_data
 
 
 
 @analyze
-def bake(config, contents_data, dynamic_templates, style, script, lambdas_data,
+def bake(config, contents_data, dynamic_templates, style, scripts, lambdas_data,
          minify=False):
-    """Bake recipes with given style and script into a single index.html
-        along with a json of style, script, and content"""
+    """Bake recipes with given style and scripts into a single index.html
+        along with a json of style, scripts, and content"""
     params = {"title": config['title']}
 
     logger.info('Baking Contents and Dynamic Templates')
@@ -64,10 +65,11 @@ def bake(config, contents_data, dynamic_templates, style, script, lambdas_data,
     params.update({"json_data": json.dumps(contents_data + dynamic_templates)})
 
     logger.info('Baking Styles and Scripts')
+    final_script = "".join(scripts)
     if minify:
-        params.update({"style_sheet": cssmin.cssmin(style), "script": jsmin.jsmin(script)})
+        params.update({"style_sheet": cssmin.cssmin(style), "script": jsmin.jsmin(final_script)})
     else:
-        params.update({"style_sheet": style, "script": script})
+        params.update({"style_sheet": style, "script": final_script})
 
     logger.info('Baking Lambdas')
     params.update(lambdas_data)
