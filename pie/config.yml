@@ -8,7 +8,7 @@ routes:
 default_template: post.mustache
 
 # Deploy
-first_page: page/abstract.md
+first_page: page/changelog.md
 title: Frozen Pie
 github_repo: https://github.com/Facjure/frozen-pie
 recipes_repo: https://github.com/Facjure/frozen-pie-recipes.git
