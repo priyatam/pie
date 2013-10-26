@@ -15,14 +15,14 @@ from utils import *
 
 
 @analyze
-def load(config, contents, dynamic_templates):
+def load(config, contents_data, dynamic_templates):
     """Load all pure functions from each module under 'lambdas' as a dictionary by funcion name"""
     # recipe should be foo.bar.baz, not .foo.bar.baz or ..foo.bar.baz or foo/bar/baz
     path = config["lambdas_path"] + os.sep
     modules = [imp.load_source(module_name, path + module_name + ".py") for module_name in get_module_names(config)]
     for module in modules:
         module.config = config
-        module.contents = contents
+        module.contents = contents_data
         module.dynamic_templates = dynamic_templates
     return {name: getattr(mod, name) for mod in modules for name in dir(mod)
             if not name.startswith("__") and type(getattr(mod, name)) == types.FunctionType}

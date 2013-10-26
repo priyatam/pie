@@ -60,7 +60,7 @@ def bake(config, contents_data, dynamic_templates, style, script, lambdas_data,
     logger.info('Baking Contents and Dynamic Templates')
     contents.bake(config, contents_data, lambdas_data)
 
-    templates.bake_dynamic(config, dynamic_templates, lambdas)
+    templates.bake(config, dynamic_templates, lambdas)
     params.update({"json_data": json.dumps(contents + dynamic_templates)})
 
     logger.info('Baking Styles and Scripts')

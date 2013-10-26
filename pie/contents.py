@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-    Functions for Contents written in Markdown, PlainText.
+    Functions for contents_data written in Markdown, PlainText.
 
     copyright:
         (c) 2013 by Facjure LLC
@@ -17,7 +17,7 @@ from utils import *
 @analyze
 def load(config):
     """Create a dictionary for retrieving content's raw body, metadata, and future compiled html"""
-    contents = []
+    data = []
     path = config['content']
     for fname in os.listdir(path):
         if fname.endswith('.md') or fname.endswith('.txt'):
@@ -29,19 +29,19 @@ def load(config):
                     "modified_date": format_date(path + os.sep + fname)
                 }
                 content.update(meta)
-                contents.append(content)
+                data.append(content)
             except RuntimeError:
                 logger.error("Error while reading content: %s:\n%s" % (fname, sys.exc_info()[0]))
         else:
             logger.warning("Incorrect Extension: %s" % fname)
-    return contents
+    return data
 
 
 @analyze
-def bake(config, contents, lambdas):
-    """Baking Contents into HTML using Mustache Templates"""
-    logger.info('Baking Contents into HTML')
-    for content in contents:
+def bake(config, contents_data, lambdas):
+    """Baking contents_data into HTML using Mustache Templates"""
+    logger.info('Baking contents_data into HTML')
+    for content in contents_data:
         try:
             if content['name'].endswith('.txt'):
                 template = content.get('template', config['default_template'])
@@ -53,5 +53,5 @@ def bake(config, contents, lambdas):
                 logger.debug('Found Template: %s for content: %s', template, content['name'])
                 content['html'] = templates.to_markstache(config, content, template, lambdas)
         except RuntimeError as e:
-            logger.error("Error Baking Contents: %s" % content, e)
+            logger.error("Error Baking contents_data: %s" % content, e)
 
