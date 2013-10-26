@@ -23,12 +23,8 @@ import recipes
 from utils import *
 
 
-@analyze
 def prepare():
     """Let's cook an Apple Pie:"""
-    logger.info('Loading config')
-    args = parse_cmdline_args(sys.argv)
-    config_path = args.config[0]
     config = load_config(config_path)
 
     if "serve" in args.string_options:
@@ -42,14 +38,12 @@ def prepare():
         serve(config, config_path)
 
 
-@analyze
-def add_recipes(config, args):
+def add_recipes(config, cmds):
     """Add recipes, if any"""
     logger.info('Checking if Recipes are required')
-    recipes.download(config, args.recipe[0]) if args.recipe[0] != "recipe" else logger.info('Using default recipe')
+    recipes.download(config, cmds.recipe[0]) if cmds.recipe[0] != "recipe" else logger.info('Using default recipe')
 
 
-@analyze
 def bake(config, to_serve=False):
     """Bakes Contents, Templates, and Recipes together"""
     logger.info('Baking...')
@@ -58,13 +52,12 @@ def bake(config, to_serve=False):
     style, script, lambdas_data = recipes.load(config, contents_data, dynamic_templates)
     pie = recipes.bake(config, contents_data, dynamic_templates, style, script, lambdas_data, minify=to_serve)
 
-    build_index_html(pie)
+    build_index_html(pie, config_path)
 
     return pie
 
 
-@analyze
-def serve(config, config_path, version=None):
+def serve(config, version=None):
     """Serves"""
     logger.info("Serving ... currently supports only gh-pages")
     directory_path = os.path.dirname(os.path.realpath(config_path))
@@ -73,6 +66,11 @@ def serve(config, config_path, version=None):
 
 if __name__ == '__main__':
     logger = get_logger()
+
+    logger.info('Setting global config path')
+    args = parse_cmdline_args(sys.argv)
+    config_path = args.config[0]
+
     logger.info('Starting ...')
     prepare()
     logger.info('Finished')
