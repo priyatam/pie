@@ -1,1 +1,1 @@
-open -a "/Applications/Google Chrome.app" .build/index.html
+open -a "/Applications/Google Chrome.app" pie/.build/index.html

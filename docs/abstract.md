@@ -18,8 +18,7 @@ Static site generators, on the other hand, simplify website development by an or
 
 They couple at least two of the following: _authors, designers, developers, hosting providers_.
 
-Logic is mixed in with Templates, Styles are tied to Templates, and Plugins—that extend your website's design or logic—are not portable across toolkits, not even the same language. When you add up authors, developers, and teams using these toolkits, you end up with millions of lines of code, design, templates, and _content_, incompatible with each other, only to become obsolete after the _next best thing_.
+Logic is mixed in with Templates, Styles are tied to Templates, and Plugins—that extend your website's design or logic—are not portable across toolkits, not even the same language. When you add up authors, developers, and teams using these toolkits, you end up with millions of lines of code, design, templates, and _content_, incompatible with each other, only to become obsolete after the _next best thing_. Things shouldn’t be this way.
 
-Things shouldn’t be this way. Not in 2013.
+Not in 2013.
 
-Let's Build Content Together.
