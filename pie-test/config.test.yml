@@ -1,7 +1,8 @@
 # Develop
-recipe_root: ../recipe
+recipe_root: ../examples/recipe
 content: content
-lib: ../lib
+routes:
+  - controller.js
 
 ## System overrides
 default_template: post.mustache
