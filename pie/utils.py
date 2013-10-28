@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-    Functions for misc utilities.
+    Utility functions shared across modules.
 
     copyright:
         (c) 2013 by Facjure LLC

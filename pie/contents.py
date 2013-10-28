@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-    Functions for contents_data written in Markdown, PlainText.
+    Functions for creating, accessing contents written in Markdown, PlainText.
 
     copyright:
         (c) 2013 by Facjure LLC

@@ -3,7 +3,7 @@ title: Ten Coding Rules
 _type: blog
 template: post.mustache
 author: Priyatam Mudivarti
-post_date: 07-18-13
+post_date: 07-14-13
 ---
 
 **Ten Coding Rules**

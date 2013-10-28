@@ -3,7 +3,7 @@ title: Change Log
 _type: page
 template: page.mustache
 author: Priyatam Mudivarti
-post_date: 07-16-13
+post_date: 07-30-13
 ---
 
 **0.3.0** - _23 Aug 2013_

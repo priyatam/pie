@@ -6,11 +6,9 @@ author: Priyatam Mudivarti
 post_date: 07-21-13
 ---
 
-### How?
+### Tech
 
-Toolkit is built in Python using functional programming. There is no state, no framework, just a single workflow that lets content creators, designers, and developers work in parallel.
-
-SammyJs will be used to create a single page.
+Built using functional programming techniques. There is no state, no framework, just a single workflow that lets content creators, designers, and developers work in parallel.
 
 **Content** can be anything: blog-post, page, navigation, header, footer, wiki, sitemap, etc., The type can be identified by reading the content's metadata.
 
@@ -21,6 +19,4 @@ SammyJs will be used to create a single page.
 **Recipe** is nothing but a package of Templates, Styles, and Lambdas under a single namespace.
 
 **Lambdas** are logic written in any language that supports functional concepts like Javascript, Coffeescript, Clojurescript on the browser, or Python on the serverside.
-
-
 

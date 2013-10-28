@@ -23,6 +23,17 @@ from utils import *
 
 
 @analyze
+def download(config, name):
+    """Download recipes from github repo"""
+    # TODO: Refactor this from brute force to git api
+    os.system("rm -rf .build")
+    os.system("rm -rf recipe.old")
+    os.system("git clone " + config["recipes_repo"] + " .build")
+    os.system("mv recipe recipe.old")
+    os.system("cp -R .build/" + name + " recipe")
+
+
+@analyze
 def load(config, contents_data, dynamic_templates):
     """Create a tuple of dictionaries, each providing  access to compiled style, script, and raw lambdas,
     along with their dictionary data"""
@@ -80,15 +91,4 @@ def bake(config, contents_data, dynamic_templates, style, scripts, lambdas_data,
     renderer = pystache.Renderer(search_dirs=[config["templates_path"]], file_encoding="utf-8", string_encoding="utf-8")
 
     return renderer.render_path(_index_page, params)
-
-
-@analyze
-def download(config, name):
-    """Download recipes from github repo"""
-    # TODO: Refactor this from brute force to git api
-    os.system("rm -rf .build")
-    os.system("rm -rf recipe.old")
-    os.system("git clone " + config["recipes_repo"] + " .build")
-    os.system("mv recipe recipe.old")
-    os.system("cp -R .build/" + name + " recipe")
 

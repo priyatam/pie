@@ -21,4 +21,6 @@ Tests:
     $ cd pie-test
     $ py.test test/tests.py
 
+For further info, see docs/overview.md or this site.
+
 **!Under active development?** / Ver 0.3 / Copyright 2013 Fac.jure LL&#955; / **Apache 2.0 License**

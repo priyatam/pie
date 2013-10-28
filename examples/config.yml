@@ -1,4 +1,5 @@
-recipe_root: recipe
-content: content
-first_page: page/about.md
-title: Frozen Pie Example
+# full path, or path relative to pie.py
+recipe_root: ../examples/recipe
+content: ../docs
+first_page: page/abstract.md
+title: Frozen Pie Sample Site

@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 """
+    DSL for making a frozen pie, a.k.a, a static website.
+
     run:
         pie.py
           or

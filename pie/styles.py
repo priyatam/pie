@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-    Utility functions for CSS, LESS, SCSS.
+    Utility functions for compiling, transforming CSS, LESS, SCSS.
 
     copyright:
         (c) 2013 by Facjure LLC
