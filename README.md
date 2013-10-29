@@ -4,6 +4,22 @@
 
 > You know you have reached perfection in design, not when there is nothing more to add, but when there is nothing more to be taken away -- Antoine de Saint-Exupery
 
+## Spec
+
+prepare
+> Prepare crust: prepare content in Markdown/Plain Text with YAML meta-data. A content can be anything.
+
+add_recipes
+> Add Templates with Mustache, and optionally, 3rd-party logic (Mustache lambdas), packaged together as 'Recipes'.
+
+bake
+> Heat everything into a single index.html
+
+serve
+> Serve an index page, anywhere: github pages, S3, email.
+
+Want more? Add Recipes (crust, fillings, frozen) and bake.
+
 ## Usage
 
 Setup:
