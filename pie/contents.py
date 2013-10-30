@@ -30,8 +30,8 @@ def load(config):
                 }
                 content.update(meta)
                 data.append(content)
-            except RuntimeError:
-                logger.error("Error while reading content: %s:\n%s" % (fname, sys.exc_info()[0]))
+            except:
+                logger.error("Error while reading content: %s: %s" % (fname, sys.exc_info()[0]))
         else:
             logger.warning("Incorrect Extension: %s" % fname)
     return data

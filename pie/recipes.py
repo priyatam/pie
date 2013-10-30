@@ -52,7 +52,7 @@ def load(config, contents_data, dynamic_templates):
 
     final_style = "".join(raw_styles)
 
-    scripts = [ read(route) for route in config["routes"] ]
+    scripts = [ read(route, config['recipe_root']) for route in config["routes"] ]
 
     lambdas_data = lambdas.load(config, contents_data, dynamic_templates)
 

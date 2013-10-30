@@ -4,6 +4,7 @@ recipe/styles/_*
 .build
 out
 recipe.old
+tags
 
 .sass-cache
 
