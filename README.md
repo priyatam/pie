@@ -1,8 +1,8 @@
-# Publish Literary Magazines, Together
+# Literary publishing, for humans
 
 Hundreds of magazines and indie publishers publish their literature on print, or bury their word and pdfs in a cms, yet we don't have access to read, edit, and discover them, like machines.
 
-Enter Literatte: A web and mobile publishing toolkit that fits in your **dropbox**.
+Enter Literatte: A mobile-first, web publishing toolkit that fits in your **dropbox**.
 
 ## Overview
 
