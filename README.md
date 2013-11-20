@@ -2,7 +2,7 @@
 
 Hundreds of magazines and indie publishers publish their literature on print, or bury their word and pdfs in a cms, yet we don't have access to read, edit, and discover them, like machines.
 
-Enter Literatte: A mobile-first, web publishing toolkit that fits in your **dropbox**.
+Enter Literatte: A mobile-first, literary publishing toolkit that can print itself and fit in your **dropbox**.
 
 ## Overview
 
