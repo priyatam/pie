@@ -1,10 +1,6 @@
 # Literary publishing, for humans
 
-Thousands of poems in the public domain live buried in websites. Hundreds of literary magazines archive thousands more that go undiscovered. Humans, even machines, can't search them in a central library.
-
-Let's build one.
-
-Literatte: A mobile-first, literary publishing toolkit that fits in your **dropbox**.
+A mobile-first, literary publishing toolkit that fits in your **dropbox**.
 
 ## Usage
 
