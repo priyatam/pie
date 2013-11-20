@@ -2,21 +2,23 @@
 
 Hundreds of magazines and indie publishers publish their literature on print, or bury their word and pdfs in a cms, yet we don't have access to read, edit, and discover them, like machines.
 
-Let's build one.
+Enter Literatte: A web and mobile publishing toolkit that fits in your **dropbox**.
 
 ## Overview
 
-Most cms platforms today are blog and database centric like wordpress, drupal, tumblr, even weebly: platforms where users drag and drop designs with **content buried in code**. Designs are coupled with cms, content _can't_ be read outside them. Designing websites around a 'cms' locks you in with a programmer, an agency, a software company that doesn't understand literature.
+Most cms platforms today are blog and database centric like wordpress, drupal, tumblr, even weebly: platforms where users drag and drop designs with **content buried in code**. Designs are coupled with cms, content _can't_ be read outside them. Designing websites around a 'cms' locks you in with a toolkit, an online service, an agency charging your money for no real value.
 
-Static site generators, on the other hand, simplify website development by an order of magnitude by replacing databases with filesystems. Opensource frameworks like jekyll, middleman, and over [a hundred variations](http://nanoc.ws/about/) of the same idea are excellent, but they're still built for developers, not indie publishers.
+Static site generators, on the other hand, simplify website development by an order of magnitude by replacing databases with filesystems. Opensource frameworks like jekyll, middleman, and over [a hundred variations](http://nanoc.ws/about/) of the same idea are excellent, but they're still built for developers, not humans.
 
 Things shouldn’t be this way. Not in 2013.
 
-Publishers should be able to write templates, buy themes, script an editorial workflow and host a site on dropbox. No lock-ins, no cms, no contracting agencies, and still be able to hire an engineer for one-off complex tasks.
+Editors and publishers should be able to write templates by hand, buy reusable themes (like bootstrap), **script an editorial workflow**, and host a site on dropbox. 
+
+No lock-ins, no cms, no contracting agencies.
 
 ## Usage
 
-TODO: Currently developer-centric steps.
+Note: The current steps are still developer-centric. Human api will be available soon.
 
 Setup:
 
@@ -37,7 +39,7 @@ Tests:
 
 Not stable. Currently in *Research & Development*.
 
-This work is being done in parallel to Poetroid, an open platform to discover poetry together with a unified [api](http://en.wikipedia.org/wiki/Application_programming_interface) for web, mobile, and print. Poetroid is currently used internally by our editors for [curating poems from the public domain](https://github.com/Facjure/poetroid-public-domain).
+This work is being done in parallel to Poetroid, an open platform to discover poetry together with a unified [api](http://en.wikipedia.org/wiki/Application_programming_interface). Poetroid is currently used internally by our editors for [curating poems from the public domain](https://github.com/Facjure/poetroid-public-domain).
 
 ## Documentation
 
