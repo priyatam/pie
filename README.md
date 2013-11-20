@@ -43,6 +43,13 @@ This work is being done in parallel to Poetroid, an open platform to discover po
 
 Coming soon.
 
+## Contributers
+
+- Priyatam Mudivarti: writer, engineer, and founder of Facjure LLC
+- Sreeharsha Mudivarti: musician, engineer, and survivor of a space ship crash.
+
+If you're a web developer and wants to move litarature forward, help, send a pull request!
+
 ## Copyright & License
 
 Copyright (c) Facjure LLC. All rights reserved.
