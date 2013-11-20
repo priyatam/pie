@@ -2,7 +2,7 @@
 
 Thousands of poems in the public domain live buried in websites. Hundreds of literary magazines archive thousands more that go undiscovered. Humans, even machines, can't search them in a central library.
 
-Enter Literatte: A mobile-first, literary publishing toolkit that can print itself and fit in your **dropbox**.
+Let's build one.
 
 Literatte: A mobile-first, literary publishing toolkit that fits in your **dropbox**.
 
