@@ -10,6 +10,5 @@ default_template: post.mustache
 
 # Deploy
 first_page: page/about.md
-title: Frozen Pie
-github_repo: https://github.com/Facjure/frozen-pie
+title: Literatte
 recipes_repo: https://github.com/Facjure/frozen-pie-recipes.git

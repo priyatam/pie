@@ -1,3 +1,10 @@
+/*
+    copyright:
+        (c) 2013 by Facjure LLC
+    license:
+        Ecipse Public License; see LICENSE for more details.
+*/
+
 $( function () {
 
     var relative_path = window.location.pathname;

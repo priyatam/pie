@@ -1,20 +1,18 @@
 # Literary publishing, for humans
 
-Hundreds of magazines and indie publishers publish their literature on print, or bury their word and pdfs in a cms, yet we don't have access to read, edit, and discover them, like machines.
+Thousands of poems in the public domain live buried in websites. Hundreds of literary magazines archive thousands more that go undiscovered. Humans, even machines, can't search them in a central library.
 
 Enter Literatte: A mobile-first, literary publishing toolkit that can print itself and fit in your **dropbox**.
+
+Literatte: A mobile-first, literary publishing toolkit that fits in your **dropbox**.
 
 ## Overview
 
 Most cms platforms today are blog and database centric like wordpress, drupal, tumblr, even weebly: platforms where users drag and drop designs with **content buried in code**. Designs are coupled with cms, content _can't_ be read outside them. Designing websites around a 'cms' locks you in with a toolkit, an online service, an agency charging your money for no real value.
 
-Static site generators, on the other hand, simplify website development by an order of magnitude by replacing databases with filesystems. Opensource frameworks like jekyll, middleman, and over [a hundred variations](http://nanoc.ws/about/) of the same idea are excellent, but they're still built for developers, not humans.
+Static site generators, jekyll, middleman, and over [a hundred variations](http://nanoc.ws/about/) of the same idea, simplify website development by an order of magnitude, replacing databases with filesystems and promoting Markdown over editors. However, you have to be a developer to customize them.
 
-Things shouldn’t be this way. Not in 2013.
-
-Editors and publishers should be able to write templates by hand, buy reusable themes (like bootstrap), **script an editorial workflow**, and host a site on dropbox. 
-
-No lock-ins, no cms, no contracting agencies.
+We can go one step further: editors and publishers should be able to write templates by hand, buy reusable themes, add, edit content, **script an editorial workflow**, and host a site on dropbox. No lock-ins, no contracting agencies, no cms.
 
 ## Usage
 

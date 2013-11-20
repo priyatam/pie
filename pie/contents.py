@@ -5,7 +5,7 @@
     copyright:
         (c) 2013 by Facjure LLC
     license:
-        Apache 2.0 License; see LICENSE for more details.
+        Ecipse Public License; see LICENSE for more details.
 """
 
 import sys
