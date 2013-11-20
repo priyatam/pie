@@ -6,14 +6,6 @@ Let's build one.
 
 Literatte: A mobile-first, literary publishing toolkit that fits in your **dropbox**.
 
-## Overview
-
-Most cms platforms today are blog and database centric like wordpress, drupal, tumblr, even weebly: platforms where users drag and drop designs with **content buried in code**. Designs are coupled with cms, content _can't_ be read outside them. Designing websites around a 'cms' locks you in with a toolkit, an online service, an agency charging your money for no real value.
-
-Static site generators, jekyll, middleman, and over [a hundred variations](http://nanoc.ws/about/) of the same idea, simplify website development by an order of magnitude, replacing databases with filesystems and promoting Markdown over editors. However, you have to be a developer to customize them.
-
-We can go one step further: editors and publishers should be able to write templates by hand, buy reusable themes, add, edit content, **script an editorial workflow**, and host a site on dropbox. No lock-ins, no contracting agencies, no cms.
-
 ## Usage
 
 Note: The current steps are still developer-centric. Human api will be available soon.
