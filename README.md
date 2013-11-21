@@ -1,42 +1,28 @@
-# Literary publishing, for humans
+# Literatte
 
-A mobile-first, literary publishing toolkit that fits in your **dropbox**.
+Millions of stories live buried in word, pdf, blogs, and cms engines meant for developers. Thousands of sites struggle to keep up with the pace of technology, the complexity of frameworks and web. Publishers, even writers, need their own toolkit to compile and generate a static site.
 
-## Usage
+Let's build one.
 
-Note: The current steps are still developer-centric. Human api will be available soon.
+## Overview
 
-Setup:
+A mobile-first, publishing toolkit that fits in your **Dropbox**.
 
-    $ mkvirtualenv pie
-    $ pip install -r requirements.txt
+Inspired by static-site generators like Jekyll, Middleman, and written in Python for humans.
 
-Run:
+Five parts: content, design, templates, scripts, and hosting
 
-    $ cd pie
-    $ python pie.py
-
-Tests:
-
-    $ cd pie-test
-    $ py.test test/tests.py
+1. Write any content using Markdown/YAML
+2. Choose coverpage, images, typography, color scheme, margins, page, story, article
+3. Create your own template in a templating language for humans
+4. Create custom editorial workflows with a scripting library for humans
+5. Host your site from dropbox
 
 ## Status and Roadmap
 
-Not stable. Currently in *Research & Development*.
+In Development, v0.4. Unstable.
 
-This work is being done in parallel to Poetroid, an open platform to discover poetry together with a unified [api](http://en.wikipedia.org/wiki/Application_programming_interface). Poetroid is currently used internally by our editors for [curating poems from the public domain](https://github.com/Facjure/poetroid-public-domain).
-
-## Documentation
-
-Coming soon.
-
-## Contributers
-
-- Priyatam Mudivarti: writer, engineer, and founder of Facjure LLC
-- Sreeharsha Mudivarti: musician, engineer, and survivor of a space ship crash.
-
-If you're a web developer and wants to move litarature forward, help, send a pull request!
+Developed in parallel to [poetroid](https://github.com/Facjure/poetroid).
 
 ## Copyright & License
 
