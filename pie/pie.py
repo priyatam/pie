@@ -16,7 +16,7 @@
     copyright:
         (c) 2013 by Facjure LLC
     license:
-        Ecipse Public License; see LICENSE for more details.
+        Apache 2 Opensource License; see LICENSE for more details.
 """
 
 import contents
