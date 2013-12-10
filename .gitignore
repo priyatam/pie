@@ -1,7 +1,7 @@
 recipe/styles/_*
 *.py[cod]
 
-.build
+*.build*.sh
 out
 recipe.old
 tags
