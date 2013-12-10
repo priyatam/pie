@@ -1,0 +1,3 @@
+title: Sample site with blog
+first_page: page/abstract.md
+default_template: post.mustache
