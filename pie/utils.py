@@ -69,7 +69,6 @@ def load_config(root_path, contents_path):
     config["master_css_fname"] = config["styles_path"] + os.sep + "master.css"
     config["scss_fname"] = config["styles_path"] + os.sep + "child.scss"
 
-
     sys.path.append(config['lambdas_path'])
 
     for element in ["templates", "lambdas", "styles"]:

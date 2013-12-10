@@ -48,7 +48,8 @@ def prepare(args):
 
 def load(config, contents_data, templates_data):
     """Create a tuple of dicts of compiled styles, scripts, and lambdas, along with their dictionary data"""
-    raw_styles = [read(os.path.basename(fn), config["styles_path"]) for fn in glob(config["styles_path"] + os.sep + "*.css") if not fn.endswith("master.css")]
+    raw_styles = [read(os.path.basename(fn), config["styles_path"])
+                  for fn in glob(config["styles_path"] + os.sep + "*.css") if not fn.endswith("master.css")]
 
     if os.path.isfile(config['scss_fname']):
         style = styles.build(config)
@@ -58,10 +59,9 @@ def load(config, contents_data, templates_data):
         raw_styles.insert(0, style)
     final_style = "".join(raw_styles)
 
-    default_script = [read('controller.js')]
+    default_script = [read('controller.js', os.path.dirname(__file__))]
     scripts = default_script
     if config.get('routes'):
-        scripts.append(default_script)
         scripts.append('/* User-defined scripts*/\n')
         scripts = [read(route, config['root_path']) for route in config["routes"]]
     lambdas_data = lambdas.load(config, contents_data, templates_data)
