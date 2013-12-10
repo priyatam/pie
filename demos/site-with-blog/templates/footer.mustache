@@ -1,0 +1,20 @@
+<div>
+    &copy; Facjure LLC, under the Apache 2.0 License. 2013
+</div>
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/0.7.2/mustache.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sammy.js/0.7.4/sammy.min.js"></script>
+<script>
+    /* Literatte */
+    var data = {{{ json_data }}};
+    var config = {{{ config }}};
+    /* Custom Script */
+    {{{ script }}}
+    /* Google Analytics */
+    var _gaq=[['_setAccount','UA-XXXXX-X'],['_trackPageview']];
+            (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
+            g.src='https://www.google-analytics.com/ga.js';
+            s.parentNode.insertBefore(g,s)}(document,'script'));
+</script>
+
