@@ -5,7 +5,7 @@
     copyright:
         (c) 2013 by Facjure LLC
     license:
-        Apache 2.0 License; see LICENSE for more details.
+        Apache License v2.0; see LICENSE for more details.
 """
 
 import os

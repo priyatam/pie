@@ -16,7 +16,7 @@
     copyright:
         (c) 2013 by Facjure LLC
     license:
-        Apache 2 Opensource License; see LICENSE for more details.
+        Apache License v2.0; see LICENSE for more details.
 """
 
 import contents
