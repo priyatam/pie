@@ -1,11 +1,24 @@
-This is a sample site created using frozen pie.
+This is a sample site with blog created using [Literatte](https://github.com/Facjure/literatte).
 
-Instead of creating new content, we'll reuse contents from the root docs/ folder. In fact, we'll create a static site that acts as project documentation for github projects.
+Structure:
+    - lambdas: custom logic implemented as mustache lambdas
+    - styles: scss, less, css files (pre-processors automatically applied)
+    - templates: mustache templates with HTML5
 
-Templates, Styles, and Logic, are stored under the *recipe* namespace.
+For content, we'll reuse literatte's 'docs' folder.
 
 Optional site configuration, like first page, title, etc., is stored in config.yml.
 
-As you can see, content, design, and logic is distributed across the filesystem--yet Frozen Pie brings them together, and generates a static site, complete with back button, and responsiveness.
+As you can see, content, design, and logic is distributed across the filesystem--yet Literatte brings them together, and generates a static site,
+complete with back button, and responsiveness.
+
+## Usage
+
+    alias pie=/path-to-literatte/pie/pie.py
+    
+    pie --root=/path-to-literatte/demos/site-with-blog --contents=/path-to-literatte/docs
+    
+    open -a "/Applications/Google Chrome.app" .build/index.html
+
 
 Simplicity *is* possible.
