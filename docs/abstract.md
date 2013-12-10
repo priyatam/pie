@@ -1,7 +1,7 @@
 ---
 title: Abstract
-_type: blog
-template: post.mustache
+_type: page
+template: page.mustache
 author: Priyatam Mudivarti
 post_date: 07-14-13
 ---
