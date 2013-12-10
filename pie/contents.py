@@ -18,20 +18,20 @@ from utils import *
 def load(config):
     """Create a dictionary for retrieving content's raw body, metadata, and future compiled html"""
     data = []
-    path = config['content']
+    path = config['contents_path']
     for fname in os.listdir(path):
         if fname.endswith('.md') or fname.endswith('.txt'):
             try:
                 meta, raw = read_yaml(path, fname)
                 content = {
-                    "name": meta.get("_type", "content") + "/" + fname,
+                    "name": meta.get("_type", "contents") + "/" + fname,
                     "body": raw,
                     "modified_date": format_date(path + os.sep + fname)
                 }
                 content.update(meta)
                 data.append(content)
             except:
-                logger.error("Error while reading content: %s: %s" % (fname, sys.exc_info()[0]))
+                logger.error("Error while reading contents: %s: %s" % (fname, sys.exc_info()[0]))
         else:
             logger.warning("Incorrect Extension: %s" % fname)
     return data

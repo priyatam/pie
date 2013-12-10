@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 """
     DSL for making a frozen pie, a.k.a, a static website.
+    TODO: Refactor
 
     run:
         pie.py
@@ -19,42 +20,88 @@
         Apache License v2.0; see LICENSE for more details.
 """
 
+import json
+import jsmin
+import cssmin
 import contents
 import templates
-import recipes
+import styles
+import lambdas
+from glob import glob
 from utils import *
 
 
-def prepare():
-    """Let's cook an Apple Pie:"""
-    config = load_config(config_path)
+def prepare(args):
+    """Preparing config"""
+    config = load_config(args.root, args.contents[0])
 
-    if "serve" in args.string_options:
+    if "deploy" in args.deploy:
         to_serve = True
     else:
         to_serve = False
 
-    bake(config, to_serve=to_serve)
+    bake(config, deploy=to_serve)
 
     if to_serve:
-        serve(config, config_path)
+        serve(config, args.deploy)
 
 
-def add_recipes(config, cmds):
-    """Add recipes, if any"""
-    logger.info('Checking if Recipes are required')
-    recipes.download(config, cmds.recipe[0]) if cmds.recipe[0] != "recipe" else logger.info('Using default recipe')
+def load(config, contents_data, templates_data):
+    """Create a tuple of dicts of compiled styles, scripts, and lambdas, along with their dictionary data"""
+    styles_path = config["styles_path"]
+    raw_styles = [read(os.path.basename(fn), styles_path) for fn in glob(styles_path + os.sep + "*.css") if not fn.endswith("master.css")]
+
+    scss_fname = styles_path + os.sep + " style.scss"
+    if os.path.isfile(scss_fname):
+        style = styles.build(config)
+        raw_styles.append(style)
+
+    mastercss_fname = styles_path + os.sep + "master.css"
+    if os.path.isfile(mastercss_fname):
+        style = read("master.css", styles_path)
+        raw_styles.insert(0, style)
+
+    final_style = "".join(raw_styles)
+    default_script = [read('controller.js', '.')]
+    scripts = default_script
+    if config.get('routes'):
+        scripts.append(default_script)
+        scripts.append('/* User-defined scripts*/\n')
+        scripts = [read(route, config['root_path']) for route in config["routes"]]
+    lambdas_data = lambdas.load(config, contents_data, templates_data)
+
+    return final_style, scripts, lambdas_data
 
 
-def bake(config, to_serve=False):
-    """Bakes Contents, Templates, and Recipes together"""
+def bake(config, deploy=False):
+    """Bakes contents, templates, scripts, and styles together"""
+    params = {"title": config['title']}
     logger.info('Baking...')
     contents_data = contents.load(config)
-    dynamic_templates = templates.load_dynamic(config)
-    style, script, lambdas_data = recipes.load(config, contents_data, dynamic_templates)
-    pie = recipes.bake(config, contents_data, dynamic_templates, style, script, lambdas_data, minify=to_serve)
+    templates_data = templates.load(config)
 
-    build_index_html(pie, config_path)
+    style, scripts, lambdas_data = load(config, contents_data, templates_data)
+
+    logger.info('Baking contents and templates')
+    contents.bake(config, contents_data, lambdas_data)
+    templates.bake(config, templates_data, lambdas_data)
+
+    params.update({"json_data": json.dumps(contents_data + templates_data)})
+
+    logger.info('Baking styles and scripts')
+    final_script = "".join(scripts)
+    if deploy:
+        params.update({"style_sheet": cssmin.cssmin(style), "script": jsmin.jsmin(final_script)})
+    else:
+        params.update({"style_sheet": style, "script": final_script})
+
+    logger.info('Baking lambdas')
+    params.update(lambdas_data)
+    params.update({"config": config})
+
+    logger.info('Compiling assets into an index page')
+    pie = merge_pages(config, templates.get_index(config), params)
+    build_index_html(pie, config)
 
     return pie
 
@@ -62,17 +109,13 @@ def bake(config, to_serve=False):
 def serve(config, version=None):
     """Serves"""
     logger.info("Serving ... currently supports only gh-pages")
-    directory_path = os.path.dirname(os.path.realpath(config_path))
+    directory_path = os.path.dirname(os.path.realpath(config.root))
     serve_github(config, directory_path)
 
 
 if __name__ == '__main__':
     logger = get_logger()
-
-    logger.info('Setting global config path')
     args = parse_cmdline_args(sys.argv)
-    config_path = args.config[0]
-
     logger.info('Starting ...')
-    prepare()
+    prepare(args)
     logger.info('Finished')

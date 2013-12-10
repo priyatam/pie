@@ -15,6 +15,7 @@ import sys
 import yaml
 import time
 import argparse
+import pystache
 from datetime import datetime
 from codecs import open
 from functools import wraps
@@ -45,26 +46,29 @@ def analyze(func):
             logger.debug(i)
         logger.debug("<--->")
         return func(*args, **kwds)
+
     return wrapper
 
 
-def load_config(config_path):
-    """Loads configuration from config.yml"""
-    with open(config_path, "r", "utf-8") as fin:
-        user_config = yaml.load(fin.read())
-    with open("config.yml", "r", "utf-8") as fin:
-        sys_config = yaml.load(fin.read())
-    config = dict(sys_config, **user_config)
-    config["templates_path"] = config["recipe_root"] + os.sep + "templates"
-    config["lambdas_path"] = config["recipe_root"] + os.sep + "lambdas"
+def load_config(root_path, contents_path):
+    """Loads configuration from user supplied config.yml"""
+    if not os.path.exists(root_path):
+        logger.error("'root' folder folder does not exist. Exiting now")
+        exit(1)
+    with open(root_path + os.sep + "config.yml", "r", "utf-8") as fin:
+        config = yaml.load(fin.read())
+    if not os.path.exists(contents_path):
+        logger.error("contents folder folder does not exist. Exiting now")
+        exit(1)
+
+    config["root_path"] = root_path
+    config["contents_path"] = contents_path
+    config["templates_path"] = root_path + os.sep + "templates"
+    config["lambdas_path"] = root_path + os.sep + "lambdas"
+    config["styles_path"] = root_path + os.sep + "styles"
+
     sys.path.append(config['lambdas_path'])
-    config["styles_path"] = config["recipe_root"] + os.sep + "styles"
-    if not os.path.exists(config["recipe_root"]):
-        logger.error("recipe folder folder does not exist. Exiting now")
-        exit(1)
-    if not os.path.exists(config["content"]):
-        logger.error("content folder folder does not exist. Exiting now")
-        exit(1)
+
     for element in ["templates", "lambdas", "styles"]:
         if not os.path.exists(config[element + "_path"]):
             logger.error(element + " folder does not exist. Exiting now")
@@ -99,20 +103,34 @@ def read_yaml(subdir, fname):
 
 def parse_cmdline_args(args):
     """Parse command line args"""
-    parser = argparse.ArgumentParser(description='Some options.')
-    parser.add_argument('string_options', type=str, nargs="*", default=[])
-    parser.add_argument("--config", nargs=1, default=["config.yml"])
-    parser.add_argument("--recipe", nargs=1, default=["recipe"])
+    parser = argparse.ArgumentParser(description='Literatte: Enter path to contents and root',
+                                     epilog='Build Content Together')
+    parser.add_argument("--root", type=str, nargs='?',
+                        help='path to root project folder containing templates, styles, lambdas, and config.yml)')
+    parser.add_argument("--contents", type=str, nargs='+',
+                        help='path to contents folder containing markdown, plaintext, epub, pdf')
+    parser.add_argument("--title", type=str, nargs='?', help='title of generate site')
+    parser.add_argument("--first_page", type=str, nargs='?',
+                        help='home page', default='page/home.md')
+    parser.add_argument("--default_template", type=str, nargs='?',
+                        help='default template when template not found for content', default='post.mustache')
+    parser.add_argument('--deploy', type=str, nargs='?', default='dropbox',
+                        help='deploy in dropbox or github')
     return parser.parse_args(args[1:])
 
 
-def build_index_html(pie, config_path):
+def merge_pages(config, index_page, params):
+    """Merges all posts, pages into an index_page"""
+    renderer = pystache.Renderer(search_dirs=[config["templates_path"]], file_encoding="utf-8", string_encoding="utf-8")
+    return renderer.render_path(index_page, params)
+
+
+def build_index_html(pie, config):
     """Builds Index"""
-    path = os.path.dirname(os.path.realpath(config_path))
-    os.chdir(path)
+    os.chdir(config['root_path'])
     os.system('mkdir .build') if not os.path.isdir(".build") else None
     open('.build/index.html', 'w', "utf-8").write(pie)
-    logger.info('Generated ' + path + '/.build/index.html')
+    logger.info('Generated ' + config['root_path'] + '/.build/index.html')
 
 
 def serve_github(config, directory_path):
@@ -126,7 +144,8 @@ def serve_github(config, directory_path):
     os.system("rm -rf .build")
     os.system("git clone -b gh-pages " + url + " .build")
     os.system("cp deploy/index.html .build/")
-    os.system("cd .build; git add index.html; git commit -m 'new deploy " + str(datetime.now()) + "'; git push --force origin gh-pages")
+    os.system("cd .build; git add index.html; git commit -m 'new deploy " + str(
+        datetime.now()) + "'; git push --force origin gh-pages")
 
 
 def newdict(*dicts):

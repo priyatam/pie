@@ -15,7 +15,7 @@ from utils import *
 
 
 @analyze
-def load_dynamic(config):
+def load(config):
     """Create a dictionary for retrieving template's raw body, metadata, and compiled HTML"""
     templates = []
     path = config["templates_path"]
@@ -82,3 +82,7 @@ def get_path(config, name):
     """For given name, return the template path from config"""
     return config["templates_path"] + os.sep + name
 
+
+def get_index(config):
+    """Returns index page"""
+    return get_path(config, "index.mustache")

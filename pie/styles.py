@@ -8,13 +8,12 @@
         Apache License v2.0; see LICENSE for more details.
 """
 
-import scss
-import cssmin
+from scss import Scss
 from utils import *
 
 
 @analyze
-def compile(config):
+def build(config):
     styles_path = config["styles_path"]
-    compiler = scss.Scss(scss_opts={"verbosity": True, "compress": False, "load_paths": [styles_path]})
+    compiler = Scss(scss_opts={"verbosity": True, "compress": False, "load_paths": [styles_path]})
     return unicode(compiler.compile(read("style.scss", styles_path), "utf-8"))
