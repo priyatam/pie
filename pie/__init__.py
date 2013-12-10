@@ -1,4 +1,4 @@
-__title__ = 'frozen-pie'
+__title__ = 'literatte'
 __version__ = '0.4'
 __author__ = 'Priyatam & Sreeharsha Mudivarti'
 __license__ = 'Apache 2.0'
@@ -10,5 +10,3 @@ from . import templates
 from . import lambdas
 from . import styles
 from . import pie
-
-# TODO: Initialize Logger at package level?
