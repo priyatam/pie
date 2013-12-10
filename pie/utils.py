@@ -66,6 +66,9 @@ def load_config(root_path, contents_path):
     config["templates_path"] = root_path + os.sep + "templates"
     config["lambdas_path"] = root_path + os.sep + "lambdas"
     config["styles_path"] = root_path + os.sep + "styles"
+    config["master_css_fname"] = config["styles_path"] + os.sep + "master.css"
+    config["scss_fname"] = config["styles_path"] + os.sep + "child.scss"
+
 
     sys.path.append(config['lambdas_path'])
 
@@ -82,7 +85,7 @@ def format_date(fname):
 
 
 def read(fname, subdir=None):
-    """Reads subdir/fname as raw content"""
+    """Reads fname as raw content from subdir"""
     if subdir:
         path = subdir + os.sep + fname
     else:

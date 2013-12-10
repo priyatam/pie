@@ -36,33 +36,29 @@ def prepare(args):
     config = load_config(args.root, args.contents[0])
 
     if "deploy" in args.deploy:
-        to_serve = True
+        to_deploy = True
     else:
-        to_serve = False
+        to_deploy = False
 
-    bake(config, deploy=to_serve)
+    bake(config, deploy=to_deploy)
 
-    if to_serve:
-        serve(config, args.deploy)
+    if to_deploy:
+        deploy(config, args.deploy)
 
 
 def load(config, contents_data, templates_data):
     """Create a tuple of dicts of compiled styles, scripts, and lambdas, along with their dictionary data"""
-    styles_path = config["styles_path"]
-    raw_styles = [read(os.path.basename(fn), styles_path) for fn in glob(styles_path + os.sep + "*.css") if not fn.endswith("master.css")]
+    raw_styles = [read(os.path.basename(fn), config["styles_path"]) for fn in glob(config["styles_path"] + os.sep + "*.css") if not fn.endswith("master.css")]
 
-    scss_fname = styles_path + os.sep + " style.scss"
-    if os.path.isfile(scss_fname):
+    if os.path.isfile(config['scss_fname']):
         style = styles.build(config)
         raw_styles.append(style)
-
-    mastercss_fname = styles_path + os.sep + "master.css"
-    if os.path.isfile(mastercss_fname):
-        style = read("master.css", styles_path)
+    if os.path.isfile(config['master_css_fname']):
+        style = read(config['master_css_fname'])
         raw_styles.insert(0, style)
-
     final_style = "".join(raw_styles)
-    default_script = [read('controller.js', '.')]
+
+    default_script = [read('controller.js')]
     scripts = default_script
     if config.get('routes'):
         scripts.append(default_script)
@@ -106,7 +102,7 @@ def bake(config, deploy=False):
     return pie
 
 
-def serve(config, version=None):
+def deploy(config, version=None):
     """Serves"""
     logger.info("Serving ... currently supports only gh-pages")
     directory_path = os.path.dirname(os.path.realpath(config.root))
