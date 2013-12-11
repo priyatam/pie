@@ -5,3 +5,4 @@ pyScss
 cssmin
 jsmin
 pytest
+boto

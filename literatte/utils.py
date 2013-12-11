@@ -10,16 +10,20 @@
 
 import logging
 import logging.config
-import os
-import sys
 import yaml
 import time
 import argparse
 import pystache
-from datetime import datetime
 from codecs import open
 from functools import wraps
 from subprocess import Popen, PIPE
+import os
+import sys
+from datetime import datetime
+from glob import glob
+import boto
+import boto.s3
+from boto.s3.key import Key
 
 
 logger = logging.getLogger('pielogger')
@@ -68,6 +72,7 @@ def load_config(root_path, contents_path):
     config["styles_path"] = root_path + os.sep + "styles"
     config["master_css_fname"] = config["styles_path"] + os.sep + "master.css"
     config["scss_fname"] = config["styles_path"] + os.sep + "child.scss"
+    config["index_html"] = config["root_path"] + os.sep + ".build" + os.sep + "index.html"
 
     sys.path.append(config['lambdas_path'])
 
@@ -105,19 +110,19 @@ def read_yaml(subdir, fname):
 
 def parse_cmdline_args(args):
     """Parse command line args"""
-    parser = argparse.ArgumentParser(description='Literatte: Enter path to contents and root',
+    parser = argparse.ArgumentParser(description='--- Literatte: Literary publishing for Humans ---',
                                      epilog='Build Content Together')
-    parser.add_argument("--root", type=str, nargs='?',
-                        help='path to root project folder containing templates, styles, lambdas, and config.yml)')
-    parser.add_argument("--contents", type=str, nargs='+',
+    parser.add_argument("root", type=str,
+                        help='path to root project folder containing templates, styles, lambdas, and config.yml')
+    parser.add_argument("contents", type=str,
                         help='path to contents folder containing markdown, plaintext, epub, pdf')
     parser.add_argument("--title", type=str, nargs='?', help='title of generate site')
     parser.add_argument("--first_page", type=str, nargs='?',
                         help='home page', default='page/home.md')
     parser.add_argument("--default_template", type=str, nargs='?',
                         help='default template when template not found for content', default='post.mustache')
-    parser.add_argument('--deploy', type=str, nargs='?', default='dropbox',
-                        help='deploy in dropbox or github')
+    parser.add_argument('-d', '--deploy', type=str, nargs='?', default='s3',
+                        help='s3 or github')
     return parser.parse_args(args[1:])
 
 
@@ -148,6 +153,24 @@ def serve_github(config, directory_path):
     os.system("cp deploy/index.html .build/")
     os.system("cd .build; git add index.html; git commit -m 'new deploy " + str(
         datetime.now()) + "'; git push --force origin gh-pages")
+
+
+def serve_s3(config):
+    """Serve baked index.html and js to S3. AWS_ACCESS_KEY_ID amd AWS_SECRET_ACCESS_KEY must be in environ """
+    connection = boto.connect_s3(os.environ['AWS_ACCESS_KEY_ID'], os.environ['AWS_SECRET_ACCESS_KEY'])
+    bucket = connection.create_bucket(config['s3_bucket'], location=boto.s3.connection.Location.DEFAULT)
+
+    logger.info('Uploading %s to Amazon S3 bucket %s' % (config['index_html'], config['s3_bucket']))
+    k = Key(bucket)
+    k.key = 'index.html'
+    k.set_contents_from_filename(config['index_html'])
+
+    logger.info("Copying user js to S3")
+    for jsfile in glob("js" + os.sep + "*.js"):
+        k = Key(bucket)
+        filename = "js/" + os.path.basename(jsfile)
+        k.key = filename
+        k.set_contents_from_filename(jsfile)
 
 
 def newdict(*dicts):

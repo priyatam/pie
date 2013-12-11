@@ -25,7 +25,7 @@ class TestPieUtils:
     def test_load_config(self):
         config = load_config(self.config_path)
         assert types.DictType == type(config)
-        assert "https://github.com/Facjure/frozen-pie" == config['github_repo']
+        assert "https://github.com/Facjure/frozen-literatte" == config['github_repo']
         with pytest.raises(SystemExit):
             load_config("./config.test.bad.yml")
 

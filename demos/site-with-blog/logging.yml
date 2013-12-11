@@ -1,0 +1,29 @@
+version: 1
+formatters:
+  simple:
+    format: '%(name)s - %(levelname)s - %(message)s'
+handlers:
+  nullh:
+    class: logging.NullHandler
+  console:
+    class: logging.StreamHandler
+    level: DEBUG
+    formatter: simple
+    stream: ext://sys.stdout
+  file:
+    class : logging.handlers.RotatingFileHandler
+    formatter: simple
+    filename: facjure-com.log
+    maxBytes: 1024
+loggers:
+  nologger:
+    level: INFO
+    handlers: [nullh]
+    propagate: no
+  pielogger:
+    level: INFO
+    handlers: [console, file]
+    propagate: no
+  root:
+    level: INFO
+    handlers: [console]
