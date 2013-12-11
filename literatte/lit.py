@@ -1,21 +1,19 @@
 #!/usr/bin/env python
 """
-    DSL for making a frozen pie, a.k.a, a static website.
-    TODO: Refactor
+    DSL for making a static site with dynamic powers.
 
-    run:
-        pie.py
-          or
-        pie.py --config=path_to_config_yml
-    host:
-        pie.py serve (pushes to your github pages)
+    usage:
+        lit.py --help
+
     algo:
         Read config.yml.
-        For each post.md, process YAML, and apply its Mustache Templates, and generate final HTML.
-        Combine everything into a single index.html with a minified CSS, JS.
-        See docs for more info.
+        For each post.md and page.md, process YAML and apply Mustache templates.
+        If template#_type=dynamic generate templates,
+        Combine all posts and pagse, generate final HTML with a minified CSS, JS.
+
     copyright:
         (c) 2013 by Facjure LLC
+
     license:
         Apache License v2.0; see LICENSE for more details.
 """
@@ -27,13 +25,12 @@ import contents
 import templates
 import styles
 import lambdas
-from glob import glob
 from utils import *
 
 
 def prepare(args):
     """Preparing config"""
-    config = load_config(args.root, args.contents[0])
+    config = load_config(args.root, args.contents)
 
     if "deploy" in args.deploy:
         to_deploy = True
