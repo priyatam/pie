@@ -16,7 +16,5 @@ Built using functional programming techniques. There is no state, no framework, 
 
 **Style** breathes life into Templates. They can be written in CSS3, or compiled from LESS, SCSS, Bourbon.
 
-**Recipe** is nothing but a package of Templates, Styles, and Lambdas under a single namespace.
-
 **Lambdas** are logic written in any language that supports functional concepts like Javascript, Coffeescript, Clojurescript on the browser, or Python on the serverside.
 
