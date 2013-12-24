@@ -103,7 +103,7 @@ def deploy(config, version=None):
     """Serves"""
     logger.info("Serving ... currently supports only gh-pages")
     directory_path = os.path.dirname(os.path.realpath(config.root))
-    serve_github(config, directory_path)
+    serve_s3(config, directory_path)
 
 
 if __name__ == '__main__':

@@ -16,7 +16,6 @@ import argparse
 import pystache
 from codecs import open
 from functools import wraps
-from subprocess import Popen, PIPE
 import os
 import sys
 from datetime import datetime
@@ -76,7 +75,7 @@ def load_config(root_path, contents_path):
 
     sys.path.append(config['lambdas_path'])
 
-    for element in ["templates", "lambdas", "styles"]:
+    for element in ["templates", "lambdas"]:
         if not os.path.exists(config[element + "_path"]):
             logger.error(element + " folder does not exist. Exiting now")
             exit(1)
@@ -116,11 +115,6 @@ def parse_cmdline_args(args):
                         help='path to root project folder containing templates, styles, lambdas, and config.yml')
     parser.add_argument("contents", type=str,
                         help='path to contents folder containing markdown, plaintext, epub, pdf')
-    parser.add_argument("--title", type=str, nargs='?', help='title of generate site')
-    parser.add_argument("--first_page", type=str, nargs='?',
-                        help='home page', default='page/home.md')
-    parser.add_argument("--default_template", type=str, nargs='?',
-                        help='default template when template not found for content', default='post.mustache')
     parser.add_argument('-d', '--deploy', type=str, nargs='?', default='s3',
                         help='s3 or github')
     return parser.parse_args(args[1:])
@@ -135,24 +129,8 @@ def merge_pages(config, index_page, params):
 def build_index_html(pie, config):
     """Builds Index"""
     os.chdir(config['root_path'])
-    os.system('mkdir .build') if not os.path.isdir(".build") else None
-    open('.build/index.html', 'w', "utf-8").write(pie)
-    logger.info('Generated ' + config['root_path'] + '/.build/index.html')
-
-
-def serve_github(config, directory_path):
-    """Serve baked index.html into gh-pages"""
-    # TODO: Refactor this from brute force to git api
-    proc = Popen(['git', 'config', "--get", "remote.origin.url"], stdout=PIPE)
-    url = proc.stdout.readline().rstrip("\n")
-    os.chdir(directory_path)
-    os.system("mkdir deploy")
-    os.system("mv .build/index.html deploy/")
-    os.system("rm -rf .build")
-    os.system("git clone -b gh-pages " + url + " .build")
-    os.system("cp deploy/index.html .build/")
-    os.system("cd .build; git add index.html; git commit -m 'new deploy " + str(
-        datetime.now()) + "'; git push --force origin gh-pages")
+    open('site/index.html', 'w', "utf-8").write(pie)
+    logger.info('Generated ' + config['root_path'] + '/site/index.html')
 
 
 def serve_s3(config):
