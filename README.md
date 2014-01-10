@@ -20,6 +20,20 @@ Run:
     $ cd pie
     $ python pie.py root content [options]
 
+Options:
+    usage: pie.py [-h] [-d [DEPLOY]] root contents
+
+    --- Frozen Pie: A minimalist static site generator and router---
+
+    positional arguments:
+    root                  path to root project folder containing templates,
+                          styles, lambdas, and config.yml
+    contents              path to contents folder containing markdown, plaintext
+
+    optional arguments:
+      -h, --help                      show this help message and exit
+      -d [DEPLOY], --deploy [DEPLOY]  s3 or dropbox
+
 Tests:
 
     $ cd pie-test
