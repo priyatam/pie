@@ -1,12 +1,12 @@
 from distutils.core import setup
 
 setup(
-    name='literatte',
+    name='frozen-pie',
     version='0.4',
-    packages=['literatte'],
-    url='https://github.com/Facjure/literatte',
+    packages=['pie'],
+    url='https://github.com/Facjure/frozen-pie',
     license='Apache 2.0 License',
     author='Priyatam Mudivarti',
     author_email='priyatam@gmail.com',
-    description='Literature and Latté: Literary publishing for humans'
+    description='Frozen Pie: a Python single-page static site generator with in-built router'
 )

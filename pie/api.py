@@ -3,7 +3,7 @@
     DSL for making a static site with dynamic powers.
 
     usage:
-        lit.py --help
+        pie.py --help
 
     algo:
         Read config.yml.
@@ -12,7 +12,7 @@
         Combine all posts and pagse, generate final HTML with a minified CSS, JS.
 
     copyright:
-        (c) 2013 by Facjure LLC
+        (c) 2014 by Priyatam Mudivarti
 
     license:
         Apache License v2.0; see LICENSE for more details.

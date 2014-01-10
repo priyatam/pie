@@ -1,6 +1,6 @@
 /*
     copyright:
-        (c) 2013 by Facjure LLC
+        (c) 2014 by Priyatam Mudivarti
     license:
         Apache License v2.0; see LICENSE for more details.
 */
