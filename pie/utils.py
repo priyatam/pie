@@ -14,15 +14,15 @@ import yaml
 import time
 import argparse
 import pystache
-from codecs import open
-from functools import wraps
 import os
 import sys
-from datetime import datetime
-from glob import glob
 import boto
 import boto.s3
 from boto.s3.key import Key
+from codecs import open
+from datetime import datetime
+from glob import glob
+from functools import wraps
 
 
 logger = logging.getLogger('pielogger')
@@ -129,6 +129,8 @@ def merge_pages(config, index_page, params):
 def build_index_html(pie, config):
     """Builds Index"""
     os.chdir(config['root_path'])
+    if not os.path.exists('site'):
+        os.makedirs('site')
     open('site/index.html', 'w', "utf-8").write(pie)
     logger.info('Generated ' + config['root_path'] + '/site/index.html')
 

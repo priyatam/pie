@@ -1,3 +1,6 @@
+*.sh
+
+demos/site-with-blog/site/
 recipe/styles/_*
 *.py[cod]
 

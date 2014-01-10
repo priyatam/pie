@@ -4,21 +4,7 @@ A minimalist static site generator and router, written in Python and Javascript.
 
 ## Why
 
-Building a Bootstrap based static site should be as simple as baking a frozen pie: Prepare, add recipes, and bake content together.
-
-## Api
-
-_prepare_
-> Prepare crust: prepare content in Markdown or Plain Text with YAML metadata. A content can be anything: blog, page, interactive search, live feed, etc.,
-
-_add_recipes_
-> Add templates with Mustache and themes with Bootstrap.
-
-_bake_
-> Compile content, logic, and styles into an index page with a router to navigate pages/content
-
-_serve_
-> Serve a single page to Github, Dropbox, or S3.
+Publishing a minimalist responsive site with Markdown content should be as simple as baking a frozen pie: Prepare, add recipes, and bake content together.
 
 ## Usage
 
@@ -30,7 +16,7 @@ Setup:
 Run:
 
     $ cd pie
-    $ python pie.py
+    $ python pie.py root content [options]
 
 Tests:
 
@@ -41,12 +27,12 @@ For further info, see [docs](http://priyatam.github.io/frozen-pie/), generated b
 
 ## Status
 
-Pre-Alpha, v0.4, api and implementations may change.  
+Pre-Alpha, v0.4, api and implementations may change.
 
 Currently, supporting [Poetroid prototype](https://github.com/poetroid/prototype) and a few personal websites.
 
 ## Copyright & License
 
-Copyright (c) Priyatam Mudivarti, 2014 under the Apache 2.0 License. 
+Copyright (c) Priyatam Mudivarti, 2014 under the Apache 2.0 License.
 
 See LICENSE for more details.

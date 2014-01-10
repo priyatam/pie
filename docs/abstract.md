@@ -14,4 +14,4 @@ Things shouldn't be this way.
 
 Stick to a lightweight language agnostic template engine (Mustache), implement logic as pure functions (Mustache Lambdas), routes with SammyJs, and responsive themes with Bootstrap; you have a pre-compiled webapp rendered as a static site.
 
-In short, you can prepare the content, add recipes with themes and functions, and bake them into a single page, like a frozen pie.
+You can prepare the content, add recipes with themes, routes, and functions, and bake them into a single responsive page, like a frozen pie.

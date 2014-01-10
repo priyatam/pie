@@ -1,7 +1,6 @@
 markdown
 PyYaml
 pystache
-pyScss
 cssmin
 jsmin
 pytest

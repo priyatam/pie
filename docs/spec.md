@@ -8,15 +8,14 @@ post_date: 07-16-13
 
 ### Spec
 
-prepare
-> Prepare crust: prepare content in Markdown/Plain Text with YAML meta-data. A content can be anything.
+_prepare_
+> Prepare crust: prepare content in Markdown or Plain Text with YAML metadata. A content can be anything: blog, page, interactive search, live feed, etc.,
 
-add_recipes
-> Add Templates with Mustache, and optionally, 3rd-party logic (Mustache lambdas), packaged together as 'Recipes'.
+_add_recipes_
+> Add templates with Mustache and themes with Bootstrap.
 
-bake
-> Heat everything into a single index.html
+_bake_
+> Compile content, logic, and styles into an index page with a router to navigate pages/content
 
-serve
-> Serves the single page to anywhere: github pages, S3, email, etc.,
-
+_serve_
+> Serve a single page to Github, Dropbox, or S3.
