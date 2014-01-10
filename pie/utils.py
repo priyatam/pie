@@ -109,8 +109,7 @@ def read_yaml(subdir, fname):
 
 def parse_cmdline_args(args):
     """Parse command line args"""
-    parser = argparse.ArgumentParser(description='--- Frozen Pie: A minimalist static site generator and router---',
-                                     epilog='Build Content Together')
+    parser = argparse.ArgumentParser(description='Frozen Pie: A minimalist static site generator and router.')
     parser.add_argument("root", type=str,
                         help='path to root project folder containing templates, styles, lambdas, and config.yml')
     parser.add_argument("contents", type=str,
