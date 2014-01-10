@@ -1,23 +1,18 @@
-This is a sample site with blog created using [Literatte](https://github.com/Facjure/literatte).
+This is a sample site with blog created using [Frozen Pie](https://github.com/priyatam/frozen-pie).
 
 Structure:
 
 - templates: HTML5 + Mustache
-- styles: CSS3, SCSS or LESS (pre-processed by lit.py automatically)
-- lambdas (optional): custom logic, implemented as mustache lambdas
+- styles: CSS3 (or copy your compiled scss or less files here)
+- lambdas (optional): custom logic, implemented as Python functions
 
-For content, we'll reuse literatte's 'docs' folder.
+For content, we'll reuse frozen-pie's `docs` folder.
 
 Optional site configuration, like first page, title, etc., is stored in `config.yml`.
 
-Though _contents, design, and logic_ are distributed across the filesystem, Literatte brings them together and generates a static site,
-with dynamic behavior injected into index.html (back button, logic).
+Though _contents, design, and logic_ are distributed across the filesystem, frozen-pie brings them together and generates a static site, with all content injected into index.html as pages with back button support, automatic routes, and custom logic.
 
 ## Usage
 
-    lit.py /path-to-literatte/demos/site-with-blog /path-to-literatte/docs
-    
+    pie.py /path-to-frozen-pie/demos/site-with-blog /path-to-frozen-pie/docs
     open -a "/Applications/Google Chrome.app" .build/index.html
-
-
-Simplicity *is* possible.
