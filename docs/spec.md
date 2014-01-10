@@ -20,4 +20,3 @@ bake
 serve
 > Serves the single page to anywhere: github pages, S3, email, etc.,
 
-Optionally, purchase Recipes (crust, fillings, frozen) and bake.

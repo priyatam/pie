@@ -8,8 +8,10 @@ post_date: 07-14-13
 
 ## Abstract
 
-Most cms platforms today are blog and database centric like wordpress, drupal, tumblr, weebly: platforms where users drag and drop designs with **content buried in code**. Designs are coupled with cms, content _can't_ be read outside them. Designing websites around a cms locks you in with a toolkit, an online service, an agency charging your money for no real value. Static site generators, jekyll, middleman, and over [a hundred variations](http://nanoc.ws/about/) of the same idea, simplify website development by an order of magnitude, replacing databases with filesystems and promoting Markdown over editors. However, you have to be a developer to customize them.
+Static site generators, jekyll, middleman, frozen flask, and over [a hundred variations](http://nanoc.ws/about/) of the same idea, simplify website development by an order of magnitude, replacing databases with filesystems and promoting Markdown over WYSISYG editors. However, they don't provide a tight integration with css themes and client-side routes. Too many templating choices make integration hard with a common content repository.
 
 Things shouldn't be this way.
 
-Editors and publishers should be able to write templates by hand, buy reusable themes, add, edit content, **script an editorial workflow**, and host a site on dropbox. No lock-ins, no contracting agencies, no cms.
+Stick to a lightweight language agnostic template engine (Mustache), implement logic as pure functions (Mustache Lambdas), routes with SammyJs, and responsive themes with Bootstrap; you have a pre-compiled webapp rendered as a static site.
+
+In short, you can prepare the content, add recipes with themes and functions, and bake them into a single page, like a frozen pie.
