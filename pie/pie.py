@@ -39,10 +39,10 @@ def prepare(args):
     bake(config, deploy=to_deploy)
 
     if to_deploy:
-        deploy(config, args.deploy)
+        serve(config, args.deploy)
 
 
-def load(config, contents_data, templates_data):
+def mix(config, contents_data, templates_data):
     """Create a tuple of dicts of compiled styles, scripts, and lambdas, along with their dictionary data"""
     raw_styles = [read(os.path.basename(fn), config["styles_path"])
                   for fn in glob(config["styles_path"] + os.sep + "*.css") if not fn.endswith("master.css")]
@@ -72,7 +72,7 @@ def bake(config, deploy=False):
     contents_data = contents.load(config)
     templates_data = templates.load(config)
 
-    style, scripts, lambdas_data = load(config, contents_data, templates_data)
+    style, scripts, lambdas_data = mix(config, contents_data, templates_data)
 
     logger.info('Baking contents and templates')
     contents.bake(config, contents_data, lambdas_data)
@@ -98,9 +98,9 @@ def bake(config, deploy=False):
     return pie
 
 
-def deploy(config, version=None):
-    """Serves"""
-    logger.info("Serving ... currently supports only gh-pages")
+def serve(config, version=None):
+    """Serves to S3 or Dropbox"""
+    logger.info("Serving ... currently supports only S3")
     directory_path = os.path.dirname(os.path.realpath(config.root))
     serve_s3(config, directory_path)
 

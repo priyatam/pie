@@ -6,7 +6,6 @@ Can only be run from the parent directory as,
 import sys
 sys.path.append(".")
 import os
-os.chdir("test")
 
 import pytest
 import types
@@ -151,11 +150,6 @@ class TestBake:
         stache = bake._textstache(self.config, post, template_name)
         assert stache != None
         assert "#What's the point of another static generator ?" in stache
-
-    def test_compile_scss(self):
-        compiled_css = bake._compile_scss(self.config)
-        assert compiled_css != None
-        assert "width" in compiled_css
 
     def test_get_lambda_module_namess(self):
         modules = bake._get_lambda_module_names(self.config)

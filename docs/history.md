@@ -6,6 +6,11 @@ author: Priyatam Mudivarti
 post_date: 07-30-13
 ---
 
+**0.4.0** - _23 Nov 2013_
+> Kill your darlings - Williwam Faulkner
+
+Refactored, broke tests, removed github pages, dropped support for recipes, streamlined api.
+
 **0.3.0** - _23 Aug 2013_
 > The only things that are important in life are the things you remember - Jean Renoir
 
