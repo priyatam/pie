@@ -13,7 +13,7 @@ handlers:
   file:
     class : logging.handlers.RotatingFileHandler
     formatter: simple
-    filename: lit.log
+    filename: pie.log
     maxBytes: 1024
 loggers:
   nologger:

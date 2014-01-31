@@ -38,8 +38,7 @@ Run:
 
 Tests:
 
-    $ cd pie-test
-    $ py.test test/tests.py
+    $ py.test pie-tests/tests.py
 
 
 ## Status

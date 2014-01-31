@@ -3,39 +3,34 @@
 Can only be run from the parent directory as,
 > py.test test/tests.py
 """
-import sys
-sys.path.append(".")
 import os
+import sys
+owd = os.getcwd()
+root_path = owd + "/demos/site-with-blog"
+sys.path.append(owd)
+os.chdir("pie-test")
 
 import pytest
 import types
-import bake
-import pieutils
-from pieutils import *
+import pie.pie as pie
+import pie.contents as contents
+import pie.templates as templates
+from pie.utils import *
 
-pieutils.logger = get_logger()
-
+pie.logger =  get_logger()
 
 class TestPieUtils:
 
     def setup(self):
-        self.config_path = "config.test.yml"
+        self.content_path = "content"
 
     def test_load_config(self):
-        config = load_config(self.config_path)
+        config = load_config(root_path, self.content_path)
         assert types.DictType == type(config)
-        assert "https://github.com/Facjure/frozen-literatte" == config['github_repo']
-        with pytest.raises(SystemExit):
-            load_config("./config.test.bad.yml")
-
-    def test_format_date(self):
-        dt = format_date('tests.py')
-        assert dt != None
-        assert "13" in dt
 
     def test_read(self):
         fin = read('tests.py', '.')
-        assert 'import unittest' in fin
+        assert 'import pytest' in fin
 
     def test_read_yaml(self, tmpdir):
         tmp_file = tmpdir.join("test.yml")
@@ -52,8 +47,8 @@ foo: bar
 class TestBake:
 
     def setup(self):
-        self.config_path = "config.test.yml"
-        self.config = load_config(self.config_path)
+        self.content_path = "content"
+        self.config = load_config(root_path, self.content_path)
 
     def test_read_posts(self):
         yaml, post = read_yaml('content', 'abstract.md')
@@ -61,10 +56,10 @@ class TestBake:
         assert post != None
 
     def test_load_contents(self):
-        posts = bake.load_contents(self.config)
+        posts = contents.load(self.config)
         for post in posts:
             assert types.DictType == type(post)
-        assert 2 == len(posts)
+        assert 1 == len(posts)
         assert posts[0]['body'] != None
 
 

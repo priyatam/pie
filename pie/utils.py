@@ -25,9 +25,6 @@ from glob import glob
 from functools import wraps
 
 
-logger = logging.getLogger('pielogger')
-
-
 def get_logger():
     """Loads logging.yml and returns appropriate logger"""
     logging_conf = open('logging.yml', 'r')
@@ -35,6 +32,7 @@ def get_logger():
     logging_conf.close()
     return logging.getLogger('pielogger')
 
+logger = get_logger()
 
 def analyze(func):
     """A debugger that dumps a docstring along with func args passed in"""
@@ -79,6 +77,7 @@ def load_config(root_path, contents_path):
         if not os.path.exists(config[element + "_path"]):
             logger.error(element + " folder does not exist. Exiting now")
             exit(1)
+
     return config
 
 
