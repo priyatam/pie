@@ -29,8 +29,9 @@ from utils import *
 
 def prepare(args):
     """Preparing config"""
+    print args
     config = load_config(args.root, args.contents)
-    bake(config, deploy=args.minify)
+    bake(config, args.minify)
     if args.deploy:
         serve(config, args.deploy)
 
@@ -91,11 +92,10 @@ def bake(config, minify):
     return pie
 
 
-def serve(config):
+def serve(config, deploy):
     """Serves to S3 or Dropbox"""
     logger.info("Serving to S3")
-    directory_path = os.path.dirname(os.path.realpath(config.root))
-    serve_s3(config, directory_path)
+    serve_s3(config)
     # TODO Dropbox
 
 

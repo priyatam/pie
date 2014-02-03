@@ -113,9 +113,8 @@ def parse_cmdline_args(args):
                         help='path to root project folder containing templates, styles, lambdas, and config.yml')
     parser.add_argument("contents", type=str,
                         help='path to contents folder containing markdown, plaintext')
-    parser.add_argument('-m', '--minify', type=str, nargs='0', default=False, help='minify')
-    parser.add_argument('-d', '--deploy', type=str, nargs='?', default='s3',
-                        help='s3')
+    parser.add_argument('-m', '--minify', action="store_const", default=False, const=True, help='minify')
+    parser.add_argument('-d', '--deploy', type=str, nargs='?', help='s3')
     return parser.parse_args(args[1:])
 
 
