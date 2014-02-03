@@ -86,19 +86,19 @@ def format_date(fname):
     return datetime.strptime(time.ctime(os.path.getmtime(fname)), "%a %b %d %H:%M:%S %Y").strftime("%m-%d-%y")
 
 
-def read(fname, subdir=None):
-    """Reads fname as raw content from subdir"""
-    if subdir:
-        path = subdir + os.sep + fname
+def read(fname, directory=None):
+    """Reads fname as raw content from dir"""
+    if directory:
+        path = directory + os.sep + fname
     else:
         path = fname
     with open(path, "r", "utf-8") as fin:
         return fin.read()
 
 
-def read_yaml(subdir, fname):
+def read_yaml(directory, fname):
     """Splits subdir/fname into a tuple of YAML and raw content"""
-    with open(subdir + os.sep + fname, "r", "utf-8") as fin:
+    with open(directory + os.sep + fname, "r", "utf-8") as fin:
         yaml_and_raw = fin.read().split('\n---\n')
         if len(yaml_and_raw) == 1:
             return {}, yaml_and_raw[0]
@@ -113,8 +113,9 @@ def parse_cmdline_args(args):
                         help='path to root project folder containing templates, styles, lambdas, and config.yml')
     parser.add_argument("contents", type=str,
                         help='path to contents folder containing markdown, plaintext')
+    parser.add_argument('-m', '--minify', type=str, nargs='0', default=False, help='minify')
     parser.add_argument('-d', '--deploy', type=str, nargs='?', default='s3',
-                        help='s3 or dropbox')
+                        help='s3')
     return parser.parse_args(args[1:])
 
 
