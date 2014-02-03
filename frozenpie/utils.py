@@ -27,7 +27,8 @@ from functools import wraps
 
 def get_logger():
     """Loads logging.yml and returns appropriate logger"""
-    logging_conf = open('logging.yml', 'r')
+    path = os.path.dirname(__file__) + "/logging.yml"
+    logging_conf = open(path, 'r')
     logging.config.dictConfig(yaml.load(logging_conf))
     logging_conf.close()
     return logging.getLogger('pielogger')
