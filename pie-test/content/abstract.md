@@ -1,6 +1,6 @@
 ---
 title: Test
-_type: page
+_type: blog
 template: page.mustache
 author: Python Test
 post_date: 08-10-13

@@ -25,16 +25,15 @@ from glob import glob
 from functools import wraps
 
 
-logger = logging.getLogger('pielogger')
-
-
 def get_logger():
     """Loads logging.yml and returns appropriate logger"""
-    logging_conf = open('logging.yml', 'r')
+    path = os.path.dirname(__file__) + "/logging.yml"
+    logging_conf = open(path, 'r')
     logging.config.dictConfig(yaml.load(logging_conf))
     logging_conf.close()
     return logging.getLogger('pielogger')
 
+logger = get_logger()
 
 def analyze(func):
     """A debugger that dumps a docstring along with func args passed in"""
@@ -79,6 +78,7 @@ def load_config(root_path, contents_path):
         if not os.path.exists(config[element + "_path"]):
             logger.error(element + " folder does not exist. Exiting now")
             exit(1)
+
     return config
 
 
@@ -87,19 +87,19 @@ def format_date(fname):
     return datetime.strptime(time.ctime(os.path.getmtime(fname)), "%a %b %d %H:%M:%S %Y").strftime("%m-%d-%y")
 
 
-def read(fname, subdir=None):
-    """Reads fname as raw content from subdir"""
-    if subdir:
-        path = subdir + os.sep + fname
+def read(fname, directory=None):
+    """Reads fname as raw content from dir"""
+    if directory:
+        path = directory + os.sep + fname
     else:
         path = fname
     with open(path, "r", "utf-8") as fin:
         return fin.read()
 
 
-def read_yaml(subdir, fname):
+def read_yaml(directory, fname):
     """Splits subdir/fname into a tuple of YAML and raw content"""
-    with open(subdir + os.sep + fname, "r", "utf-8") as fin:
+    with open(directory + os.sep + fname, "r", "utf-8") as fin:
         yaml_and_raw = fin.read().split('\n---\n')
         if len(yaml_and_raw) == 1:
             return {}, yaml_and_raw[0]
@@ -114,8 +114,8 @@ def parse_cmdline_args(args):
                         help='path to root project folder containing templates, styles, lambdas, and config.yml')
     parser.add_argument("contents", type=str,
                         help='path to contents folder containing markdown, plaintext')
-    parser.add_argument('-d', '--deploy', type=str, nargs='?', default='s3',
-                        help='s3 or dropbox')
+    parser.add_argument('-m', '--minify', action="store_const", default=False, const=True, help='minify')
+    parser.add_argument('-d', '--deploy', type=str, nargs='?', help='s3')
     return parser.parse_args(args[1:])
 
 

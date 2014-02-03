@@ -21,28 +21,22 @@
 import json
 import jsmin
 import cssmin
-import contents
-import templates
-import lambdas
-from utils import *
+import frozenpie.contents
+import frozenpie.templates
+import frozenpie.lambdas
+from frozenpie.utils import *
 
 
 def prepare(args):
     """Preparing config"""
+    print args
     config = load_config(args.root, args.contents)
-
-    if "deploy" in args.deploy:
-        to_deploy = True
-    else:
-        to_deploy = False
-
-    bake(config, deploy=to_deploy)
-
-    if to_deploy:
+    bake(config, args.minify)
+    if args.deploy:
         serve(config, args.deploy)
 
 
-def mix(config, contents_data, templates_data):
+def mix(config):
     """Create a tuple of dicts of compiled styles, scripts, and lambdas, along with their dictionary data"""
     raw_styles = [read(os.path.basename(fn), config["styles_path"])
                   for fn in glob(config["styles_path"] + os.sep + "*.css") if not fn.endswith("master.css")]
@@ -60,32 +54,32 @@ def mix(config, contents_data, templates_data):
     if config.get('routes'):
         scripts.append('/* User-defined scripts*/\n')
         scripts = [read(route, config['root_path']) for route in config["routes"]]
-    lambdas_data = lambdas.load(config, contents_data, templates_data)
+    final_script = "".join(scripts)
 
-    return final_style, scripts, lambdas_data
+    return final_style, final_script
 
 
-def bake(config, deploy=False):
+def bake(config, minify):
     """Bakes contents, templates, scripts, and styles together"""
     params = {"title": config['title']}
     logger.info('Baking...')
     contents_data = contents.load(config)
-    templates_data = templates.load(config)
+    dynamic_templates = templates.load(config)
+    lambdas_data = lambdas.load(config, contents_data, dynamic_templates)
 
-    style, scripts, lambdas_data = mix(config, contents_data, templates_data)
+    style, script = mix(config)
 
     logger.info('Baking contents and templates')
     contents.bake(config, contents_data, lambdas_data)
-    templates.bake(config, templates_data, lambdas_data)
+    templates.bake(config, dynamic_templates, lambdas_data)
 
-    params.update({"json_data": json.dumps(contents_data + templates_data)})
+    params.update({"json_data": json.dumps(contents_data + dynamic_templates)})
 
     logger.info('Baking styles and scripts')
-    final_script = "".join(scripts)
-    if deploy:
-        params.update({"style_sheet": cssmin.cssmin(style), "script": jsmin.jsmin(final_script)})
+    if minify:
+        params.update({"style_sheet": cssmin.cssmin(style), "script": jsmin.jsmin(script)})
     else:
-        params.update({"style_sheet": style, "script": final_script})
+        params.update({"style_sheet": style, "script": script})
 
     logger.info('Baking lambdas')
     params.update(lambdas_data)
@@ -98,11 +92,11 @@ def bake(config, deploy=False):
     return pie
 
 
-def serve(config, version=None):
+def serve(config, deploy):
     """Serves to S3 or Dropbox"""
-    logger.info("Serving ... currently supports only S3")
-    directory_path = os.path.dirname(os.path.realpath(config.root))
-    serve_s3(config, directory_path)
+    logger.info("Serving to S3")
+    serve_s3(config)
+    # TODO Dropbox
 
 
 if __name__ == '__main__':

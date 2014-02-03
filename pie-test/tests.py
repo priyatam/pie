@@ -1,41 +1,38 @@
 #!/usr/bin/env python
 """
 Can only be run from the parent directory as,
-> py.test test/tests.py
+> py.test pie-test/tests.py
 """
-import sys
-sys.path.append(".")
+
 import os
+import sys
+owd = os.getcwd()
+root_path = owd + "/demos/site-with-blog"
+sys.path.append(owd)
+os.chdir("pie-test")
 
 import pytest
 import types
-import bake
-import pieutils
-from pieutils import *
+import pie.pie as pie
+import pie.contents as contents
+import pie.templates as templates
+import pie.lambdas as lambdas
+from pie.utils import *
 
-pieutils.logger = get_logger()
-
+pie.logger =  get_logger()
 
 class TestPieUtils:
 
     def setup(self):
-        self.config_path = "config.test.yml"
+        self.content_path = "content"
 
     def test_load_config(self):
-        config = load_config(self.config_path)
+        config = load_config(root_path, self.content_path)
         assert types.DictType == type(config)
-        assert "https://github.com/Facjure/frozen-literatte" == config['github_repo']
-        with pytest.raises(SystemExit):
-            load_config("./config.test.bad.yml")
-
-    def test_format_date(self):
-        dt = format_date('tests.py')
-        assert dt != None
-        assert "13" in dt
 
     def test_read(self):
         fin = read('tests.py', '.')
-        assert 'import unittest' in fin
+        assert 'import pytest' in fin
 
     def test_read_yaml(self, tmpdir):
         tmp_file = tmpdir.join("test.yml")
@@ -52,8 +49,8 @@ foo: bar
 class TestBake:
 
     def setup(self):
-        self.config_path = "config.test.yml"
-        self.config = load_config(self.config_path)
+        self.content_path = "content"
+        self.config = load_config(root_path, self.content_path)
 
     def test_read_posts(self):
         yaml, post = read_yaml('content', 'abstract.md')
@@ -61,59 +58,49 @@ class TestBake:
         assert post != None
 
     def test_load_contents(self):
-        posts = bake.load_contents(self.config)
+        posts = contents.load(self.config)
         for post in posts:
             assert types.DictType == type(post)
-        assert 2 == len(posts)
+        assert 1 == len(posts)
         assert posts[0]['body'] != None
 
 
     def test_load_dynamic_templates(self):
-        templates = bake.load_dynamic_templates(self.config)
-        for template in templates:
+        dynamic_templates = templates.load(self.config)
+        for template in dynamic_templates:
             assert types.DictType == type(template)
-        assert 1 == len(templates)
-        assert templates[0]['body'] != None
-        assert u"{{#posts}}" in templates[0]['body']
+        assert 1 == len(dynamic_templates)
+        assert dynamic_templates[0]['name'] == "blog"
 
     def test_load_lambdas(self):
-        contents = bake.load_contents(self.config)
-        dynamic_templates = bake.load_dynamic_templates(self.config)
-        lambdas = bake.load_lambdas(self.config, contents, dynamic_templates)
-        for k,v in lambdas.items():
+        contents_data = contents.load(self.config)
+        dynamic_templates = templates.load(self.config)
+        lambdas_data = lambdas.load(self.config, contents_data, dynamic_templates)
+        for k,v in lambdas_data.items():
             assert types.FunctionType == type(v)
-        assert len(lambdas) == 2
+        assert len(lambdas_data) == 2
 
-    def test_load_recipes(self):
-        contents = bake.load_contents(self.config)
-        dynamic_templates = bake.load_dynamic_templates(self.config)
-        style, script, lambdas = bake.load_recipes(self.config, contents, dynamic_templates)
+    def test_mix(self):
+        style, script = pie.mix(self.config)
         assert types.UnicodeType == type(style)
         assert types.UnicodeType == type(script)
-        assert types.DictType == type(lambdas)
         assert style != None
         assert script != None
         assert "width" in style
         assert "sammy" in script
-        for k,v in lambdas.items():
-            assert types.FunctionType == type(v)
-        assert len(lambdas) == 2
 
 
-    def test_bake_contents(self):
-        contents = bake.load_contents(self.config)
-        dynamic_templates = bake.load_dynamic_templates(self.config)
-        lambdas = bake.load_lambdas(self.config, contents, dynamic_templates)
-        bake.bake_contents(self.config, contents, lambdas)
-        for content in contents:
+    def test_all_bakes(self):
+        contents_data = contents.load(self.config)
+        dynamic_templates = templates.load(self.config)
+        lambdas_data = lambdas.load(self.config, contents_data, dynamic_templates)
+        contents.bake(self.config, contents_data, lambdas_data)
+        templates.bake(self.config, dynamic_templates, lambdas_data)
+
+        for content in contents_data:
             assert "html" in content
             assert content["html"] != None
 
-    def test_bake_dynamic_templates(self):
-        contents = bake.load_contents(self.config)
-        dynamic_templates = bake.load_dynamic_templates(self.config)
-        lambdas = bake.load_lambdas(self.config, contents, dynamic_templates)
-        bake.bake_dynamic_templates(self.config, dynamic_templates, lambdas)
         for template in dynamic_templates:
             assert "html" in template
             assert template["html"] != None
@@ -126,18 +113,18 @@ class TestBake:
                 }
 
         template_name = "post.mustache"
-        stache = bake._markstache(self.config, post, template_name)
+        stache = templates.to_markstache(self.config, post, template_name)
         assert stache != None
         assert "<h1>What's the point of another static generator ?" in stache
 
     def test_htmlstache(self):
-        meta, template = read_yaml(self.config["templates_path"], "blog.mustache")
-        contents = bake.load_contents(self.config)
-        dynamic_templates = bake.load_dynamic_templates(self.config)
-        lambdas = bake.load_lambdas(self.config, contents, dynamic_templates)
-        stache = bake._htmlstache(self.config, template, lambdas=lambdas)
+        contents_data = contents.load(self.config)
+        dynamic_templates = templates.load(self.config)
+        lambdas_data = lambdas.load(self.config, contents_data, dynamic_templates)
+        template = read_yaml(self.config["templates_path"], "blog.mustache")[1]
+        stache = templates.to_htmlstache(self.config, template, lambdas=lambdas_data)
         assert stache != None
-        assert "plain_text" in stache
+        assert "Test" in stache
 
     def test_textstache(self):
         post = {'body': """#What's the point of another static generator ?
@@ -146,22 +133,16 @@ class TestBake:
                         """
                 }
 
-        template_name = "post_plain.mustache"
-        stache = bake._textstache(self.config, post, template_name)
+        template_name = "post.mustache"
+        stache = templates.to_textstache(self.config, post, template_name)
         assert stache != None
         assert "#What's the point of another static generator ?" in stache
 
-    def test_get_lambda_module_namess(self):
-        modules = bake._get_lambda_module_names(self.config)
-        assert len(modules) == 1
-        assert modules[0] == 'default'
-
-    def test_cook(self):
-        pie = bake.cook(self.config)
-        assert pie != None
-        assert "<style" in pie
-        assert "<script>" in pie
-        assert "<nav" in pie
-        assert self.config["title"] in pie
-        assert self.config["github_repo"] in pie
+    def test_bake(self):
+        res = pie.bake(self.config, False)
+        assert res != None
+        assert "<style" in res
+        assert "<script>" in res
+        assert "<nav" in res
+        assert self.config["title"] in res
 
