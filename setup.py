@@ -12,9 +12,13 @@ setup(
     package_data={ "frozenpie": ["logging.yml"]},
     url='https://github.com/priyatam/frozen-pie',
     download_url='https://github.com/priyatam/frozen-pie/archive/0.5.tar.gz',
-    scripts=["scripts/pie"],
     keywords=["jekyll","static site"],
     license='Apache 2.0 License',
+    entry_points={
+            'console_scripts': [
+                'pie = frozenpie.pie:main',
+            ]
+    },
     author='Priyatam Mudivarti',
     author_email='priyatam@gmail.com',
     description='Frozen Pie: a Python single-page static site generator',
