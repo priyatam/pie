@@ -7,16 +7,16 @@ with open('requirements.txt') as f:
 setup(
     name='frozen-pie',
     version='0.4',
-    packages=['frozenpie'],
-    package_dir={"frozenpie": "frozenpie"},
-    package_data={ "frozenpie": ["logging.yml"]},
+    packages=['pie'],
+    package_dir={"pie": "pie"},
+    package_data={ "pie": ["logging.yml", "controller.js"]},
     url='https://github.com/priyatam/frozen-pie',
     download_url='https://github.com/priyatam/frozen-pie/archive/0.5.tar.gz',
     keywords=["jekyll","static site"],
     license='Apache 2.0 License',
     entry_points={
             'console_scripts': [
-                'pie = frozenpie.pie:main',
+                'pie = pie.pie:main',
             ]
     },
     author='Priyatam Mudivarti',

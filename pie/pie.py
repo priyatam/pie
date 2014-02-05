@@ -20,10 +20,10 @@
 import json
 import jsmin
 import cssmin
-import frozenpie.contents
-import frozenpie.templates
-import frozenpie.lambdas
-from frozenpie.utils import *
+import contents
+import templates
+import lambdas
+from utils import *
 
 
 def prepare(args):
