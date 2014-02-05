@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """
     DSL for making a static site with dynamic powers.
 
@@ -99,7 +98,7 @@ def serve(config, deploy):
     # TODO Dropbox
 
 
-if __name__ == '__main__':
+def main():
     logger = get_logger()
     args = parse_cmdline_args(sys.argv)
     logger.info('Starting ...')
