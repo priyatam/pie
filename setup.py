@@ -9,7 +9,7 @@ setup(
     version='0.4',
     packages=['pie'],
     package_dir={"pie": "pie"},
-    package_data={ "pie": ["logging.yml"]},
+    package_data={ "pie": ["logging.yml", "controller.js"]},
     url='https://github.com/priyatam/frozen-pie',
     download_url='https://github.com/priyatam/frozen-pie/archive/0.5.tar.gz',
     keywords=["jekyll","static site"],
