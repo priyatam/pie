@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
     DSL for making a static site with dynamic powers.
 
