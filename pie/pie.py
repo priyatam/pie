@@ -98,8 +98,7 @@ def serve(config, deploy):
     serve_s3(config)
     # TODO Dropbox
 
-
-def main():
+if __name__ == '__main__':
     logger = get_logger()
     args = parse_cmdline_args(sys.argv)
     logger.info('Starting ...')

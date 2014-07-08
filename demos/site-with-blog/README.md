@@ -14,5 +14,5 @@ Though _contents, design, and logic_ are distributed across the filesystem, froz
 
 ## Usage
 
-    pie.py /path-to-frozen-pie/demos/site-with-blog /path-to-frozen-pie/docs
-    open -a "/Applications/Google Chrome.app" .build/index.html
+    pie.py /path-to-pie/demos/site-with-blog /path-to-pie/docs
+    open -a "/Applications/Google Chrome.app" /path-to-pie/demos/site/index.html

@@ -1,4 +1,4 @@
-# Frozen Pie
+# Pie
 
 A minimalist static site generator and router, optimized for Python and SammyJs.
 
@@ -12,16 +12,17 @@ For more info, see [sample site](http://priyatam.github.io/frozen-pie/) (generat
 
 ## Setup
 
-    $ git clone https://github.com/priyatam/frozen-pie.git
-    $ cd frozen-pie
+    $ git clone https://github.com/facjure/pie.git
+    $ cd pie
     $ virtualenv pie
-    $ python setup.py install
+    $ cd pie
+    $ chmod 755 pie.py
 
 ## Run
 
-    $ pie --help
+    $ pie.py --help
 
-    usage: pie [-h] [-m] [-d [DEPLOY]] root contents
+    usage: pie.py [-h] [-m] [-d [DEPLOY]] root contents
 
     Frozen Pie: A minimalist static site generator and router.
 
@@ -43,7 +44,7 @@ For more info, see [sample site](http://priyatam.github.io/frozen-pie/) (generat
 
 Alpha, v0.5.
 
-Currently, frozen-pie supports [Poetroid prototype](https://github.com/poetroid/prototype) and a few personal websites.
+Currently, pie supports [Poetroid prototype](https://github.com/poetroid/prototype) and a few personal websites.
 
 ## Copyright & License
 
