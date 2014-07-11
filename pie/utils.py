@@ -35,6 +35,15 @@ def get_logger():
 
 logger = get_logger()
 
+
+def newdict(*dicts):
+    """Creates a new dictionary out of several dictionaries"""
+    _dict = {}
+    for d in dicts:
+        _dict.update(d)
+    return _dict
+
+
 def analyze(func):
     """A debugger that dumps a docstring along with func args passed in"""
     argnames = func.func_code.co_varnames[:func.func_code.co_argcount]
@@ -68,8 +77,8 @@ def load_config(root_path, contents_path):
     config["templates_path"] = root_path + os.sep + "templates"
     config["lambdas_path"] = root_path + os.sep + "lambdas"
     config["styles_path"] = root_path + os.sep + "styles"
-    config["master_css_fname"] = config["styles_path"] + os.sep + "master.css"
-    config["scss_fname"] = config["styles_path"] + os.sep + "child.scss"
+    config["master_css"] = config["styles_path"] + os.sep + "master.css"
+    config["child_css"] = config["styles_path"] + os.sep + "child.css"
     config["index_html"] = config["root_path"] + os.sep + ".build" + os.sep + "index.html"
 
     sys.path.append(config['lambdas_path'])
@@ -150,11 +159,3 @@ def serve_s3(config):
         filename = "js/" + os.path.basename(jsfile)
         k.key = filename
         k.set_contents_from_filename(jsfile)
-
-
-def newdict(*dicts):
-    """Creates a new dictionary out of several dictionaries"""
-    _dict = {}
-    for d in dicts:
-        _dict.update(d)
-    return _dict

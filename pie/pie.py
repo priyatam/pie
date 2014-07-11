@@ -41,11 +41,11 @@ def mix(config):
     raw_styles = [read(os.path.basename(fn), config["styles_path"])
                   for fn in glob(config["styles_path"] + os.sep + "*.css") if not fn.endswith("master.css")]
 
-    if os.path.isfile(config['scss_fname']):
-        style = read("child.css", styles_path)
+    if os.path.isfile(config['child_css']):
+        style = read(config['child_css'], styles_path)
         raw_styles.append(style)
-    if os.path.isfile(config['master_css_fname']):
-        style = read(config['master_css_fname'])
+    if os.path.isfile(config['master_css']):
+        style = read(config['master_css'])
         raw_styles.insert(0, style)
     final_style = "".join(raw_styles)
 
